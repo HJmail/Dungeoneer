@@ -8,15 +8,17 @@ public abstract class DungeonCharacter {
     protected double myChanceToHit;
     protected int myMinDamage;
     protected int myMaxDamage;
+    protected int myGold;
 
     public DungeonCharacter(String theName, int theHitPoints, int theAttackSpeed,
-                            double theChanceToHit, int theMinDamage, int theMaxDamage) {
+                            double theChanceToHit, int theMinDamage, int theMaxDamage, int theGold) {
         myName = theName;
         myHitPoints = theHitPoints;
         myAttackSpeed = theAttackSpeed;
         myChanceToHit = theChanceToHit;
         myMinDamage = theMinDamage;
         myMaxDamage = theMaxDamage;
+        myGold = theGold;
     }
 
     public boolean isAlive() {
@@ -32,4 +34,12 @@ public abstract class DungeonCharacter {
             System.out.println(myName + " missed!");
         }
     }
+    /**
+     * Returns the character's name.
+     * @return the character name
+     */
+    public String getName() {
+        return myName;
+    }
+
 }
