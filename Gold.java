@@ -1,15 +1,20 @@
 
 public class Gold implements Item {
 	
-	private int myAmount; 
+  private int myAmount; 
 	
-	public Gold() {
+  public Gold(int theAmount) {
+    myAmount = theAmount;
 		
-	}
+  }
 	
-	public int getAmount() {
-	  return myAmount;
+  public int getAmount() {
+    return myAmount;
 		
-	}
+  }
+  
+  public void addGold(int moreGold) {
+    myAmount += moreGold;
+  }
 
 }

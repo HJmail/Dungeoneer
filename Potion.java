@@ -13,8 +13,7 @@ public abstract class Potion implements Item {
 		
   }
   
-  public void consume() {
+  public abstract void consume();
 	  
-  }
-	
 }
+	
