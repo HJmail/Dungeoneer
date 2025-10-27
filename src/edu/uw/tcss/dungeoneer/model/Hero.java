@@ -14,4 +14,12 @@ public abstract class Hero extends DungeonCharacter {
     public boolean defend() {
         return Math.random() <= myChanceToBlock;
     }
+    
+    public double getChanceToBlock() {
+        return myChanceToBlock;
+    }
+    
+    public void setChanceToBlock(final double theChanceToBlock) {
+        myChanceToBlock = theChanceToBlock;
+    }
 }

@@ -21,4 +21,28 @@ public abstract class Monster extends DungeonCharacter {
             System.out.println(getName() + " heals for " + healPoints + " points!");
         }
     }
+    
+    public double getChanceToHeal() {
+        return myChanceToHeal;
+    }
+
+    public void setChanceToHeal(final double theChanceToHeal) {
+        myChanceToHeal = theChanceToHeal;
+    }
+
+    public int getMinHeal() {
+        return myMinHeal;
+    }
+
+    public void setMinHeal(final int theMinHeal) {
+        myMinHeal = theMinHeal;
+    }
+
+    public int getMaxHeal() {
+        return myMaxHeal;
+    }
+    
+    public void setMaxHeal(final int theMaxHeal) {
+        myMaxHeal = theMaxHeal;
+    }
 }

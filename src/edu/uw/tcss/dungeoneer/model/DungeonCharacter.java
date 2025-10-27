@@ -34,12 +34,48 @@ public abstract class DungeonCharacter {
             System.out.println(myName + " missed!");
         }
     }
-    /**
-     * Returns the character's name.
-     * @return the character name
-     */
+
     public String getName() {
         return myName;
     }
+
+    public int getHitPoints() {
+        return myHitPoints;
+    }
+
+    public void setHitPoints(final int theHitPoints) {
+        myHitPoints = theHitPoints;
+    }
+
+    public int getGold() {
+        return myGold;
+    }
+
+    public void setGold(final int theGold) {
+        myGold = theGold;
+    }
+
+    public int getAttackSpeed() {
+        return myAttackSpeed;
+    }
+
+    public double getChanceToHit() {
+        return myChanceToHit;
+    }
+
+    public int getMinDamage() {
+        return myMinDamage;
+    }
+
+    public int getMaxDamage() {
+        return myMaxDamage;
+    }
+    
+    @Override
+    public String toString() {
+        return myName + " [HP: " + myHitPoints + ", Gold: " + myGold + "]";
+    }
+
+
 
 }
