@@ -1,63 +1,34 @@
 package Model;
 
+import java.util.EnumSet;
 import java.util.List;
+
 
 /**
  * This class represents one room within the dungeon.
  */
 public class Room 
 {	
-	/**
-	 *  boolean representing if this room is a pit.
-	 */
-	boolean myHasPit = false;
-	
-	/** 
-	 * boolean representing if this room is a entrance.
-	 */
-	boolean myHasEntrance = false;
 	
 	/**
-	 *  Boolean representing if this room is a exit.
+	 * This EnumSet represents the directions that exist
 	 */
-	boolean myHasExit = false;
-	
-	// Might remove if we make shop keeper
-	/**
-	 * boolean representing if there is a healing potion 
-	 */
-	boolean myHealingPotion = false;
-	
-	// Might remove if we make shop keeper
-	/**
-	 * boolean representing if there is a vision potion 
-	 */
-	boolean myVisionPotion = false;
+	private EnumSet<Direction> myDirections;
 	
 	/**
-	 *  boolean representing if there is a north door.
+	 * This EnumSet represents the type of room it is
 	 */
-	boolean myNorthDoor = false;
+	private EnumSet<Feature> myFeatures;
 	
 	/**
-	 *  boolean representing if there is a east Door.
+	 * This EnumSet represents the items that are lootable from the room.
 	 */
-	boolean myEastDoor = false;
+	private EnumSet<Item> myItems;
 	
 	/**
-	 *  boolean representing if there is a south door.
+	 * This character field represents what is shown on the map.
 	 */
-	boolean mySouthDoor = false;
-	
-	/**
-	 *  boolean representing if there is a west door.
-	 */
-	boolean myWestDoor = false;
-	
-	/**
-	 * This is the pillar for the room if one.
-	 */
-	Pillar myPillar;
+	private char myCharRepresentation;
 	
 	/**
 	 * This List holds all DungeonCharacters within the room. 
@@ -69,17 +40,69 @@ public class Room
 		
 	}
 	
-	public Room(final boolean thePit,
-				final boolean theEnterance,
-				final boolean theExit,
-				final boolean theHealingPotion,
-				final boolean theVisionPotion,
-				final boolean thePillar,
-				final boolean theNorth,
-				final boolean theEast,
-				final boolean theSouth,
-				final boolean theWest)
+	/**
+	 * This is the Room constructor when we have all the data already.
+	 * @param theDirections This is a EnumSet that represents existing doors relative to this room.
+	 * @param theFeatures This is a EnumSet that represents the existing Features within this room.
+	 * @param theItems This is the EnumSet that represents the existing Items within this room that is lootable.
+	 * @param theCharRepresentation This is a char that represents the room on the map.
+	 */
+	public Room(final EnumSet<Direction> theDirections,
+				final EnumSet<Feature> theFeatures,
+				final EnumSet<Item> theItems,
+				final char theCharRepresentation)
 	{
-		
+		myDirections = EnumSet.copyOf(theDirections);
+		myFeatures = EnumSet.copyOf(theFeatures);
+		myItems = EnumSet.copyOf(theItems);
+		myCharRepresentation = theCharRepresentation;
+	}
+	
+	/**
+	 * This enters the Hero into the room.
+	 * @param theHero The Hero that entered the room. 
+	 */
+	public void enter(final Hero theHero)
+	{
+		myCharactersInRoom.add(theHero);
+		activateRoom();
+	}
+	
+	/**
+	 * This gets the room's char that is used on the map.
+	 * @return This is the char that is used on the map.
+	 */
+	public char getRoomChar()
+	{
+		return myCharRepresentation;
+	}
+	
+	/**
+	 * This starts the Room logic starting 
+	 */
+	private void activateRoom()
+	{
+		System.out.println(myDirections);
+	}
+	
+	
+	
+	
+
+	
+	/**
+	 *  This enum represents the Events or Features present within the room.
+	 */
+	enum Feature
+	{
+		ENTERANCE, EXIT, PIT, PILLAR, SHOP, ENCOUNTER
+	}
+	
+	/**
+	 * This enum represents what items are in the room.
+	 */
+	enum Item
+	{
+		HEALING_POTION, VISION_POTION
 	}
 }

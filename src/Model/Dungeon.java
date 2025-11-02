@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * This class represents the dungeon the player must traverse.
@@ -13,41 +14,35 @@ public class Dungeon
 	Room[][] myMaze; 
 	
 	/**
-	 * This field is the entrance to the dungeon
+	 * This is the hero that gets passed through.
 	 */
-	Room myEntrance;
+	Hero myHero;
 	
 	/**
-	 * This field is the exit to the dungeon
+	 * This field is the number of rows.
 	 */
-	Room myExit;
+	int myRows;
 	
 	/**
-	 * This field is a list of my pillars
+	 * This field is the number of cols.
 	 */
-	List<Pillar> myPillars;
+	int myCols;
 	
 	/**
-	 * This field is a list of monsters
+	 * This is the given seed randomly generated for used for creating the map.
 	 */
-	List<Monster> myMonsters;
+	int mySeed;
 	
 	/**
-	 * This field is the number of rows
+	 *  This is the basic class constructor.
 	 */
-	int myNumRows;
-	
-	/**
-	 * This field is the number of cols
-	 */
-	int myNumCols;
-	
-	/**
-	 *  This is the basic class constructor
-	 */
-	public Dungeon(final Hero theHero)
+	public Dungeon(final Hero theHero, final int theRows, final int theCols)
 	{
+		myHero = theHero;
+		myRows = theRows;
+		myCols = theCols;
 		
+		generateDungeon();
 	}
 	
 	/**
@@ -63,7 +58,14 @@ public class Dungeon
 	 */
 	private void generateDungeon()
 	{
-		
+		for(int i = 0; i < myRows; i++) // outer is row
+		{
+			for(int j = 0; j < myCols; j++) // inner is col
+			{
+				Room newRoom = new Room();
+						
+			}
+		}
 	}
 	
 	/**

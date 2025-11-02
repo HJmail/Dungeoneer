@@ -2,6 +2,9 @@ package Contoller;
 
 import java.util.Scanner;
 
+import Model.Dungeon;
+import Model.Hero;
+
 /**
  *  This class is the main logic holding class for the Dungeoneer Game
  *  @author Skyler Z Broussard
@@ -27,7 +30,7 @@ public class DungeonAdventure
 	/**
 	 * This field is the dungeon of the current game.
 	 */
-	// static Dungeon myDungeon;
+	static Dungeon myDungeon;
 	
 	
 	/**
@@ -48,8 +51,8 @@ public class DungeonAdventure
 	private static void startGame() 
 	{
 		myUserInput = new Scanner(System.in);
-		//myDungeon  = new Dungeon();
-		//myHero = new Hero();
+		myHero = new Hero();
+		myDungeon  = new Dungeon(myHero);
 		myGameStatus = false;
 	}
 	

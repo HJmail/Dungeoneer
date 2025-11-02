@@ -1,2 +1,3 @@
-2025/10/20-13:01:12.988 25b0 Creating DB C:\Users\skyze\OneDrive\Desktop\DEV\Dungeoneer\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb since it was missing.
-2025/10/20-13:01:13.018 25b0 Reusing MANIFEST C:\Users\skyze\OneDrive\Desktop\DEV\Dungeoneer\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb/MANIFEST-000001
+2025/11/01-12:36:37.358 c9c Reusing MANIFEST C:\Users\skyze\Desktop\College\TCSS_360\Dungeoneer\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb/MANIFEST-000001
+2025/11/01-12:36:37.363 c9c Recovering log #3
+2025/11/01-12:36:37.365 c9c Reusing old log C:\Users\skyze\Desktop\College\TCSS_360\Dungeoneer\.metadata\.plugins\org.eclipse.swt\EBWebView\Default\Local Storage\leveldb/000003.log 

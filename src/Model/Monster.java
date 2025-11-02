@@ -1,4 +1,4 @@
-package edu.uw.tcss.dungeoneer.model;
+package Model;
 
 public abstract class Monster extends DungeonCharacter {
 
