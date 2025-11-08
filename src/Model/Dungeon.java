@@ -67,15 +67,16 @@ public class Dungeon
 			}
 		}
 	}
-	
+
 	/**
 	 * Checks if a given path is able to go into.
 	 */
+/**
 	private boolean isTraversable()
 	{
 		
 	}
-	
+*/
 	/**
 	 * This places the entrance and exit rooms
 	 */
@@ -112,9 +113,11 @@ public class Dungeon
 	/**
 	 * This prints the dungeon to the console.
 	 */
+/**
 	public String toString()
 	{
 		
 	}
+	*/
 	
 }
