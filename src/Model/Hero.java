@@ -19,6 +19,14 @@ public abstract class Hero extends DungeonCharacter {
         return myChanceToBlock;
     }
     
+    public String defendAction() {
+        if (defend()) {
+            return myName + " blocks the attack!";
+        }
+        return myName + " fails to block!";
+    }
+
+    
     public void setChanceToBlock(final double theChanceToBlock) {
         myChanceToBlock = theChanceToBlock;
     }

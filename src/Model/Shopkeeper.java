@@ -1,51 +1,37 @@
-package edu.uw.tcss.dungeoneer.model;
+package Model;
 	/**
 	 * Represents a shopkeeper that sells items to the hero.
 	 * @author Hiba Jmaileh
 	 */
 	public class Shopkeeper {
 
-	    /**
-	     * Displays the items the shopkeeper has for sale.
-	     */
-	    public void displayItems() {
-	        System.out.println("Welcome to my shop!");
-	        System.out.println("1. Healing Potion - 25 gold");
-	        System.out.println("2. Vision Potion - 40 gold");
-	        System.out.println("3. Weapon Upgrade - 100 gold");
-	    }
+		public String displayItems() {
+		    return "Welcome to my shop!\n" +
+		           "1. Healing Potion - 25 gold\n" +
+		           "2. Vision Potion - 40 gold\n" +
+		           "3. Weapon Upgrade - 100 gold\n";
+		}
 
-	    /**
-	     * Handles the hero's purchase based on input.
-	     * @param hero the hero buying the item.
-	     * @param choice the player's selection.
-	     */
-	    public void buyItem(Hero hero, int choice) {
-	        switch (choice) {
-	            case 1:
-	                purchase(hero, 25, "Healing Potion");
-	                break;
-	            case 2:
-	                purchase(hero, 40, "Vision Potion");
-	                break;
-	            case 3:
-	                purchase(hero, 100, "Weapon Upgrade");
-	                break;
-	            default:
-	                System.out.println("Invalid choice.");
-	        }
-	    }
+		public String buyItem(Hero hero, int choice) {
+		    switch (choice) {
+		        case 1:
+		            return purchase(hero, 25, "Healing Potion");
+		        case 2:
+		            return purchase(hero, 40, "Vision Potion");
+		        case 3:
+		            return purchase(hero, 100, "Weapon Upgrade");
+		        default:
+		            return "Invalid choice.";
+		    }
+		}
 
-	    /**
-	     * Helper method to handle gold deduction and confirmation.
-	     */
-	    private void purchase(Hero hero, int cost, String itemName) {
-	        if (hero.getGold() >= cost) {
-	            hero.setGold(hero.getGold() - cost);
-	            System.out.println("You purchased a " + itemName + "!");
-	            // In the future: hero.getInventory().add(new Potion());
-	        } else {
-	            System.out.println("Not enough gold!");
-	        }
-	    }
+		private String purchase(Hero hero, int cost, String itemName) {
+		    if (hero.getGold() >= cost) {
+		        hero.setGold(hero.getGold() - cost);
+		        return "You purchased a " + itemName + "!";
+		    } else {
+		        return "Not enough gold!";
+		    }
+		}
+
 }

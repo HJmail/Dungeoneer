@@ -15,12 +15,15 @@ public abstract class Monster extends DungeonCharacter {
         myMaxHeal = theMaxHeal;
     }
 
-    public void heal() {
+    public String heal() {
         if (Math.random() <= myChanceToHeal) {
             int healPoints = (int) (Math.random() * (myMaxHeal - myMinHeal + 1)) + myMinHeal;
-            System.out.println(getName() + " heals for " + healPoints + " points!");
+            myHitPoints += healPoints;
+            return getName() + " heals for " + healPoints + " points!";
         }
+        return getName() + " tried to heal but failed.";
     }
+
     
     public double getChanceToHeal() {
         return myChanceToHeal;
