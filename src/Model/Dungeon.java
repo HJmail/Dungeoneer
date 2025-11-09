@@ -1,5 +1,6 @@
 package Model;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
@@ -11,36 +12,43 @@ public class Dungeon
 	/**
 	 * This is a 2d array that holds a grid of rooms that represents a Maze
 	 */
-	Room[][] myMaze; 
+	private Room[][] myMaze; 
 	
 	/**
 	 * This is the hero that gets passed through.
 	 */
-	Hero myHero;
+	private Hero myHero;
 	
 	/**
 	 * This field is the number of rows.
 	 */
-	int myRows;
+	private int myRows;
 	
 	/**
 	 * This field is the number of cols.
 	 */
-	int myCols;
+	private int myCols;
 	
 	/**
 	 * This is the given seed randomly generated for used for creating the map.
 	 */
-	int mySeed;
+	private int mySeed;
+	
+	/**
+	 *  This array holds the Hero's location.
+	 */
+	private int[] myHeroLocation;
 	
 	/**
 	 *  This is the basic class constructor.
 	 */
-	public Dungeon(final Hero theHero, final int theRows, final int theCols)
+	public Dungeon(final Hero theHero, final int theDifficulty)
 	{
 		myHero = theHero;
-		myRows = theRows;
-		myCols = theCols;
+		myRows = theDifficulty + 4;
+		myCols = theDifficulty + 4;
+		myMaze = new Room [myRows][myCols];
+		myHeroLocation = new int[2];
 		
 		generateDungeon();
 	}
@@ -63,24 +71,40 @@ public class Dungeon
 			for(int j = 0; j < myCols; j++) // inner is col
 			{
 				Room newRoom = new Room();
-						
+				myMaze[i][j] = newRoom;
 			}
 		}
+		// All of the special room creations happen here
+		placeEntranceAndExit();
+		
 	}
 	
 	/**
 	 * Checks if a given path is able to go into.
 	 */
-	private boolean isTraversable()
+	public EnumSet<Direction> getTraversable()
 	{
-		
+		return myMaze[myHeroLocation[0]][myHeroLocation[1]].getDirections();
 	}
 	
 	/**
 	 * This places the entrance and exit rooms
 	 */
-	private void placeEnteraceAndExit()
+	private void placeEntranceAndExit()
 	{
+		// Need to make this dynamic and randomly generated.
+		
+		EnumSet<Direction> entryDirection = EnumSet.of(Direction.EAST, Direction.SOUTH) ;
+		EnumSet<Direction> exitDircretion = EnumSet.of(Direction.NORTH, Direction.WEST);
+		
+		//entry
+		myMaze[0][0].setDirections(entryDirection);
+		myMaze[0][0].setRoomChar('e');
+		setHeroLocation(0, 0);
+		
+		// exit
+		myMaze[myRows - 1][myCols - 1].setDirections(exitDircretion);
+		myMaze[myRows - 1][myCols - 1].setRoomChar('E');
 		
 	}
 	
@@ -109,12 +133,27 @@ public class Dungeon
 		
 	}
 	
+	private void setHeroLocation(final int theRows, final int theCols)
+	{
+		myHeroLocation[0] = theRows;
+		myHeroLocation[1] = theCols;
+	}
+	
 	/**
 	 * This prints the dungeon to the console.
 	 */
 	public String toString()
 	{
-		
+		String returnString = "";
+		for(int i = 0; i < myRows; i++)
+		{
+			for(int j = 0; j < myCols; j++)
+			{
+				returnString += myMaze[i][j].getRoomChar();
+			}
+			returnString += "\n";
+		}
+		return returnString;
 	}
 	
 }
