@@ -1,51 +1,45 @@
 /**
  * Represents a Vision Potion that reveals hidden parts of the dungeon
- * when consumed by the hero.
- * 
- * This class extends {@link Potion} and overrides the {@code consume()}
- * method to define the potion's effect.
+ * when consumed by the hero. Duration scales with rarity.
  * 
  * @author Cristian Acevedo-Villasana
  * @version 0.0.1
- * @date 11/1/25
+ * @date 10/26/25
  */
 public class VisionPotion extends Potion {
+	
+	private int myBaseDuration;
 
     /**
-     * Constructs a VisionPotion with a specified duration.
+     * Constructs a VisionPotion with a specified base duration and rarity.
      * 
-     * @param theDuration the duration (in arbitrary units) for which 
-     *                    the potion's vision effect lasts
+     * @param theDuration the base duration of the vision effect
+     * @param theRarity   the rarity of the potion
      */
-    public VisionPotion(int theDuration) {
-        super(theDuration);
+    public VisionPotion(int theDuration, Rarity theRarity) {
+        super(theRarity);
+        myBaseDuration = theDuration;
+    }
+    
+    public int getDuration() {
+        return myBaseDuration + getRarityBonus();
     }
 
     /**
-     * Consumes this Vision Potion and prints a message describing its effect.
+     * Consumes this Vision Potion and prints a message describing its effect and duration.
      */
     @Override
     public void consume() {
-        System.out.println("You used a Vision Potion. You can now see hidden parts of the "
-        		+ "dungeon!");
+        System.out.println("You used a Vision Potion. You can now see hidden parts of the dungeon for " + getDuration() + " turns!");
     }
 
     /**
      * Provides a short description of this Vision Potion item.
      * 
-     * @return a descriptive string showing the potion’s purpose
+     * @return a descriptive string showing the potion’s rarity and duration
      */
     @Override
     public String getDescription() {
-        return "Vision Potion (reveals hidden parts of the dungeon)";
-    }
-
-    /**
-     * Defines what happens when the potion is used.
-     * By default, this calls the {@code consume()} method to activate the effect.
-     */
-    @Override
-    public void use() {
-        consume();
+        return "Vision Potion (" + getRarity() + ", Duration: " + getDuration() + ")";
     }
 }

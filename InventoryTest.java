@@ -5,16 +5,9 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for the {@link Inventory} class in the Dungeon Adventure project.
  * 
- * <p>This test suite verifies that the inventory system correctly manages
- * item addition, removal, and pillar collection logic, ensuring that the
- * player can only exit the dungeon once all four pillars of OOP are obtained.</p>
- * 
- * <p>Each test method validates a specific feature of the {@code Inventory}
- * class using JUnit 5 assertions.</p>
- * 
  * @author Cristian Acevedo-Villasana
- * @version 0.0.1
- * @date 11/01/25
+ * @version 0.0.2
+ * @date 11/09/25
  */
 class InventoryTest {
 
@@ -23,21 +16,13 @@ class InventoryTest {
 
     /**
      * Sets up a new {@link Inventory} object before each test.
-     * 
-     * @throws Exception if an error occurs during setup (not expected)
      */
     @BeforeEach
     void setUp() throws Exception {
         inv = new Inventory();
     }
 
-    /**
-     * Tests adding an item to the inventory and verifying its presence using
-     * {@link Inventory#hasItem(Item)}.
-     * 
-     * <p>This ensures that the {@code addItem()} method correctly stores
-     * objects in the inventory list.</p>
-     */
+    /** Tests that adding an item makes it detectable via hasItem(). */
     @Test
     void testAddAndHasItem() {
         Pillar pillarA = new Pillar('A');
@@ -45,27 +30,16 @@ class InventoryTest {
         assertTrue(inv.hasItem(pillarA), "Inventory should contain the added pillar.");
     }
 
-    /**
-     * Tests removing an item from the inventory.
-     * 
-     * <p>This verifies that {@link Inventory#removeItem(Item)} successfully
-     * deletes an existing item from the list and that {@code hasItem()} reflects
-     * this removal correctly.</p>
-     */
+    /** Tests removing any item from inventory. */
     @Test
     void testRemoveItem() {
-        Weapon sword = new Weapon("Sword", 15);
+        Weapon sword = new Weapon("Sword", 15, Rarity.COMMON);
         inv.addItem(sword);
         inv.removeItem(sword);
         assertFalse(inv.hasItem(sword), "Inventory should not contain removed weapon.");
     }
 
-    /**
-     * Tests that the player cannot exit the dungeon if not all pillars have been collected.
-     * 
-     * <p>This ensures that {@link Inventory#canExit()} returns {@code false} when
-     * one or more pillars are missing.</p>
-     */
+    /** Player cannot exit if fewer than 4 pillars are collected. */
     @Test
     void testCanExitFalseWhenIncomplete() {
         inv.addItem(new Pillar('A'));
@@ -73,12 +47,7 @@ class InventoryTest {
         assertFalse(inv.canExit(), "Should not be able to exit with only 2 pillars collected.");
     }
 
-    /**
-     * Tests that the player can exit the dungeon once all four pillars are collected.
-     * 
-     * <p>This verifies that {@link Inventory#canExit()} correctly returns
-     * {@code true} when all pillars (A, E, I, P) are present.</p>
-     */
+    /** Player can exit when ALL pillars are collected. */
     @Test
     void testCanExitTrueWhenAllPillarsCollected() {
         inv.addItem(new Pillar('A'));
@@ -88,18 +57,13 @@ class InventoryTest {
         assertTrue(inv.canExit(), "Should be able to exit once all 4 pillars are collected.");
     }
 
-    /**
-     * Tests that the inventory can handle multiple different item types at once.
-     * 
-     * <p>This ensures that {@link Inventory#addItem(Item)} correctly adds various
-     * subclasses of {@link Item}, such as potions, gold, and weapons, without issue.</p>
-     */
+    /** Inventory must accept different Item subclasses. */
     @Test
     void testInventoryHandlesMultipleItemTypes() {
-        HealingPotion heal = new HealingPotion(5);
-        VisionPotion vision = new VisionPotion(3);
+        HealingPotion heal = new HealingPotion(5, Rarity.UNCOMMON);
+        VisionPotion vision = new VisionPotion(3, Rarity.RARE);
         Gold gold = new Gold(50);
-        Weapon sword = new Weapon("Sword", 20);
+        Weapon sword = new Weapon("Sword", 15, Rarity.EPIC);
 
         inv.addItem(heal);
         inv.addItem(vision);
@@ -107,9 +71,54 @@ class InventoryTest {
         inv.addItem(sword);
 
         assertTrue(inv.hasItem(heal), "Inventory should contain Healing Potion.");
+        assertTrue(inv.hasItem(vision), "Inventory should contain Vision Potion.");
         assertTrue(inv.hasItem(gold), "Inventory should contain Gold.");
         assertTrue(inv.hasItem(sword), "Inventory should contain Weapon.");
     }
+    
+    @Test
+    void testWeaponRarityDamageScaling() {
+        Weapon common = new Weapon("Sword", 15, Rarity.COMMON);
+        Weapon uncommon = new Weapon("Sword", 15, Rarity.UNCOMMON);
+        Weapon rare = new Weapon("Sword", 15, Rarity.RARE);
+        Weapon epic = new Weapon("Sword", 15, Rarity.EPIC);
+        Weapon legendary = new Weapon("Sword", 15, Rarity.LEGENDARY);
 
+        assertEquals(15, common.getDamage());
+        assertEquals(17, uncommon.getDamage());
+        assertEquals(19, rare.getDamage());
+        assertEquals(21, epic.getDamage());
+        assertEquals(23, legendary.getDamage());
+    }
+    
+    @Test
+    void testHealingPotionRarityScaling() {
+        HealingPotion common = new HealingPotion(5, Rarity.COMMON);
+        HealingPotion uncommon = new HealingPotion(5, Rarity.UNCOMMON);
+        HealingPotion rare = new HealingPotion(5, Rarity.RARE);
+        HealingPotion epic = new HealingPotion(5, Rarity.EPIC);
+        HealingPotion legendary = new HealingPotion(5, Rarity.LEGENDARY);
+
+        assertEquals(5, common.getHealAmount());
+        assertEquals(6, uncommon.getHealAmount());
+        assertEquals(7, rare.getHealAmount());
+        assertEquals(8, epic.getHealAmount());
+        assertEquals(9, legendary.getHealAmount());
+    }
+    
+    @Test
+    void testVisionPotionRarityScaling() {
+        VisionPotion common = new VisionPotion(3, Rarity.COMMON);
+        VisionPotion uncommon = new VisionPotion(3, Rarity.UNCOMMON);
+        VisionPotion rare = new VisionPotion(3, Rarity.RARE);
+        VisionPotion epic = new VisionPotion(3, Rarity.EPIC);
+        VisionPotion legendary = new VisionPotion(3, Rarity.LEGENDARY);
+
+        assertEquals(3, common.getDuration());
+        assertEquals(4, uncommon.getDuration());
+        assertEquals(5, rare.getDuration());
+        assertEquals(6, epic.getDuration());
+        assertEquals(7, legendary.getDuration());
+    }
 }
 

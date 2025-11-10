@@ -1,11 +1,6 @@
 /**
- * Represents a Healing Potion item that restores the hero's hit points when consumed.
- * 
- * This class extends the {@link Potion} superclass and overrides the 
- * {@code consume()} method to define the healing effect. The amount of health 
- * restored can vary depending on the implementation in the main game.
- * 
- * Part of the Dungeon Adventure project's Inventory system.
+ * Represents a Healing Potion that restores health points to the hero when consumed.
+ * The healing magnitude is represented here by a base heal value plus rarity bonus (optional).
  * 
  * @author Cristian Acevedo-Villasana
  * @version 0.0.1
@@ -13,44 +8,48 @@
  */
 public class HealingPotion extends Potion {
 
+    /** Base heal amount (HP) for this potion; you can tune as needed. */
+    private int myBaseHeal;
+
     /**
-     * Constructs a HealingPotion with a specified duration value.
+     * Constructs a HealingPotion with a specified base heal and rarity.
      * 
-     * @param theDuration the length of time (in arbitrary units) 
-     * for which the potion's effect lasts or is active
+     * @param theBaseHeal the base amount of HP the potion restores
+     * @param theDuration the base duration (unused for instant heal but kept for consistency)
+     * @param theRarity   the rarity of the potion
      */
-    public HealingPotion(int theDuration) {
-        super(theDuration);
+    public HealingPotion(int theBaseHeal, Rarity theRarity) {
+        super(theRarity);
+        myBaseHeal = theBaseHeal;
+    }
+
+    /**
+     * Returns the effective heal amount provided by this potion.
+     * For simple design we add the potion rarity bonus to the base heal.
+     * 
+     * @return the calculated heal amount
+     */
+    public int getHealAmount() {
+        return myBaseHeal + getRarityBonus();
     }
 
     /**
      * Consumes this Healing Potion.
-     * -Prints a message indicating that the player has used the potion and restored health.
-     * In a full implementation, this method could be expanded to actually increase
-     * the hero’s hit points.</p>
-     * 
-     * @override Indicates that this method overrides consume.
+     * Prints a message indicating healing and the amount healed.
      */
     @Override
     public void consume() {
-        System.out.println("You used a Healing Potion. Restored health!");
+        System.out.println("You used a Healing Potion. Restored " + getHealAmount() + " HP!");
     }
-    
 
     /**
      * Provides a short description of this Healing Potion item.
      * 
-     * @return a descriptive string showing the potion’s purpose
+     * @return a descriptive string showing the potion’s rarity and heal amount
      */
+    @Override
     public String getDescription() {
-        return "Healing Potion (restores health)";
-    }
-
-    /**
-     * Defines what happens when the potion is used.
-     * By default, this calls the {@code consume()} method to activate the effect.
-     */
-    public void use() {
-        consume();
+        return "Healing Potion (" + getRarity() + ", Heals: " + getHealAmount() + " HP)";
     }
 }
+
