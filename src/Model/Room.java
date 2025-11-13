@@ -67,9 +67,15 @@ public class Room
 	 * This enters the Hero into the room.
 	 * @param theHero The Hero that entered the room. 
 	 */
-	public void enter()
+	public void enter(final Hero theHero)
 	{
+		myHero = theHero;
+		myCharRepresentation = 'C';
 		activateRoom();
+	}
+	public void exit()
+	{
+		myHero = null;
 	}
 	
 	/**
@@ -130,6 +136,4 @@ public class Room
 	{
 		myCharRepresentation = theChar;
 	}
-	
-	
 }

@@ -58,7 +58,7 @@ public class DungeonAdventure
 	 */
 	private static void setupGame() 
 	{
-		myGameStatus = false; // change when wanting to run game.
+		myGameStatus = true; // change when wanting to run game.
 		myUserInput = new Scanner(System.in);
 		myDifficulty = promptDifficulty();
 		myHero = promptHero();
@@ -129,43 +129,23 @@ public class DungeonAdventure
 	
 	/**
 	 * This method has all of the logic for moving rooms.
-	 * @param theInput 
+	 * @param theInput This is the user input.
 	 */
 	private static boolean processMovement(final String theInput)
 	{
-		boolean wasSuccessful = true;
-		if(theInput == "N")
+		boolean wasSuccessful = false;
+		int move = myDungeon.checkMove(theInput.toUpperCase());
+		if(move == 0)
 		{
-			if(myDungeon.getTraversable().contains(Direction.NORTH))
-			{
-				
-			}
+			wasSuccessful = true;
 		}
-		else if(theInput == "E")
+		else if(move == 1)
 		{
-			if(myDungeon.getTraversable().contains(Direction.EAST))
-			{
-				
-			}
-		}
-		else if(theInput == "S")
-		{
-			if(myDungeon.getTraversable().contains(Direction.SOUTH))
-			{
-				
-			}
-		}
-		else if(theInput == "W")
-		{
-			if(myDungeon.getTraversable().contains(Direction.WEST))
-			{
-				
-			}
+			System.out.println("That direction does not work! Please select another.");		
 		}
 		else
 		{
 			System.out.println("That input was erroneous, please try again.");
-			wasSuccessful = false;
 		}
 		return wasSuccessful;
 	}

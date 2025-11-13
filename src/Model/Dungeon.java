@@ -1,4 +1,4 @@
-package Model;
+ package Model;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -82,7 +82,7 @@ public class Dungeon
 	/**
 	 * Checks if a given path is able to go into.
 	 */
-	public EnumSet<Direction> getTraversable()
+	private EnumSet<Direction> getTraversable()
 	{
 		return myMaze[myHeroLocation[0]][myHeroLocation[1]].getDirections();
 	}
@@ -125,18 +125,93 @@ public class Dungeon
 	}
 	
 	/**
-	 * This moves the hero and handles errors if needed.
-	 * @param theDirection This is the direction the player wants to go.
+	 * This method just changes the hero location.
+	 * @param theRows The new row the Hero will be.
+	 * @param theCols The new col the Hero will be.
 	 */
-	public void moveHero(final String theDirection)
-	{
-		
-	}
-	
 	private void setHeroLocation(final int theRows, final int theCols)
 	{
 		myHeroLocation[0] = theRows;
 		myHeroLocation[1] = theCols;
+	}
+	
+	public int checkMove(final String theInput)
+	{
+		int returnInt = 0; // 0 is success, 1 direction is bad, 2 is bad input
+		String[] goodInput = {"N", "E", "S", "W"};
+		
+		if(checkStringArray(theInput, goodInput))
+		{
+			if(move(theInput))
+			{
+				returnInt = 1;
+			}
+		}
+		else
+		{
+			returnInt = 2; // bad input
+		}
+		return returnInt;
+	}
+	
+	/**
+	 * This is a helper method that makes sure a given input string is within the array of string
+	 * @param theInput
+	 * @param theArray
+	 * @return
+	 */
+	private boolean checkStringArray(final String theInput, final String[] theArray)
+	{
+		boolean isThere = false;
+		for(String s: theArray)
+		{
+			if(s.equals(theInput))
+			{
+				isThere = true;
+				break;
+			}
+		}
+		return isThere;
+	}
+	
+	
+	private boolean move(final String theDirection)
+	{
+		boolean moved = true;
+		
+		
+		if(theDirection.equals("N") && getTraversable().contains(Direction.NORTH))
+		{
+			moveHero(myHeroLocation[0] - 1, myHeroLocation[1]);
+		}
+		else if(theDirection.equals("E") && getTraversable().contains(Direction.EAST))
+		{
+			moveHero(myHeroLocation[0], myHeroLocation[1] + 1);
+		}
+		else if(theDirection.equals("S") && getTraversable().contains(Direction.SOUTH))
+		{
+			moveHero(myHeroLocation[0] + 1, myHeroLocation[1]);
+		}
+		else if(getTraversable().contains(Direction.WEST))
+		{
+			moveHero(myHeroLocation[0] - 1, myHeroLocation[1]);
+		}
+		else
+		{
+			moved = false;
+		}
+		System.out.println(theDirection);
+		System.out.println(myHeroLocation[0] + " " +  myHeroLocation[1]);
+		return moved;
+	}
+	
+	private void moveHero(final int theRow, final int theCol)
+	{
+		myMaze[myHeroLocation[0]][ myHeroLocation[0]].exit();
+		setHeroLocation(theRow, theCol);
+		myMaze[theRow][theCol].enter(myHero);
+		System.out.println("Move Successful!");
+		System.out.println(toString());
 	}
 	
 	/**
