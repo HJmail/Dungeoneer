@@ -1,51 +1,49 @@
-package edu.uw.tcss.dungeoneer.model;
-	/**
-	 * Represents a shopkeeper that sells items to the hero.
-	 * @author Hiba Jmaileh
-	 */
-	public class Shopkeeper {
+package Model;
 
-	    /**
-	     * Displays the items the shopkeeper has for sale.
-	     */
-	    public void displayItems() {
-	        System.out.println("Welcome to my shop!");
-	        System.out.println("1. Healing Potion - 25 gold");
-	        System.out.println("2. Vision Potion - 40 gold");
-	        System.out.println("3. Weapon Upgrade - 100 gold");
-	    }
+public class Shopkeeper {
 
-	    /**
-	     * Handles the hero's purchase based on input.
-	     * @param hero the hero buying the item.
-	     * @param choice the player's selection.
-	     */
-	    public void buyItem(Hero hero, int choice) {
-	        switch (choice) {
-	            case 1:
-	                purchase(hero, 25, "Healing Potion");
-	                break;
-	            case 2:
-	                purchase(hero, 40, "Vision Potion");
-	                break;
-	            case 3:
-	                purchase(hero, 100, "Weapon Upgrade");
-	                break;
-	            default:
-	                System.out.println("Invalid choice.");
-	        }
-	    }
+    private static final int HEALING_POTION_COST = 25;
+    private static final int VISION_POTION_COST = 40;
+    private static final int WEAPON_UPGRADE_COST = 100;
 
-	    /**
-	     * Helper method to handle gold deduction and confirmation.
-	     */
-	    private void purchase(Hero hero, int cost, String itemName) {
-	        if (hero.getGold() >= cost) {
-	            hero.setGold(hero.getGold() - cost);
-	            System.out.println("You purchased a " + itemName + "!");
-	            // In the future: hero.getInventory().add(new Potion());
-	        } else {
-	            System.out.println("Not enough gold!");
-	        }
-	    }
+    public String displayItems() {
+        return "Welcome to my shop!\n" +
+               "1. Healing Potion - " + HEALING_POTION_COST + " gold\n" +
+               "2. Vision Potion - " + VISION_POTION_COST + " gold\n" +
+               "3. Weapon Upgrade - " + WEAPON_UPGRADE_COST + " gold\n";
+    }
+
+    public String buyItem(Hero theHero, int theChoice) {
+        switch (theChoice) {
+            case 1:
+                return purchase(theHero, HEALING_POTION_COST, "Healing Potion");
+            case 2:
+                return purchase(theHero, VISION_POTION_COST, "Vision Potion");
+            case 3:
+                return upgradeWeapon(theHero);
+            default:
+                return "Invalid choice.";
+        }
+    }
+
+    private String purchase(Hero theHero, int theCost, String theItemName) {
+        if (theHero.getGold() < theCost) {
+            return "Not enough gold!";
+        }
+
+        theHero.setGold(theHero.getGold() - theCost);
+        return "You purchased a " + theItemName + "! (Added to inventory soon)";
+    }
+
+    private String upgradeWeapon(Hero theHero) {
+        if (theHero.getGold() < WEAPON_UPGRADE_COST) {
+            return "Not enough gold!";
+        }
+
+        theHero.setGold(theHero.getGold() - WEAPON_UPGRADE_COST);
+        theHero.setMinDamage(theHero.getMinDamage() + 5);
+        theHero.setMaxDamage(theHero.getMaxDamage() + 10);
+
+        return "Your weapon has been upgraded!";
+    }
 }

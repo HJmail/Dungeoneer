@@ -1,15 +1,55 @@
-package Model;
+/**
+ * Represents a Healing Potion that restores health points to the hero when consumed.
+ * The healing magnitude is represented here by a base heal value plus rarity bonus (optional).
+ * 
+ * @author Cristian Acevedo-Villasana
+ * @version 0.0.1
+ * @date 10/31/25
+ */
+public class HealingPotion extends Potion {
 
-public class HealingPotion {
-	
-  private int DURATION;
-  
-  public HealingPotion(int theDuration) {
-	  super();
-  }
-  
-  public void consume() {
-	  
-  }
+    /** Base heal amount (HP) for this potion; you can tune as needed. */
+    private int myBaseHeal;
 
+    /**
+     * Constructs a HealingPotion with a specified base heal and rarity.
+     * 
+     * @param theBaseHeal the base amount of HP the potion restores
+     * @param theDuration the base duration (unused for instant heal but kept for consistency)
+     * @param theRarity   the rarity of the potion
+     */
+    public HealingPotion(int theBaseHeal, Rarity theRarity) {
+        super(theRarity);
+        myBaseHeal = theBaseHeal;
+    }
+
+    /**
+     * Returns the effective heal amount provided by this potion.
+     * For simple design we add the potion rarity bonus to the base heal.
+     * 
+     * @return the calculated heal amount
+     */
+    public int getHealAmount() {
+        return myBaseHeal + getRarityBonus();
+    }
+
+    /**
+     * Consumes this Healing Potion.
+     * Prints a message indicating healing and the amount healed.
+     */
+    @Override
+    public void consume() {
+        System.out.println("You used a Healing Potion. Restored " + getHealAmount() + " HP!");
+    }
+
+    /**
+     * Provides a short description of this Healing Potion item.
+     * 
+     * @return a descriptive string showing the potion’s rarity and heal amount
+     */
+    @Override
+    public String getDescription() {
+        return "Healing Potion (" + getRarity() + ", Heals: " + getHealAmount() + " HP)";
+    }
 }
+

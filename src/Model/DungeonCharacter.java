@@ -1,81 +1,124 @@
 package Model;
 
+/**
+ * Abstract base class representing all characters in the dungeon. Supports both
+ * console and GUI-based interactions.
+ *
+ * @author Hiba
+ */
 public abstract class DungeonCharacter {
 
-    protected String myName;
-    protected int myHitPoints;
-    protected int myAttackSpeed;
-    protected double myChanceToHit;
-    protected int myMinDamage;
-    protected int myMaxDamage;
-    protected int myGold;
+	/** Character's name. */
+	protected String myName;
 
-    public DungeonCharacter(String theName, int theHitPoints, int theAttackSpeed,
-                            double theChanceToHit, int theMinDamage, int theMaxDamage, int theGold) {
-        myName = theName;
-        myHitPoints = theHitPoints;
-        myAttackSpeed = theAttackSpeed;
-        myChanceToHit = theChanceToHit;
-        myMinDamage = theMinDamage;
-        myMaxDamage = theMaxDamage;
-        myGold = theGold;
-    }
+	/** Character's health points. */
+	protected int myHitPoints;
 
-    public boolean isAlive() {
-        return myHitPoints > 0;
-    }
+	/** Character's minimum attack damage. */
+	protected int myMinDamage;
 
-    public void attack(DungeonCharacter theOpponent) {
-        if (Math.random() <= myChanceToHit) {
-            int damage = (int)(Math.random() * (myMaxDamage - myMinDamage + 1)) + myMinDamage;
-            theOpponent.myHitPoints -= damage;
-            System.out.println(myName + " hits " + theOpponent.myName + " for " + damage + " damage!");
-        } else {
-            System.out.println(myName + " missed!");
-        }
-    }
+	/** Character's maximum attack damage. */
+	protected int myMaxDamage;
 
-    public String getName() {
-        return myName;
-    }
+	/** Character's attack speed. */
+	protected int myAttackSpeed;
 
-    public int getHitPoints() {
-        return myHitPoints;
-    }
+	/** Character's chance to successfully hit an opponent. */
+	protected double myChanceToHit;
 
-    public void setHitPoints(final int theHitPoints) {
-        myHitPoints = theHitPoints;
-    }
+	/** Gold carried (mainly used by Hero). */
+	protected int myGold;
 
-    public int getGold() {
-        return myGold;
-    }
+	/** Path to this character's image for GUI use. */
+	protected String myImagePath;
 
-    public void setGold(final int theGold) {
-        myGold = theGold;
-    }
+	/**
+	 * Constructs a DungeonCharacter with its stats. This is used by both Monsters
+	 * and Heroes.
+	 */
+	protected DungeonCharacter(String theName, int theHitPoints, int theMinDamage, int theMaxDamage, int theAttackSpeed,
+			double theChanceToHit) {
 
-    public int getAttackSpeed() {
-        return myAttackSpeed;
-    }
+		myName = theName;
+		myHitPoints = theHitPoints;
+		myMinDamage = theMinDamage;
+		myMaxDamage = theMaxDamage;
+		myAttackSpeed = theAttackSpeed;
+		myChanceToHit = theChanceToHit;
 
-    public double getChanceToHit() {
-        return myChanceToHit;
-    }
+		myGold = 0; // default
+		myImagePath = "images/default.png";
+	}
 
-    public int getMinDamage() {
-        return myMinDamage;
-    }
+	/** Returns true if the character is still alive. */
+	public boolean isAlive() {
+		return myHitPoints > 0;
+	}
 
-    public int getMaxDamage() {
-        return myMaxDamage;
-    }
-    
-    @Override
-    public String toString() {
-        return myName + " [HP: " + myHitPoints + ", Gold: " + myGold + "]";
-    }
+	/** Standard attack. */
+	public int attack(DungeonCharacter theOpponent) {
+		if (Math.random() <= myChanceToHit) {
+			int damage = (int) (Math.random() * (myMaxDamage - myMinDamage + 1)) + myMinDamage;
+			theOpponent.myHitPoints -= damage;
+			return damage; // IMPORTANT: return value instead of printing
+		}
+		return -1; // tells the caller it missed
+	}
 
+	public String getName() {
+		return myName;
+	}
 
+	public int getHitPoints() {
+		return myHitPoints;
+	}
 
+	public void setHitPoints(final int theHitPoints) {
+		myHitPoints = theHitPoints;
+	}
+
+	public int getGold() {
+		return myGold;
+	}
+
+	public void setGold(final int theGold) {
+		myGold = theGold;
+	}
+
+	public int getAttackSpeed() {
+		return myAttackSpeed;
+	}
+
+	public double getChanceToHit() {
+		return myChanceToHit;
+	}
+
+	public int getMinDamage() {
+		return myMinDamage;
+	}
+
+	public int getMaxDamage() {
+		return myMaxDamage;
+	}
+	
+	public void setMinDamage(int theMinDamage) {
+	    myMinDamage = theMinDamage;
+	}
+
+	public void setMaxDamage(int theMaxDamage) {
+	    myMaxDamage = theMaxDamage;
+	}
+
+	public String getImagePath() {
+		return myImagePath;
+	}
+
+	public void setImagePath(final String thePath) {
+		myImagePath = thePath;
+	}
+
+	@Override
+	public String toString() {
+		return myName + " [HP: " + myHitPoints + ", Gold: " + myGold + "]";
+	}
 }
