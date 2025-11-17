@@ -3,6 +3,7 @@ package Model;
 import java.util.ArrayList;
 import java.util.List;
 
+package Model;
 
 /**
  * Test class to simulate 1v1, 1v2, and 1v3 combat scenarios.

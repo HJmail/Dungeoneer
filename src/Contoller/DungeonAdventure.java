@@ -3,6 +3,7 @@ package Contoller;
 import java.util.Scanner;
 
 import Model.Dungeon;
+import Model.EventType;
 import Model.Hero;
 import Model.Priestess;
 import Model.Thief;
@@ -148,6 +149,11 @@ public class DungeonAdventure
 		if(move == 0)
 		{
 			wasSuccessful = true;
+			if(myDungeon.getRoom().getEvents().contains(EventType.EXIT)
+					) // checking for exit
+			{
+				
+			}
 		}
 		else if(move == 1)
 		{

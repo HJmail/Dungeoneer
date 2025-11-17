@@ -30,11 +30,6 @@ public class Dungeon
 	private int myCols;
 	
 	/**
-	 * This is the given seed randomly generated for used for creating the map.
-	 */
-	private int mySeed;
-	
-	/**
 	 *  This array holds the Hero's location.
 	 */
 	private int[] myHeroLocation;
@@ -48,7 +43,7 @@ public class Dungeon
 		myHero = theHero;
 		myRows = theDifficulty + 4;
 		myCols = theDifficulty + 4;
-		myMaze = new Room [myRows][myCols];
+		myMaze = new Room[myRows][myCols];
 		myHeroLocation = new int[2];
 		
 		generateDungeon();
@@ -132,17 +127,10 @@ public class Dungeon
 	private void placeEntranceAndExit()
 	{
 		// Need to make this dynamic and randomly generated.
-		
-		//EnumSet<Direction> entryDirection = EnumSet.of(Direction.EAST, Direction.SOUTH);
-		//EnumSet<Direction> exitDircretion = EnumSet.of(Direction.NORTH, Direction.WEST);
-		
-		//entry
-		//myMaze[0][0].setDirections(entryDirection);
+
 		myMaze[0][0].setRoomChar('e');
 		setHeroLocation(0, 0);
 		
-		// exit
-		//myMaze[myRows - 1][myCols - 1].setDirections(exitDircretion);
 		myMaze[myRows - 1][myCols - 1].setRoomChar('E');
 		
 	}
@@ -260,6 +248,21 @@ public class Dungeon
 			returnString += "\n";
 		}
 		return returnString;
+	}
+	
+	public int getRows()
+	{
+		return myRows;
+	}
+	
+	public int getCols()
+	{
+		return myCols;
+	}
+	
+	public Room getRoom()
+	{
+		return myMaze[myHeroLocation[0]][myHeroLocation[1]];
 	}
 	
 }

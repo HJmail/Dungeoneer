@@ -94,6 +94,11 @@ public class Room
 		return myDirections.clone();
 	}
 	
+	public EnumSet<EventType> getEvents()
+	{
+		return myEvents.clone();
+	}
+	
 	/**
 	 * This starts the Room logic starting 
 	 */

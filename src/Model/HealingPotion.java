@@ -1,3 +1,5 @@
+package Model;
+
 /**
  * Represents a Healing Potion that restores health points to the hero when consumed.
  * The healing magnitude is represented here by a base heal value plus rarity bonus (optional).

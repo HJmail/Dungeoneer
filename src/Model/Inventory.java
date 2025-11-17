@@ -1,3 +1,5 @@
+package Model;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,9 +89,7 @@ public class Inventory {
    */
   public void removeItem(Item theItem) {
     myInventory.remove(theItem);
-	  
   }
-  
 
   /**
    * Checks if the player's inventory contains the specified item.

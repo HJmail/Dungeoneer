@@ -1,3 +1,5 @@
+package Model;
+
 /**
  * Represents a general Potion item that can be consumed by the player to produce
  * temporary effects such as healing or enhanced vision. Potions have a base
