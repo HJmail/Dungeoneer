@@ -39,6 +39,7 @@ public class Dungeon
 	 */
 	private int[] myHeroLocation;
 	
+	
 	/**
 	 *  This is the basic class constructor.
 	 */
@@ -71,9 +72,13 @@ public class Dungeon
 			for(int j = 0; j < myCols; j++) // inner is col
 			{
 				Room newRoom = new Room();
+				
 				myMaze[i][j] = newRoom;
 			}
 		}
+		// Giving the Room their Directions
+		setAllRoomDirections();
+		
 		// All of the special room creations happen here
 		placeEntranceAndExit();
 		
@@ -88,22 +93,56 @@ public class Dungeon
 	}
 	
 	/**
+	 * This sets all the created rooms directions.
+	 */
+	private void setAllRoomDirections()
+	{
+		// IMPORTANT THIS DOES NOT CHANGE BASED ON GIVEN ROOMS OR WALLS
+		// SIMPLY REMOVES DIRECTIONS BASED ON MAP EDGES
+		for(int i = 0; i < myMaze.length; i++) // rows
+		{
+			for(int j = 0; j < myMaze[0].length; j++) // cols
+			{
+				EnumSet<Direction> directions = EnumSet.of(Direction.NORTH, Direction.EAST,
+															Direction.SOUTH, Direction.WEST);
+				if(i == 0) // check for NORTH edges
+				{
+					directions.remove(Direction.NORTH);
+				}
+				if(i == myMaze.length - 1) // check for SOUTH edges
+				{
+					directions.remove(Direction.SOUTH);
+				}
+				if(j == 0) // check for WEST edge
+				{
+					directions.remove(Direction.WEST);
+				}
+				if(j == myMaze[0].length - 1) // checks for EAST edge
+				{
+					directions.remove(Direction.EAST);
+				}
+				myMaze[i][j].setDirections(directions);
+			}
+		}
+	}
+	
+	/**
 	 * This places the entrance and exit rooms
 	 */
 	private void placeEntranceAndExit()
 	{
 		// Need to make this dynamic and randomly generated.
 		
-		EnumSet<Direction> entryDirection = EnumSet.of(Direction.EAST, Direction.SOUTH) ;
-		EnumSet<Direction> exitDircretion = EnumSet.of(Direction.NORTH, Direction.WEST);
+		//EnumSet<Direction> entryDirection = EnumSet.of(Direction.EAST, Direction.SOUTH);
+		//EnumSet<Direction> exitDircretion = EnumSet.of(Direction.NORTH, Direction.WEST);
 		
 		//entry
-		myMaze[0][0].setDirections(entryDirection);
+		//myMaze[0][0].setDirections(entryDirection);
 		myMaze[0][0].setRoomChar('e');
 		setHeroLocation(0, 0);
 		
 		// exit
-		myMaze[myRows - 1][myCols - 1].setDirections(exitDircretion);
+		//myMaze[myRows - 1][myCols - 1].setDirections(exitDircretion);
 		myMaze[myRows - 1][myCols - 1].setRoomChar('E');
 		
 	}
@@ -140,12 +179,9 @@ public class Dungeon
 		int returnInt = 0; // 0 is success, 1 direction is bad, 2 is bad input
 		String[] goodInput = {"N", "E", "S", "W"};
 		
-		if(checkStringArray(theInput, goodInput))
+		if(checkStringArray(theInput, goodInput) && !move(theInput))
 		{
-			if(move(theInput))
-			{
-				returnInt = 1;
-			}
+			returnInt = 1; // direction doesn't work
 		}
 		else
 		{
@@ -165,7 +201,7 @@ public class Dungeon
 		boolean isThere = false;
 		for(String s: theArray)
 		{
-			if(s.equals(theInput))
+			if(s.equals(theInput.toUpperCase()))
 			{
 				isThere = true;
 				break;
@@ -179,7 +215,6 @@ public class Dungeon
 	{
 		boolean moved = true;
 		
-		
 		if(theDirection.equals("N") && getTraversable().contains(Direction.NORTH))
 		{
 			moveHero(myHeroLocation[0] - 1, myHeroLocation[1]);
@@ -192,30 +227,26 @@ public class Dungeon
 		{
 			moveHero(myHeroLocation[0] + 1, myHeroLocation[1]);
 		}
-		else if(getTraversable().contains(Direction.WEST))
+		else if(theDirection.equals("W") && getTraversable().contains(Direction.WEST))
 		{
-			moveHero(myHeroLocation[0] - 1, myHeroLocation[1]);
+			moveHero(myHeroLocation[0], myHeroLocation[1] - 1);
 		}
 		else
 		{
 			moved = false;
 		}
-		System.out.println(theDirection);
-		System.out.println(myHeroLocation[0] + " " +  myHeroLocation[1]);
 		return moved;
 	}
 	
 	private void moveHero(final int theRow, final int theCol)
 	{
-		myMaze[myHeroLocation[0]][ myHeroLocation[0]].exit();
+		myMaze[myHeroLocation[0]][myHeroLocation[1]].exit();
 		setHeroLocation(theRow, theCol);
 		myMaze[theRow][theCol].enter(myHero);
-		System.out.println("Move Successful!");
-		System.out.println(toString());
 	}
 	
 	/**
-	 * This prints the dungeon to the console.
+	 * This gets a string to represent the dungeon.
 	 */
 	public String toString()
 	{

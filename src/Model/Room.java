@@ -73,8 +73,10 @@ public class Room
 		myCharRepresentation = 'C';
 		activateRoom();
 	}
+	
 	public void exit()
 	{
+		myCharRepresentation = '-';
 		myHero = null;
 	}
 	
@@ -125,7 +127,7 @@ public class Room
 	public void setDirections(final EnumSet<Direction> theDirections)
 	{
 		myDirections = EnumSet.copyOf(theDirections);
-		System.out.println(myDirections);
+		//System.out.println(myDirections);
 	}
 	
 	/**

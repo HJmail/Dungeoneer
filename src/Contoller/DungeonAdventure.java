@@ -2,12 +2,12 @@ package Contoller;
 
 import java.util.Scanner;
 
-import Model.Direction;
 import Model.Dungeon;
 import Model.Hero;
 import Model.Priestess;
 import Model.Thief;
 import Model.Warrior;
+import View.ConsoleView;
 
 /**
  *  This class is the main logic holding class for the Dungeoneer Game
@@ -19,27 +19,32 @@ public class DungeonAdventure
 	/**
 	 * This field is the main character 
 	 */
-	static Hero myHero;
+	private static Hero myHero;
 	
 	/**
 	 * This field is a scanner for user input.
 	 */
-	static Scanner myUserInput;
+	private static Scanner myUserInput;
 	
 	/**
 	 * This boolean represents if a game is running.
 	 */
-	static boolean myGameStatus;
+	private static boolean myGameStatus;
 	
 	/**
 	 * This field is the dungeon of the current game.
 	 */
-	static Dungeon myDungeon;
+	private static Dungeon myDungeon;
 	
 	/**
 	 * This field represents the difficulty
 	 */
-	static int myDifficulty;
+	private static int myDifficulty;
+	
+	/**
+	 * This is the Console view.
+	 */
+	private static ConsoleView myConsoleView;
 	
 	/**
 	 * This is the method with the main workflow.
@@ -48,7 +53,6 @@ public class DungeonAdventure
 	public static void main(final String theArgs[])
 	{
 		setupGame();
-		
 		play();
 		
 	}
@@ -58,12 +62,12 @@ public class DungeonAdventure
 	 */
 	private static void setupGame() 
 	{
-		myGameStatus = true; // change when wanting to run game.
+		myConsoleView = new ConsoleView(); // will switch to GUI when created...
+		myGameStatus = true;
 		myUserInput = new Scanner(System.in);
 		myDifficulty = promptDifficulty();
 		myHero = promptHero();
 		myDungeon  = new Dungeon(myHero, myDifficulty);
-		System.out.println(myDungeon);
 	}
 	
 	/**
@@ -75,7 +79,7 @@ public class DungeonAdventure
 		{
 			promptMove();
 		}
-		System.out.println("Game has halted...");
+		myConsoleView.showMessage("Game Halted.");
 	}
 	
 	/**
@@ -84,7 +88,7 @@ public class DungeonAdventure
 	 */
 	private static int promptDifficulty()
 	{
-		System.out.print("What Difficulty do you want?  Please choose 1-9: ");
+		myConsoleView.showMessage("What Difficulty do you want?  Please choose 1-9: ");
 		return myUserInput.nextInt();
 	}
 	
@@ -94,11 +98,10 @@ public class DungeonAdventure
 	 */
 	private static Hero promptHero()
 	{
-		System.out.print("What Class do you want to play? (P)riestess, (T)hief, or (W)arrior: ");
+		myConsoleView.showMessage("What Class do you want to play? (P)riestess, (T)hief, or (W)arrior: ");
 		String response = myUserInput.next();
-		String heroName = "Test";
+		String heroName = promptHeroName();
 		Hero userHero = null;
-		
 		if(response == "W")
 		{
 			userHero = new Warrior(heroName);
@@ -111,17 +114,24 @@ public class DungeonAdventure
 		{
 			userHero = new Priestess(heroName);
 		}
-		System.out.println(heroName + " has been created!");
+		myConsoleView.showMessage(heroName + " has been created!");
 		return userHero;
+	}
+
+	private static String promptHeroName()
+	{
+		myConsoleView.showMessage("What is you Hero's Name: ");
+		return myUserInput.next();
 	}
 	
 	private static void promptMove()
 	{
-		System.out.print("What direction do you want to move? (N)orth, (E)ast, (S)outh, and (W)est: ");
 		boolean goodResponse = false;
 		
 		while(!goodResponse) // keep prompting until good input.
 		{
+			myConsoleView.showDungeon(myDungeon);
+			myConsoleView.showMessage("What direction do you want to move? (N)orth, (E)ast, (S)outh, and (W)est: ");
 			String chosenDirection = myUserInput.next(); 
 			goodResponse = processMovement(chosenDirection);
 		}
@@ -141,11 +151,12 @@ public class DungeonAdventure
 		}
 		else if(move == 1)
 		{
-			System.out.println("That direction does not work! Please select another.");		
+			myConsoleView.showMessage("That direction does not work! Please select another.");
+			
 		}
 		else
 		{
-			System.out.println("That input was erroneous, please try again.");
+			myConsoleView.showMessage("That input was erroneous, please try again.");
 		}
 		return wasSuccessful;
 	}
