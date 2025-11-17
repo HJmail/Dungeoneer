@@ -2,23 +2,27 @@
  * Represents an additional item Gold class for the player to collect and
  * use for the shop. 
  * 
- * @author Cristian Acevedo-Villasana
- * @version 0.0.1
- * @date 10/25/25
+ * <p>@author Cristian Acevedo-Villasana
+ * 
+ * <p>@version 0.1.2
+ * 
+ * <p>@date 11/16/25
  */
 public class Gold implements Item {
-	
-  /** Represents the golds amount the player has as an integer */	
+
+  /** Represents the golds amount the player has as an integer. */
   private int myAmount; 
-	
+
   /**
    * Constructs a new Gold object with a specified initial amount.
    * 
-   * @param theAmount the initial amount of gold the player starts with
+   * <p>@param theAmount the initial amount of gold the player starts with
    */
-  public Gold(int theAmount) {
+  public Gold(final int theAmount) {
+    if (theAmount < 0) {
+      throw new IllegalArgumentException("Gold amount cannot be negative.");
+    }
     myAmount = theAmount;
-		
   }
 
   /*
@@ -28,13 +32,13 @@ public class Gold implements Item {
    */
   public int getAmount() {
     return myAmount;
-		
+    
   }
   
   /**
    * myAmount equals the amount of gold that is added to the player's total.
    * 
-   * @param moreGold the additional gold to be added
+   * <p>@param moreGold the additional gold to be added
    */
   public void addGold(int moreGold) {
     myAmount += moreGold;
@@ -43,18 +47,18 @@ public class Gold implements Item {
   /**
    * Provides a short description of this gold item.
    * 
-   * @return a descriptive string showing the current gold amount
+   * <p>@return a descriptive string showing the current gold amount
    */
   public String getDescription() {
-      return "Gold (" + myAmount + " coins)";
+    return "Gold (" + myAmount + " coins)";
   }
 
   /**
    * Defines the behavior when gold is used.
-   * <p>Since gold itself cannot be 'used' directly, this simply prints
-   * a message about the total gold held.</p>
+   * Since gold itself cannot be 'used' directly, this simply prints
+   * a message about the total gold held.
    */
   public void use() {
-      System.out.println("You have " + myAmount + " gold coins.");
+    System.out.println("You have " + myAmount + " gold coins.");
   }
 }
