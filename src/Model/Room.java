@@ -18,12 +18,12 @@ public class Room
 	/**
 	 * This EnumSet represents the type of room it is
 	 */
-	private EnumSet<Feature> myFeatures;
+	private EnumSet<EventType> myEvents;
 	
 	/**
 	 * This EnumSet represents the items that are lootable from the room.
 	 */
-	private EnumSet<Item> myItems;
+	private EnumSet<ItemType> myItems;
 	
 	/**
 	 * This character field represents what is shown on the map.
@@ -35,9 +35,14 @@ public class Room
 	 */
 	List<DungeonCharacter> myCharactersInRoom;
 	
+	/**
+	 * This field holds a reference to hero if they are here.
+	 */
+	private Hero myHero;
+	
 	public Room()
 	{
-		
+		myCharRepresentation = '*';
 	}
 	
 	/**
@@ -48,12 +53,12 @@ public class Room
 	 * @param theCharRepresentation This is a char that represents the room on the map.
 	 */
 	public Room(final EnumSet<Direction> theDirections,
-				final EnumSet<Feature> theFeatures,
-				final EnumSet<Item> theItems,
+				final EnumSet<EventType> theEvents,
+				final EnumSet<ItemType> theItems,
 				final char theCharRepresentation)
 	{
 		myDirections = EnumSet.copyOf(theDirections);
-		myFeatures = EnumSet.copyOf(theFeatures);
+		myEvents = EnumSet.copyOf(theEvents);
 		myItems = EnumSet.copyOf(theItems);
 		myCharRepresentation = theCharRepresentation;
 	}
@@ -64,8 +69,15 @@ public class Room
 	 */
 	public void enter(final Hero theHero)
 	{
-		myCharactersInRoom.add(theHero);
+		myHero = theHero;
+		myCharRepresentation = 'C';
 		activateRoom();
+	}
+	
+	public void exit()
+	{
+		myCharRepresentation = '-';
+		myHero = null;
 	}
 	
 	/**
@@ -77,6 +89,11 @@ public class Room
 		return myCharRepresentation;
 	}
 	
+	public EnumSet<Direction> getDirections()
+	{
+		return myDirections.clone();
+	}
+	
 	/**
 	 * This starts the Room logic starting 
 	 */
@@ -85,24 +102,40 @@ public class Room
 		System.out.println(myDirections);
 	}
 	
-	
-	
-	
-
-	
 	/**
-	 *  This enum represents the Events or Features present within the room.
+	 * This sets the Enums of the room.
+	 * @param theItems EnumSet that represents the room.
 	 */
-	enum Feature
+	public void setItems(final EnumSet<ItemType> theItems)
 	{
-		ENTERANCE, EXIT, PIT, PILLAR, SHOP, ENCOUNTER
+		myItems = EnumSet.copyOf(theItems);
 	}
 	
 	/**
-	 * This enum represents what items are in the room.
+	 * This sets the Events of the room.
+	 * @param theEvents EnumSet that represents the events within the room.
 	 */
-	enum Item
+	public void setEvents(final EnumSet<EventType> theEvents)
 	{
-		HEALING_POTION, VISION_POTION
+		myEvents = EnumSet.copyOf(theEvents);
+	}
+	
+	/**
+	 * This sets the Directions of the room.
+	 * @param theDirections The available directions from the room.
+	 */
+	public void setDirections(final EnumSet<Direction> theDirections)
+	{
+		myDirections = EnumSet.copyOf(theDirections);
+		//System.out.println(myDirections);
+	}
+	
+	/**
+	 * This sets the Char of the room.
+	 * @param theChar The char of the room.
+	 */
+	public void setRoomChar(final char theChar)
+	{
+		myCharRepresentation = theChar;
 	}
 }

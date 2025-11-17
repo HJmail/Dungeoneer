@@ -2,11 +2,20 @@ package Model;
 
 public class Gremlin extends Monster {
 
-    public Gremlin() {
-        super("Gremlin",
-              70, 5, 0.8,
-              15, 30,
-              0.4, 20, 40, 25);
+    public Gremlin(String name,
+                   int hitPoints,
+                   int minDamage,
+                   int maxDamage,
+                   int attackSpeed,
+                   double chanceToHit,
+                   double chanceToHeal,
+                   int minHeal,
+                   int maxHeal) {
+
+        super(name, hitPoints, minDamage, maxDamage,
+              attackSpeed, chanceToHit, chanceToHeal,
+              minHeal, maxHeal);
+
         myImagePath = "images/gremlin.png";
     }
 }

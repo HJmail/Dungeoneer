@@ -4,6 +4,10 @@ import java.util.Scanner;
 
 import Model.Dungeon;
 import Model.Hero;
+import Model.Priestess;
+import Model.Thief;
+import Model.Warrior;
+import View.ConsoleView;
 
 /**
  *  This class is the main logic holding class for the Dungeoneer Game
@@ -15,32 +19,40 @@ public class DungeonAdventure
 	/**
 	 * This field is the main character 
 	 */
-	static Hero myHero;
+	private static Hero myHero;
 	
 	/**
 	 * This field is a scanner for user input.
 	 */
-	static Scanner myUserInput;
+	private static Scanner myUserInput;
 	
 	/**
 	 * This boolean represents if a game is running.
 	 */
-	static boolean myGameStatus;
+	private static boolean myGameStatus;
 	
 	/**
 	 * This field is the dungeon of the current game.
 	 */
-	static Dungeon myDungeon;
+	private static Dungeon myDungeon;
 	
+	/**
+	 * This field represents the difficulty
+	 */
+	private static int myDifficulty;
+	
+	/**
+	 * This is the Console view.
+	 */
+	private static ConsoleView myConsoleView;
 	
 	/**
 	 * This is the method with the main workflow.
-	 * @param theArgs
+	 * @param theArgs 
 	 */
 	public static void main(final String theArgs[])
 	{
-		startGame();
-		
+		setupGame();
 		play();
 		
 	}
@@ -48,12 +60,14 @@ public class DungeonAdventure
 	/**
 	 * This method starts creating the required fields for all other functionalities.
 	 */
-	private static void startGame() 
+	private static void setupGame() 
 	{
+		myConsoleView = new ConsoleView(); // will switch to GUI when created...
+		myGameStatus = true;
 		myUserInput = new Scanner(System.in);
-		myHero = new Hero();
-		myDungeon  = new Dungeon(myHero);
-		myGameStatus = false;
+		myDifficulty = promptDifficulty();
+		myHero = promptHero();
+		myDungeon  = new Dungeon(myHero, myDifficulty);
 	}
 	
 	/**
@@ -63,21 +77,87 @@ public class DungeonAdventure
 	{
 		while(myGameStatus)
 		{
-			
+			promptMove();
+		}
+		myConsoleView.showMessage("Game Halted.");
+	}
+	
+	/**
+	 * This method asks the user what difficulty they want.
+	 * @return Integer representing the difficulty.
+	 */
+	private static int promptDifficulty()
+	{
+		myConsoleView.showMessage("What Difficulty do you want?  Please choose 1-9: ");
+		return myUserInput.nextInt();
+	}
+	
+	/**
+	 * This method asks the user what class they want to play.
+	 * @return The newly made hero that the user will play.
+	 */
+	private static Hero promptHero()
+	{
+		myConsoleView.showMessage("What Class do you want to play? (P)riestess, (T)hief, or (W)arrior: ");
+		String response = myUserInput.next();
+		String heroName = promptHeroName();
+		Hero userHero = null;
+		if(response == "W")
+		{
+			userHero = new Warrior(heroName);
+		}
+		else if(response == "T")
+		{
+			userHero = new Thief(heroName);
+		}
+		else if(response == "P")
+		{
+			userHero = new Priestess(heroName);
+		}
+		myConsoleView.showMessage(heroName + " has been created!");
+		return userHero;
+	}
+
+	private static String promptHeroName()
+	{
+		myConsoleView.showMessage("What is you Hero's Name: ");
+		return myUserInput.next();
+	}
+	
+	private static void promptMove()
+	{
+		boolean goodResponse = false;
+		
+		while(!goodResponse) // keep prompting until good input.
+		{
+			myConsoleView.showDungeon(myDungeon);
+			myConsoleView.showMessage("What direction do you want to move? (N)orth, (E)ast, (S)outh, and (W)est: ");
+			String chosenDirection = myUserInput.next(); 
+			goodResponse = processMovement(chosenDirection);
 		}
 	}
 	
 	/**
 	 * This method has all of the logic for moving rooms.
-	 * @param theInput
+	 * @param theInput This is the user input.
 	 */
-	private static void processMovement(final String theInput)
+	private static boolean processMovement(final String theInput)
 	{
-		
-	}
-	
-	public static Hero getHero()
-	{
-		return myHero;
+		boolean wasSuccessful = false;
+		int move = myDungeon.checkMove(theInput.toUpperCase());
+		if(move == 0)
+		{
+			wasSuccessful = true;
+		}
+		else if(move == 1)
+		{
+			myConsoleView.showMessage("That direction does not work! Please select another.");
+			
+		}
+		else
+		{
+			myConsoleView.showMessage("That input was erroneous, please try again.");
+		}
+		return wasSuccessful;
 	}
 }
