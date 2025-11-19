@@ -9,6 +9,8 @@ public enum EventType
 	NONE,
 	PIT,
 	ENCOUNTER,
+	PILLAR,
 	EXIT,
+	START,
 	SHOP;
 }

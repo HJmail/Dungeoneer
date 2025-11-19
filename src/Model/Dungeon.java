@@ -4,6 +4,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
+import Model.EventType;
+
 /**
  * This class represents the dungeon the player must traverse.
  */
@@ -162,21 +164,6 @@ public class Dungeon
 		myHeroLocation[1] = theCols;
 	}
 	
-	public int checkMove(final String theInput)
-	{
-		int returnInt = 0; // 0 is success, 1 direction is bad, 2 is bad input
-		String[] goodInput = {"N", "E", "S", "W"};
-		
-		if(checkStringArray(theInput, goodInput) && !move(theInput))
-		{
-			returnInt = 1; // direction doesn't work
-		}
-		else
-		{
-			returnInt = 2; // bad input
-		}
-		return returnInt;
-	}
 	
 	/**
 	 * This is a helper method that makes sure a given input string is within the array of string
@@ -250,17 +237,62 @@ public class Dungeon
 		return returnString;
 	}
 	
+	/**
+	 * Sets the given room to  the 
+	 * @param theRow
+	 * @param theCol
+	 * @param theEvent
+	 */
+	public void setRoomType(final int theRow, final int theCol, final EnumSet<EventType> theEvents)
+	{
+		moveHero(theRow, theCol);
+		myMaze[theRow][theCol].setEvents(theEvents);
+	}
+	
+	public int checkMove(final String theInput)
+	{
+		int returnInt = 0; // 0 is success, 1 direction is bad, 2 is bad input
+		String[] goodInput = {"N", "E", "S", "W"};
+		
+		if(checkStringArray(theInput, goodInput) && !move(theInput))
+		{
+			returnInt = 1; // direction doesn't work
+		}
+		else
+		{
+			returnInt = 2; // bad input
+		}
+		return returnInt;
+	}
+	
+	/**
+	 * This gets the number of rows.
+	 * @return The number of rows
+	 */
 	public int getRows()
 	{
 		return myRows;
 	}
 	
+	/**
+	 * This gets the number of columns.
+	 * @return The number of columns.
+	 */
 	public int getCols()
 	{
 		return myCols;
 	}
 	
-	public Room getRoom()
+	public Room getCurrentRoom()
+	{
+		getRoom(myHeroLocation[0],myHeroLocation[1]);
+	}
+	
+	/**
+	 * This gets the current room the player is in.
+	 * @return The current room the player is in.
+	 */
+	public Room getRoom(final int theRow, final int theCol)
 	{
 		return myMaze[myHeroLocation[0]][myHeroLocation[1]];
 	}

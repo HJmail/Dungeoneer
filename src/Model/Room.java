@@ -91,12 +91,12 @@ public class Room
 	
 	public EnumSet<Direction> getDirections()
 	{
-		return myDirections.clone();
+		return myDirections; // want it to be mutable 
 	}
 	
 	public EnumSet<EventType> getEvents()
 	{
-		return myEvents.clone();
+		return myEvents; // want it to be mutable 
 	}
 	
 	/**
