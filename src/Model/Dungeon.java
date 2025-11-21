@@ -36,6 +36,8 @@ public class Dungeon
 	 */
 	private int[] myHeroLocation;
 	
+	private int[] myStartLocation;
+	
 	
 	/**
 	 *  This is the basic class constructor.
@@ -47,6 +49,7 @@ public class Dungeon
 		myCols = theDifficulty + 4;
 		myMaze = new Room[myRows][myCols];
 		myHeroLocation = new int[2];
+		myStartLocation = new int[2];
 		
 		generateDungeon();
 	}
@@ -74,11 +77,10 @@ public class Dungeon
 			}
 		}
 		// Giving the Room their Directions
-		setAllRoomDirections();
+		//setAllRoomDirections();
 		
 		// All of the special room creations happen here
-		placeEntranceAndExit();
-		
+		//placeEntranceAndExit();
 	}
 	
 	/**
@@ -134,7 +136,6 @@ public class Dungeon
 		setHeroLocation(0, 0);
 		
 		myMaze[myRows - 1][myCols - 1].setRoomChar('E');
-		
 	}
 	
 	/**
@@ -220,22 +221,6 @@ public class Dungeon
 		myMaze[theRow][theCol].enter(myHero);
 	}
 	
-	/**
-	 * This gets a string to represent the dungeon.
-	 */
-	public String toString()
-	{
-		String returnString = "";
-		for(int i = 0; i < myRows; i++)
-		{
-			for(int j = 0; j < myCols; j++)
-			{
-				returnString += myMaze[i][j].getRoomChar();
-			}
-			returnString += "\n";
-		}
-		return returnString;
-	}
 	
 	/**
 	 * Sets the given room to  the 
@@ -243,10 +228,10 @@ public class Dungeon
 	 * @param theCol
 	 * @param theEvent
 	 */
-	public void setRoomType(final int theRow, final int theCol, final EnumSet<EventType> theEvents)
+	public void setRoomType(final int theRow, final int theCol, final EventType theEvent)
 	{
 		moveHero(theRow, theCol);
-		myMaze[theRow][theCol].setEvents(theEvents);
+		myMaze[theRow][theCol].setEvent(theEvent);
 	}
 	
 	public int checkMove(final String theInput)
@@ -263,6 +248,17 @@ public class Dungeon
 			returnInt = 2; // bad input
 		}
 		return returnInt;
+	}
+	
+	public void setStartLocation(final int theRow, final int theCol)
+	{
+		myStartLocation[0] = theRow;
+		myStartLocation[1] = theCol;
+	}
+	
+	public int[] getStartLocation()
+	{
+		return myStartLocation;
 	}
 	
 	/**
@@ -285,7 +281,7 @@ public class Dungeon
 	
 	public Room getCurrentRoom()
 	{
-		getRoom(myHeroLocation[0],myHeroLocation[1]);
+		return getRoom(myHeroLocation[0],myHeroLocation[1]);
 	}
 	
 	/**
@@ -294,7 +290,24 @@ public class Dungeon
 	 */
 	public Room getRoom(final int theRow, final int theCol)
 	{
-		return myMaze[myHeroLocation[0]][myHeroLocation[1]];
+		return myMaze[theRow][theCol];
+	}
+	
+	/**
+	 * This gets a string to represent the dungeon.
+	 */
+	public String toString()
+	{
+		String returnString = "";
+		for(int i = 0; i < myRows; i++)
+		{
+			for(int j = 0; j < myCols; j++)
+			{
+				returnString += myMaze[i][j].getRoomChar();
+			}
+			returnString += "\n";
+		}
+		return returnString;
 	}
 	
 }

@@ -9,7 +9,6 @@ import java.util.List;
  */
 public class Room 
 {	
-	
 	/**
 	 * This EnumSet represents the directions that exist
 	 */
@@ -18,7 +17,7 @@ public class Room
 	/**
 	 * This EnumSet represents the type of room it is
 	 */
-	private EnumSet<EventType> myEvents;
+	private EventType myEvent;
 	
 	/**
 	 * This EnumSet represents the items that are lootable from the room.
@@ -43,6 +42,9 @@ public class Room
 	public Room()
 	{
 		myCharRepresentation = '*';
+		myDirections = EnumSet.noneOf(Direction.class);
+		//myEvent = EventType.class;
+		myItems = EnumSet.noneOf(ItemType.class);
 	}
 	
 	/**
@@ -53,12 +55,12 @@ public class Room
 	 * @param theCharRepresentation This is a char that represents the room on the map.
 	 */
 	public Room(final EnumSet<Direction> theDirections,
-				final EnumSet<EventType> theEvents,
+				final EventType theEvent,
 				final EnumSet<ItemType> theItems,
 				final char theCharRepresentation)
 	{
 		myDirections = EnumSet.copyOf(theDirections);
-		myEvents = EnumSet.copyOf(theEvents);
+		myEvent = theEvent;
 		myItems = EnumSet.copyOf(theItems);
 		myCharRepresentation = theCharRepresentation;
 	}
@@ -94,9 +96,9 @@ public class Room
 		return myDirections; // want it to be mutable 
 	}
 	
-	public EnumSet<EventType> getEvents()
+	public EventType getEvent()
 	{
-		return myEvents; // want it to be mutable 
+		return myEvent; // want it to be mutable 
 	}
 	
 	/**
@@ -120,9 +122,9 @@ public class Room
 	 * This sets the Events of the room.
 	 * @param theEvents EnumSet that represents the events within the room.
 	 */
-	public void setEvents(final EnumSet<EventType> theEvents)
+	public void setEvent(final EventType theEvent)
 	{
-		myEvents = EnumSet.copyOf(theEvents);
+		myEvent = theEvent;
 	}
 	
 	/**

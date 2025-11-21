@@ -44,6 +44,8 @@ public class DungeonGenerator
 		Deque<Point> stack = new ArrayDeque<>();
 		stack.push(new Point(startRow, startCol));
 		
+
+		
 		// keep going until no more room's
 		while(!stack.isEmpty()) 
 		{
@@ -61,6 +63,9 @@ public class DungeonGenerator
 				int nextRow = nextNeighbor.x;
 				int nextCol = nextNeighbor.y;
 				
+				// visited
+				visited[nextRow][nextCol] = true;
+				
 				// get both rooms
 				Room currentRoom = theDungeon.getRoom(currentRow, currentCol);
 				Room nextRoom = theDungeon.getRoom(nextRow, nextCol);
@@ -71,6 +76,9 @@ public class DungeonGenerator
 				
 				currentRoom.getDirections().add(theDirection);
 				nextRoom.getDirections().add(theDirection.opposite());
+				
+				// stack continued
+				stack.push(nextNeighbor); 
 			}
 			else 
 			{
@@ -81,7 +89,39 @@ public class DungeonGenerator
 	
 	private static void createEvents(final Dungeon theDungeon, final Random theRng)
 	{
+		int rows = theDungeon.getRows();
+		int cols = theDungeon.getCols();
 		
+		List<Point> allRooms = new ArrayList<>();
+		
+		for(int r = 0; r < rows; r++)
+		{
+			for(int c = 0; c < cols; c++)
+			{
+				Room room = theDungeon.getRoom(r, c);
+				
+				// deals with START
+				if(room.getEvent() == EventType.START) continue;
+				
+				int rng = theRng.nextInt(100);
+				
+				// rng rates
+				if(rng < 50)
+				{
+					
+				}
+				else
+				{
+					room.setEvent(EventType.NONE);
+				}
+			}
+		}
+		Point end = getDeepestRoom(theDungeon, theDungeon.getStartLocation());
+	}
+	
+	private static Room getDeepestRoom(final Dungeon theDungeon, final int[] theStart)
+	{
+		int rows
 	}
 	
 	private static Direction getDirection(final int[] theCurrent, final int[] theNext)
@@ -103,7 +143,7 @@ public class DungeonGenerator
 													final boolean[][] theVisited)
 	{
 		List<Point> result = new ArrayList<>();
-		int [][] neighbors = {{-1, 0}, {1, 0}, {0, -1}, {0, -1}};
+		int [][] neighbors = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; // N, S, W, E
 		
 		// filter through neighbors
 		for(int[] n: neighbors)
