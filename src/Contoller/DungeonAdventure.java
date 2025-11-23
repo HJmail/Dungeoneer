@@ -1,8 +1,11 @@
 package Contoller;
 
+import java.util.Random;
 import java.util.Scanner;
 
 import Model.Dungeon;
+import Model.DungeonGenerator;
+import Model.RoomType;
 import Model.Hero;
 import Model.Priestess;
 import Model.Thief;
@@ -47,6 +50,16 @@ public class DungeonAdventure
 	private static ConsoleView myConsoleView;
 	
 	/**
+	 * Used for temporary random like seed generation
+	 */
+	private static Random myRandom;
+	
+	/**
+	 *  Actual seed for the run.
+	 */
+	private static long mySeed;
+	
+	/**
 	 * This is the method with the main workflow.
 	 * @param theArgs 
 	 */
@@ -67,7 +80,8 @@ public class DungeonAdventure
 		myUserInput = new Scanner(System.in);
 		myDifficulty = promptDifficulty();
 		myHero = promptHero();
-		myDungeon  = new Dungeon(myHero, myDifficulty);
+		mySeed = promptSeed();
+		myDungeon  = DungeonGenerator.generate(mySeed, myDifficulty, myHero);
 	}
 	
 	/**
@@ -75,7 +89,7 @@ public class DungeonAdventure
 	 */
 	private static void play()
 	{
-		while(myGameStatus)
+		while(myGameStatus) // currently off
 		{
 			promptMove();
 		}
@@ -124,6 +138,12 @@ public class DungeonAdventure
 		return myUserInput.next();
 	}
 	
+	private static long promptSeed()
+	{
+		myConsoleView.showMessage("What Seed do you want?");
+		return myUserInput.nextInt();
+	}
+	
 	private static void promptMove()
 	{
 		boolean goodResponse = false;
@@ -131,6 +151,7 @@ public class DungeonAdventure
 		while(!goodResponse) // keep prompting until good input.
 		{
 			myConsoleView.showDungeon(myDungeon);
+			myConsoleView.showMessage(myDungeon.getCurrentRoom().getDirections().toString());
 			myConsoleView.showMessage("What direction do you want to move? (N)orth, (E)ast, (S)outh, and (W)est: ");
 			String chosenDirection = myUserInput.next(); 
 			goodResponse = processMovement(chosenDirection);
@@ -148,6 +169,11 @@ public class DungeonAdventure
 		if(move == 0)
 		{
 			wasSuccessful = true;
+			if(myDungeon.getCurrentRoom().getRoomType() == RoomType.EXIT)// need to add more when inventory is integrated
+					 // checking for exit
+			{
+				myConsoleView.showMessage("You have reached the exit.");
+			}
 		}
 		else if(move == 1)
 		{

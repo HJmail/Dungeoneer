@@ -1,3 +1,5 @@
+package Model;
+
 /**
  * Represents the weapons for both the heroes and monsters that they can pick
  * up and use. Weapons have a base damage and a rarity which modifies final damage.

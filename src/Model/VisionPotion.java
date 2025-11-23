@@ -1,3 +1,5 @@
+package Model;
+
 /**
  * Represents a Vision Potion that reveals hidden parts of the dungeon
  * when consumed by the hero. Duration scales with rarity.

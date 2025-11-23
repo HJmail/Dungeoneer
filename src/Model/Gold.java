@@ -1,3 +1,5 @@
+package Model;
+
 /**
  * Represents an additional item Gold class for the player to collect and
  * use for the shop. 

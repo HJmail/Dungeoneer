@@ -1,3 +1,5 @@
+package Model;
+
 /**
  * Represents one of the four Pillars of OO that the player must collect
  * to win the Dungeon Adventure game.

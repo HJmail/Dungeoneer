@@ -1,3 +1,5 @@
+package Model;
+
 /**
  * Represents a general item that can exist in the player's inventory.
  * All items in the Dungeon Adventure game (e.g., potions, gold, weapons, pillars)
