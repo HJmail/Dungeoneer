@@ -17,7 +17,7 @@ public class Room
 	/**
 	 * This EnumSet represents the type of room it is
 	 */
-	private EventType myEvent;
+	private RoomType myRoomType;
 	
 	/**
 	 * This EnumSet represents the items that are lootable from the room.
@@ -39,11 +39,16 @@ public class Room
 	 */
 	private Hero myHero;
 	
+	/**
+	 *  Represents maze depth.
+	 */
+	private int myDepth;
+	
 	public Room()
 	{
-		myCharRepresentation = '*';
 		myDirections = EnumSet.noneOf(Direction.class);
-		//myEvent = EventType.class;
+		myRoomType = RoomType.NONE;
+		myCharRepresentation = myRoomType.getChar();
 		myItems = EnumSet.noneOf(ItemType.class);
 	}
 	
@@ -55,12 +60,12 @@ public class Room
 	 * @param theCharRepresentation This is a char that represents the room on the map.
 	 */
 	public Room(final EnumSet<Direction> theDirections,
-				final EventType theEvent,
+				final RoomType theEvent,
 				final EnumSet<ItemType> theItems,
 				final char theCharRepresentation)
 	{
 		myDirections = EnumSet.copyOf(theDirections);
-		myEvent = theEvent;
+		myRoomType = theEvent;
 		myItems = EnumSet.copyOf(theItems);
 		myCharRepresentation = theCharRepresentation;
 	}
@@ -72,13 +77,16 @@ public class Room
 	public void enter(final Hero theHero)
 	{
 		myHero = theHero;
-		myCharRepresentation = 'C';
 		activateRoom();
 	}
 	
 	public void exit()
 	{
-		myCharRepresentation = '-';
+		if(myRoomType != RoomType.START 
+				&& myRoomType != RoomType.EXIT) 
+		{
+			setRoomType(RoomType.TRAVELED);
+		}
 		myHero = null;
 	}
 	
@@ -88,17 +96,22 @@ public class Room
 	 */
 	public char getRoomChar()
 	{
-		return myCharRepresentation;
+		return myRoomType.getChar();
 	}
 	
 	public EnumSet<Direction> getDirections()
 	{
-		return myDirections; // want it to be mutable 
+		return myDirections;
 	}
 	
-	public EventType getEvent()
+	public RoomType getRoomType()
 	{
-		return myEvent; // want it to be mutable 
+		return myRoomType;
+	}
+	
+	public int getDepth()
+	{
+		return myDepth;
 	}
 	
 	/**
@@ -122,9 +135,9 @@ public class Room
 	 * This sets the Events of the room.
 	 * @param theEvents EnumSet that represents the events within the room.
 	 */
-	public void setEvent(final EventType theEvent)
+	public void setRoomType(final RoomType theEvent)
 	{
-		myEvent = theEvent;
+		myRoomType = theEvent;
 	}
 	
 	/**
@@ -137,12 +150,8 @@ public class Room
 		//System.out.println(myDirections);
 	}
 	
-	/**
-	 * This sets the Char of the room.
-	 * @param theChar The char of the room.
-	 */
-	public void setRoomChar(final char theChar)
+	public void setDepth(final int theDepth)
 	{
-		myCharRepresentation = theChar;
+		myDepth = theDepth;
 	}
 }

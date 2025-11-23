@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import Model.Dungeon;
 import Model.DungeonGenerator;
-import Model.EventType;
+import Model.RoomType;
 import Model.Hero;
 import Model.Priestess;
 import Model.Thief;
@@ -169,7 +169,7 @@ public class DungeonAdventure
 		if(move == 0)
 		{
 			wasSuccessful = true;
-			if(myDungeon.getCurrentRoom().getEvent() == EventType.EXIT)// need to add more when inventory is integrated
+			if(myDungeon.getCurrentRoom().getRoomType() == RoomType.EXIT)// need to add more when inventory is integrated
 					 // checking for exit
 			{
 				myConsoleView.showMessage("You have reached the exit.");

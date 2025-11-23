@@ -1,10 +1,11 @@
  package Model;
 
+import java.awt.Point;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
-import Model.EventType;
+import Model.RoomType;
 
 /**
  * This class represents the dungeon the player must traverse.
@@ -34,9 +35,9 @@ public class Dungeon
 	/**
 	 *  This array holds the Hero's location.
 	 */
-	private int[] myHeroLocation;
+	private Point myHeroLocation;
 	
-	private int[] myStartLocation;
+	private Point myStartLocation;
 	
 	
 	/**
@@ -48,19 +49,11 @@ public class Dungeon
 		myRows = theDifficulty + 4;
 		myCols = theDifficulty + 4;
 		myMaze = new Room[myRows][myCols];
-		myHeroLocation = new int[2];
-		myStartLocation = new int[2];
+		myHeroLocation = new Point();
+		myStartLocation = new Point();
 		
 		generateDungeon();
 	}
-	
-	/**
-	 * This class constructor will hopefully load data from save files (future)
-	 */
-	//public Dungeon()
-	//{
-	//	
-	//}
 	
 	/**
 	 * This method generates a random dungeon
@@ -88,7 +81,7 @@ public class Dungeon
 	 */
 	private EnumSet<Direction> getTraversable()
 	{
-		return myMaze[myHeroLocation[0]][myHeroLocation[1]].getDirections();
+		return myMaze[(int)myHeroLocation.getX()][(int)myHeroLocation.getY()].getDirections();
 	}
 	
 	/**
@@ -126,43 +119,13 @@ public class Dungeon
 	}
 	
 	/**
-	 * This places the entrance and exit rooms
-	 */
-	private void placeEntranceAndExit()
-	{
-		// Need to make this dynamic and randomly generated.
-
-		myMaze[0][0].setRoomChar('e');
-		setHeroLocation(0, 0);
-		
-		myMaze[myRows - 1][myCols - 1].setRoomChar('E');
-	}
-	
-	/**
-	 *  This places the pillars randomly throughout the map 
-	 */
-	private void placePillars()
-	{
-		
-	}
-	
-	/**
-	 *  THis places the monsters randomly throughout the map
-	 */
-	private void placeMonsters()
-	{
-		
-	}
-	
-	/**
 	 * This method just changes the hero location.
 	 * @param theRows The new row the Hero will be.
 	 * @param theCols The new col the Hero will be.
 	 */
 	private void setHeroLocation(final int theRows, final int theCols)
 	{
-		myHeroLocation[0] = theRows;
-		myHeroLocation[1] = theCols;
+		myHeroLocation.setLocation(theRows, theCols);
 	}
 	
 	
@@ -190,22 +153,24 @@ public class Dungeon
 	private boolean move(final String theDirection)
 	{
 		boolean moved = true;
+		int x = (int) myHeroLocation.getX();
+		int y = (int) myHeroLocation.getY();
 		
 		if(theDirection.equals("N") && getTraversable().contains(Direction.NORTH))
 		{
-			moveHero(myHeroLocation[0] - 1, myHeroLocation[1]);
+			moveHero(x - 1, y);
 		}
 		else if(theDirection.equals("E") && getTraversable().contains(Direction.EAST))
 		{
-			moveHero(myHeroLocation[0], myHeroLocation[1] + 1);
+			moveHero(x, y + 1);
 		}
 		else if(theDirection.equals("S") && getTraversable().contains(Direction.SOUTH))
 		{
-			moveHero(myHeroLocation[0] + 1, myHeroLocation[1]);
+			moveHero(x + 1, y);
 		}
 		else if(theDirection.equals("W") && getTraversable().contains(Direction.WEST))
 		{
-			moveHero(myHeroLocation[0], myHeroLocation[1] - 1);
+			moveHero(x, y - 1);
 		}
 		else
 		{
@@ -216,11 +181,17 @@ public class Dungeon
 	
 	private void moveHero(final int theRow, final int theCol)
 	{
-		myMaze[myHeroLocation[0]][myHeroLocation[1]].exit();
+		int x = (int) myHeroLocation.getX();
+		int y = (int) myHeroLocation.getY();
+		myMaze[x][y].exit();
 		setHeroLocation(theRow, theCol);
 		myMaze[theRow][theCol].enter(myHero);
 	}
 	
+	public void setRoomDepth(final int theRow, final int theCol, final int theDepth)
+	{
+		myMaze[theRow][theCol].setDepth(theDepth);
+	}
 	
 	/**
 	 * Sets the given room to  the 
@@ -228,10 +199,10 @@ public class Dungeon
 	 * @param theCol
 	 * @param theEvent
 	 */
-	public void setRoomType(final int theRow, final int theCol, final EventType theEvent)
+	public void setRoomType(final int theRow, final int theCol, final RoomType theRoom)
 	{
 		moveHero(theRow, theCol);
-		myMaze[theRow][theCol].setEvent(theEvent);
+		myMaze[theRow][theCol].setRoomType(theRoom);
 	}
 	
 	public int checkMove(final String theInput)
@@ -252,13 +223,12 @@ public class Dungeon
 	
 	public void setStartLocation(final int theRow, final int theCol)
 	{
-		myStartLocation[0] = theRow;
-		myStartLocation[1] = theCol;
+		myStartLocation.setLocation(theRow, theCol);
 	}
 	
-	public int[] getStartLocation()
+	public Point getStartPoint()
 	{
-		return myStartLocation;
+		return new Point(myStartLocation);
 	}
 	
 	/**
@@ -281,7 +251,9 @@ public class Dungeon
 	
 	public Room getCurrentRoom()
 	{
-		return getRoom(myHeroLocation[0],myHeroLocation[1]);
+		int x = (int) myHeroLocation.getX();
+		int y = (int) myHeroLocation.getY();
+		return getRoom(x, y);
 	}
 	
 	/**
@@ -303,7 +275,15 @@ public class Dungeon
 		{
 			for(int j = 0; j < myCols; j++)
 			{
-				returnString += myMaze[i][j].getRoomChar();
+				if((int) myHeroLocation.getX() == i &&
+					(int) myHeroLocation.getY() == j)
+				{
+					returnString += 'C';
+				}
+				else
+				{
+					returnString += myMaze[i][j].getRoomChar();
+				}
 			}
 			returnString += "\n";
 		}

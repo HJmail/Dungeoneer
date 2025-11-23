@@ -8,7 +8,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
-import Model.EventType;
+import Model.RoomType;
 
 public class DungeonGenerator 
 {
@@ -38,13 +38,16 @@ public class DungeonGenerator
 		visited[startRow][startCol] = true;
 		
 		// setting the start room
-		theDungeon.setRoomType(startRow, startCol, EnumSet.of(EventType.START));
+		theDungeon.setRoomType(startRow, startCol, RoomType.START);
+		theDungeon.setRoomDepth(startRow, startCol, 0);
 		
 		// Double ended queue
 		Deque<Point> stack = new ArrayDeque<>();
 		stack.push(new Point(startRow, startCol));
 		
-
+		// depth logic
+		int maxDepth = 0;
+		Point deepestRoom = new Point(startRow, startCol);
 		
 		// keep going until no more room's
 		while(!stack.isEmpty()) 
@@ -77,6 +80,15 @@ public class DungeonGenerator
 				currentRoom.getDirections().add(theDirection);
 				nextRoom.getDirections().add(theDirection.opposite());
 				
+		        // depth logic 
+		        int nextDepth = currentRoom.getDepth() + 1;
+		        nextRoom.setDepth(nextDepth);
+
+		        if (nextDepth > maxDepth) {
+		            maxDepth = nextDepth;
+		            deepestRoom = nextNeighbor;
+		        }
+				
 				// stack continued
 				stack.push(nextNeighbor); 
 			}
@@ -85,6 +97,11 @@ public class DungeonGenerator
 				stack.pop();
 			}
 		}
+		
+		// setting exit.
+		int deep_x = (int)deepestRoom.getX();
+		int deep_y = (int)deepestRoom.getY();
+		theDungeon.getRoom(deep_x, deep_y).setRoomType(RoomType.EXIT);;
 	}
 	
 	private static void createEvents(final Dungeon theDungeon, final Random theRng)
@@ -101,27 +118,34 @@ public class DungeonGenerator
 				Room room = theDungeon.getRoom(r, c);
 				
 				// deals with START
-				if(room.getEvent() == EventType.START) continue;
-				
-				int rng = theRng.nextInt(100);
+				if(room.getRoomType() == RoomType.START &&
+						room.getRoomType() == RoomType.EXIT) continue;
+	
+				int roll = theRng.nextInt(100);
+				int depth = room.getDepth();
 				
 				// rng rates
-				if(rng < 50)
+				if(depth <= 1) // 
+				{
+					if(roll < 70)
+					{
+						room.setRoomType(RoomType.NONE);
+					}
+					else
+					{
+						room.setRoomType(RoomType.TREASURE);
+					}
+				}
+				else if(false)
 				{
 					
 				}
 				else
 				{
-					room.setEvent(EventType.NONE);
+					room.setRoomType(RoomType.NONE);
 				}
 			}
 		}
-		Point end = getDeepestRoom(theDungeon, theDungeon.getStartLocation());
-	}
-	
-	private static Room getDeepestRoom(final Dungeon theDungeon, final int[] theStart)
-	{
-		int rows
 	}
 	
 	private static Direction getDirection(final int[] theCurrent, final int[] theNext)
