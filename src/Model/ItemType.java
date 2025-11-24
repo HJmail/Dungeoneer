@@ -8,7 +8,9 @@ public enum ItemType
 	// These are the Different types of findable items.
 	HEALING_POTION("This potion seems to glimmer a shiny crimson red."),
 	VISION_POTION("This potion seems to shine white and silver."),
-	PILLAR("This seems like a pillar, I wonder what it could be used for.");
+	PILLAR("This seems like a pillar, I wonder what it could be used for."),
+	WEAPON("This can kill!"),
+	Gold("Shiny!");
 	
 	/**
 	 * This is a description for the item.

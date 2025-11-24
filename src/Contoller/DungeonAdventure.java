@@ -6,8 +6,10 @@ import java.util.Scanner;
 import Model.Dungeon;
 import Model.DungeonGenerator;
 import Model.RoomType;
+import Model.Shopkeeper;
 import Model.Hero;
 import Model.Priestess;
+import Model.Room;
 import Model.Thief;
 import Model.Warrior;
 import View.ConsoleView;
@@ -59,6 +61,8 @@ public class DungeonAdventure
 	 */
 	private static long mySeed;
 	
+	//private static CombatController myCombat;
+	
 	/**
 	 * This is the method with the main workflow.
 	 * @param theArgs 
@@ -67,7 +71,6 @@ public class DungeonAdventure
 	{
 		setupGame();
 		play();
-		
 	}
 	
 	/**
@@ -75,12 +78,23 @@ public class DungeonAdventure
 	 */
 	private static void setupGame() 
 	{
-		myConsoleView = new ConsoleView(); // will switch to GUI when created...
 		myGameStatus = true;
+		
+		// setting up type of View
+		myConsoleView = new ConsoleView(); // will switch to GUI when created...
+		
+		// Combat Controller
+		//myCombat = new CombatController();
+		CombatController.setView(myConsoleView);
+		
+		// User Input Scanner and results... (only used when we do console.) will change.
 		myUserInput = new Scanner(System.in);
+		
+		// User inputs
 		myDifficulty = promptDifficulty();
 		myHero = promptHero();
 		mySeed = promptSeed();
+		
 		myDungeon  = DungeonGenerator.generate(mySeed, myDifficulty, myHero);
 	}
 	
@@ -91,9 +105,36 @@ public class DungeonAdventure
 	{
 		while(myGameStatus) // currently off
 		{
-			promptMove();
+			promptMove(); // user input for move
+			
+			Room room = myDungeon.getCurrentRoom(); 
+			
+			if(!room.isActivated()) // check if new room is activated
+			{
+				// all Room Logic
+				if(room.hasCombat())
+				{
+					CombatController.battleMultiple(myHero, room.getMonsters());
+				}
+				else if(room.getRoomType() == RoomType.PIT) // if pit then we will take damage
+				{
+					myHero.setHitPoints(myHero.getHitPoints() - 4); // -4 hit points
+				}
+				else if(room.getRoomType() == RoomType.SHOP) // shop keeper set up and prompt
+				{
+					room.setShopkeeper(new Shopkeeper());
+					promptShop();
+				}
+				room.setActivated(true);
+			}
 		}
 		myConsoleView.showMessage("Game Halted.");
+	}
+	
+	private static void promptShop(final Room theRoom)
+	{
+		Shopkeeper shop = theRoom.getShopkeeper();
+		myConsoleView.showMessage(shop.displayItems());
 	}
 	
 	/**
@@ -151,8 +192,11 @@ public class DungeonAdventure
 		while(!goodResponse) // keep prompting until good input.
 		{
 			myConsoleView.showDungeon(myDungeon);
+			
 			myConsoleView.showMessage(myDungeon.getCurrentRoom().getDirections().toString());
+			
 			myConsoleView.showMessage("What direction do you want to move? (N)orth, (E)ast, (S)outh, and (W)est: ");
+			
 			String chosenDirection = myUserInput.next(); 
 			goodResponse = processMovement(chosenDirection);
 		}
@@ -169,10 +213,11 @@ public class DungeonAdventure
 		if(move == 0)
 		{
 			wasSuccessful = true;
-			if(myDungeon.getCurrentRoom().getRoomType() == RoomType.EXIT)// need to add more when inventory is integrated
-					 // checking for exit
+			if(myDungeon.getCurrentRoom().getRoomType() == RoomType.EXIT &&
+					myHero.getInventory().canExit())
 			{
 				myConsoleView.showMessage("You have reached the exit.");
+				myGameStatus = false; // ending while loop
 			}
 		}
 		else if(move == 1)

@@ -3,6 +3,7 @@ package Model;
 import java.awt.Point;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.List;
@@ -17,13 +18,12 @@ public class DungeonGenerator
 		Dungeon dungeon = new Dungeon(theHero, theDifficulty);
 		Random rng = new Random(theSeed);
 		
-		createLayout(dungeon, rng);
-		createEvents(dungeon, rng);
+		createEvents(dungeon, rng, createLayout(dungeon, rng));
 		
 		return dungeon;
 	}
 	
-	private static void createLayout(final Dungeon theDungeon, final Random theRng)
+	private static int createLayout(final Dungeon theDungeon, final Random theRng)
 	{
 		// getting dimensions
 		int rows = theDungeon.getRows();
@@ -38,8 +38,9 @@ public class DungeonGenerator
 		visited[startRow][startCol] = true;
 		
 		// setting the start room
-		theDungeon.setRoomType(startRow, startCol, RoomType.START);
+		theDungeon.getRoom(startRow, startCol).setRoomType(RoomType.START);;
 		theDungeon.setRoomDepth(startRow, startCol, 0);
+		theDungeon.getRoom(startRow, startCol).setActivated(true);
 		
 		// Double ended queue
 		Deque<Point> stack = new ArrayDeque<>();
@@ -101,15 +102,18 @@ public class DungeonGenerator
 		// setting exit.
 		int deep_x = (int)deepestRoom.getX();
 		int deep_y = (int)deepestRoom.getY();
-		theDungeon.getRoom(deep_x, deep_y).setRoomType(RoomType.EXIT);;
+		theDungeon.getRoom(deep_x, deep_y).setRoomType(RoomType.EXIT);
+		
+		return maxDepth;
 	}
 	
-	private static void createEvents(final Dungeon theDungeon, final Random theRng)
+	private static void createEvents(final Dungeon theDungeon, final Random theRng, int maxDepth)
 	{
 		int rows = theDungeon.getRows();
 		int cols = theDungeon.getCols();
 		
 		List<Point> allRooms = new ArrayList<>();
+		List<Point> possiablePillars = new ArrayList<>();
 		
 		for(int r = 0; r < rows; r++)
 		{
@@ -118,34 +122,118 @@ public class DungeonGenerator
 				Room room = theDungeon.getRoom(r, c);
 				
 				// deals with START
-				if(room.getRoomType() == RoomType.START &&
+				if(room.getRoomType() == RoomType.START ||
 						room.getRoomType() == RoomType.EXIT) continue;
-	
+				
+				possiablePillars.add(new Point(r, c));
+			}
+		}
+		
+		// setting pillars
+		Collections.shuffle(possiablePillars, theRng); // mix possibles
+		for(int  i = 0; i < 4; i++)
+		{
+			Point roomPoint = possiablePillars.get(i);
+			Room room = theDungeon.getRoom((int)roomPoint.getX(), (int) roomPoint.getY());
+			room.setRoomType(RoomType.PILLAR);
+			room.setItems(EnumSet.of(ItemType.PILLAR));
+		}
+		
+		// setting rest of the rooms
+		for(int r = 0; r < rows; r++)
+		{
+			for(int c = 0; c < cols; c++)
+			{
+				Room room = theDungeon.getRoom(r, c);
+				
+				// skips start, end, and pillars
+				if(room.getRoomType() == RoomType.START ||
+						room.getRoomType() == RoomType.EXIT ||
+						room.getRoomType() == RoomType.PILLAR)
+					continue;
+				
 				int roll = theRng.nextInt(100);
 				int depth = room.getDepth();
 				
 				// rng rates
 				if(depth <= 1) // 
 				{
-					if(roll < 70)
+					if(roll < 50)
 					{
 						room.setRoomType(RoomType.NONE);
 					}
 					else
 					{
 						room.setRoomType(RoomType.TREASURE);
+						room.setItems(EnumSet.of(getRandomItem(theRng)));
 					}
 				}
-				else if(false)
+				else if(depth < maxDepth * 0.5) // less than half max depth
 				{
-					
+					if(roll <= 20) // 0-20
+					{
+						room.setRoomType(RoomType.ENCOUNTER);
+						room.setItems(EnumSet.of(getRandomItem(theRng)));
+					}
+					else if(roll <= 60) // 21-60
+					{
+						room.setRoomType(RoomType.TREASURE);
+						room.setItems(EnumSet.of(getRandomItem(theRng), getRandomItem(theRng)));
+					}
+					else if(roll <= 75)
+					{
+						room.setRoomType(RoomType.PIT);
+					}
+					else if(roll <= 85)
+					{
+						room.setRoomType(RoomType.SHOP);
+						room.setShopkeeper(new Shopkeeper());
+					}
+					else 
+					{
+						room.setRoomType(RoomType.NONE);
+					}
 				}
-				else
+				else // deep section
 				{
-					room.setRoomType(RoomType.NONE);
+					if(roll <= 50)
+					{
+						room.setRoomType(RoomType.ENCOUNTER);
+						room.setItems(EnumSet.of(ItemType.WEAPON, getRandomItem(theRng)));
+					}
+					else if(roll <= 75)
+					{
+						room.setRoomType(RoomType.SHOP);
+						room.setShopkeeper(new Shopkeeper());
+					}
+					else if(roll <= 90)
+					{
+						room.setRoomType(RoomType.PIT);
+					}
+					else
+					{
+						room.setRoomType(RoomType.NONE);
+					}
 				}
 			}
 		}
+	}
+	
+	private static ItemType getRandomItem(final Random theRandom)
+	{
+		int roll = theRandom.nextInt(3);
+		ItemType item = ItemType.Gold;
+		
+		if(roll == 1 )
+		{
+			item = ItemType.HEALING_POTION;
+		}
+		else if (roll == 2)
+		{
+			item = ItemType.VISION_POTION;
+		}
+		
+		return item;
 	}
 	
 	private static Direction getDirection(final int[] theCurrent, final int[] theNext)
@@ -185,5 +273,4 @@ public class DungeonGenerator
 		}
 		return result;
 	}
-	
 }

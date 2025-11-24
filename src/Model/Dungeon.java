@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
+import Contoller.CombatController;
 import Model.RoomType;
 
 /**
@@ -38,6 +39,7 @@ public class Dungeon
 	private Point myHeroLocation;
 	
 	private Point myStartLocation;
+	
 	
 	
 	/**
@@ -158,19 +160,19 @@ public class Dungeon
 		
 		if(theDirection.equals("N") && getTraversable().contains(Direction.NORTH))
 		{
-			moveHero(x - 1, y);
+			moveHero(x - 1, y, Direction.NORTH);
 		}
 		else if(theDirection.equals("E") && getTraversable().contains(Direction.EAST))
 		{
-			moveHero(x, y + 1);
+			moveHero(x, y + 1, Direction.EAST);
 		}
 		else if(theDirection.equals("S") && getTraversable().contains(Direction.SOUTH))
 		{
-			moveHero(x + 1, y);
+			moveHero(x + 1, y, Direction.SOUTH);
 		}
 		else if(theDirection.equals("W") && getTraversable().contains(Direction.WEST))
 		{
-			moveHero(x, y - 1);
+			moveHero(x, y - 1, Direction.WEST);
 		}
 		else
 		{
@@ -179,18 +181,27 @@ public class Dungeon
 		return moved;
 	}
 	
-	private void moveHero(final int theRow, final int theCol)
+	private void moveHero(final int theRow, final int theCol, final Direction theDirection)
 	{
 		int x = (int) myHeroLocation.getX();
 		int y = (int) myHeroLocation.getY();
-		myMaze[x][y].exit();
+		
+		myMaze[x][y].exit(theDirection);
+		
 		setHeroLocation(theRow, theCol);
 		myMaze[theRow][theCol].enter(myHero);
+		
+		activateRoom(myMaze[theRow][theCol]);
 	}
 	
 	public void setRoomDepth(final int theRow, final int theCol, final int theDepth)
 	{
 		myMaze[theRow][theCol].setDepth(theDepth);
+	}
+	
+	private void activateRoom(final Room theRoom)
+	{
+		//check room type
 	}
 	
 	/**
@@ -199,11 +210,11 @@ public class Dungeon
 	 * @param theCol
 	 * @param theEvent
 	 */
-	public void setRoomType(final int theRow, final int theCol, final RoomType theRoom)
-	{
-		moveHero(theRow, theCol);
-		myMaze[theRow][theCol].setRoomType(theRoom);
-	}
+	//public void setRoomTypeTEST(final int theRow, final int theCol, final RoomType theRoom)
+	//{
+	//	moveHero(theRow, theCol);
+	//	myMaze[theRow][theCol].setRoomType(theRoom);
+	//}
 	
 	public int checkMove(final String theInput)
 	{
@@ -289,5 +300,4 @@ public class Dungeon
 		}
 		return returnString;
 	}
-	
 }

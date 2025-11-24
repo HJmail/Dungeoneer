@@ -1,5 +1,6 @@
 package Model;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class Room
 	/**
 	 * This List holds all DungeonCharacters within the room. 
 	 */
-	List<DungeonCharacter> myCharactersInRoom;
+	private List<Monster> myMonstersInRoom;
 	
 	/**
 	 * This field holds a reference to hero if they are here.
@@ -43,6 +44,10 @@ public class Room
 	 *  Represents maze depth.
 	 */
 	private int myDepth;
+	
+	private Shopkeeper myShop;
+	
+	private boolean myIsActivated;
 	
 	public Room()
 	{
@@ -77,15 +82,21 @@ public class Room
 	public void enter(final Hero theHero)
 	{
 		myHero = theHero;
-		activateRoom();
 	}
 	
-	public void exit()
+	public void exit(final Direction theDirection)
 	{
 		if(myRoomType != RoomType.START 
 				&& myRoomType != RoomType.EXIT) 
 		{
-			setRoomType(RoomType.TRAVELED);
+			if(theDirection == Direction.NORTH || theDirection.opposite() == Direction.NORTH)
+			{	
+				setRoomType(RoomType.TRAVELED_NS);
+			}
+			else
+			{
+				setRoomType(RoomType.TRAVELED_EW);
+			}
 		}
 		myHero = null;
 	}
@@ -115,14 +126,6 @@ public class Room
 	}
 	
 	/**
-	 * This starts the Room logic starting 
-	 */
-	private void activateRoom()
-	{
-		System.out.println(myDirections);
-	}
-	
-	/**
 	 * This sets the Enums of the room.
 	 * @param theItems EnumSet that represents the room.
 	 */
@@ -147,11 +150,55 @@ public class Room
 	public void setDirections(final EnumSet<Direction> theDirections)
 	{
 		myDirections = EnumSet.copyOf(theDirections);
-		//System.out.println(myDirections);
 	}
 	
 	public void setDepth(final int theDepth)
 	{
 		myDepth = theDepth;
+	}
+	
+	public void addMonster(final Monster theCharacter)
+	{
+		myMonstersInRoom.add(theCharacter);
+	}
+	
+	public void removeMonster(final Monster theCharacter)
+	{
+		myMonstersInRoom.remove(theCharacter);
+	}
+	
+	public Shopkeeper getShopkeeper()
+	{
+		return myShop;
+	}
+	
+	public void setShopkeeper(final Shopkeeper theShop)
+	{
+		myShop = theShop;
+	}
+	
+	public void setActivated(final boolean theActivated)
+	{
+		myIsActivated = theActivated;
+	}
+	
+	public void setMonsters(final List<Monster> theMonsters)
+	{
+		myMonstersInRoom = new ArrayList<Monster>(theMonsters);
+	}
+	
+	public List<Monster> getMonsters()
+	{
+		return new ArrayList<Monster>(myMonstersInRoom);
+	}
+	
+	public boolean hasCombat()
+	{
+		return myMonstersInRoom.size() == 0;
+	}
+	
+	public boolean isActivated()
+	{
+		return myIsActivated;
 	}
 }
