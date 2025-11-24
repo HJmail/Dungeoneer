@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Enum representing types of items findable.

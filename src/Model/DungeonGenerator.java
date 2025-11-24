@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.awt.Point;
 import java.util.ArrayDeque;
@@ -8,7 +8,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
-import Model.RoomType;
+import model.RoomType;
 
 public class DungeonGenerator 
 {

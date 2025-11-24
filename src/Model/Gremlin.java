@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 public class Gremlin extends Monster {
 
@@ -16,6 +16,6 @@ public class Gremlin extends Monster {
               attackSpeed, chanceToHit, chanceToHeal,
               minHeal, maxHeal);
 
-        myImagePath = "images/gremlin.png";
+        myImagePath = "Dungeoneer_Character/gremlin.png";
     }
 }

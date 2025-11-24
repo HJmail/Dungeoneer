@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Represents a general item that can exist in the player's inventory.
@@ -9,7 +9,7 @@ package Model;
  * 
  * <p>@version 0.0.1
  * 
- * <p>@date 11/1/25
+ * <p>@date 11/16/25
  */
 public interface Item {
 

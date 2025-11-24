@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Represents a Healing Potion that restores health points to the hero when consumed.
@@ -8,7 +8,7 @@ package Model;
  * 
  * <P>@version 0.0.1
  * 
- * <p>@date 10/31/25
+ * <p>@date 11/16/25
  */
 public class HealingPotion extends Potion {
 
@@ -65,4 +65,3 @@ public class HealingPotion extends Potion {
     return "Healing Potion (" + getRarity() + ", Heals: " + getHealAmount() + " HP)";
   }
 }
-

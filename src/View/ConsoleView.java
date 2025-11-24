@@ -1,10 +1,9 @@
-package View;
+package view;
 
-import Model.Dungeon;
-import Model.Hero;
+import model.Dungeon;
+import model.Hero;
 
-public class ConsoleView implements GameView
-{
+public class ConsoleView implements GameView {
 
 	@Override
 	public void showMessage(final String theMessage) 
