@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Represents an additional item Gold class for the player to collect and

@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Represents a Vision Potion that reveals hidden parts of the dungeon
@@ -8,7 +8,7 @@ package Model;
  * 
  * <p>@version 0.0.1
  * 
- * <p>@date 10/26/25
+ * <p>@date 11/16/25
  */
 public class VisionPotion extends Potion {
 

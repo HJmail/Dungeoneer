@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Represents one of the four Pillars of OO that the player must collect
@@ -12,7 +12,7 @@ package Model;
  * 
  * <p>@version 0.0.1
  * 
- * <p>@date 11/1/25
+ * <p>@date 11/16/25
  */
 public class Pillar implements Item {
 

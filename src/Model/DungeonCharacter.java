@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Abstract base class representing all characters in the dungeon. Supports both

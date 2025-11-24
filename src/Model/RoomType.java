@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  *  This is the enum for possible events in rooms.
@@ -12,6 +12,7 @@ public enum RoomType
 	PILLAR('l'),
 	EXIT('E'),
 	START('e'),
+	TRAVELED('~'),
 	TRAVELED_NS('|'),
 	TRAVELED_EW('-'),
 	SHOP('s'),
@@ -29,4 +30,3 @@ public enum RoomType
 		return myChar;
 	}
 }
-

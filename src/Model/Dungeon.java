@@ -1,11 +1,11 @@
- package Model;
+package model;
 
 import java.awt.Point;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
-import Model.RoomType;
+import model.RoomType;
 
 /**
  * This class represents the dungeon the player must traverse.
@@ -289,5 +289,4 @@ public class Dungeon
 		}
 		return returnString;
 	}
-	
 }

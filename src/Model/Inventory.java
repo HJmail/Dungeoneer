@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.Map;
  * 
  * <p>@version 0.0.1
  * 
- * <p>@date 10/24/25
+ * <p>@date 11/16/25
  */
 
 public class Inventory {
@@ -203,7 +203,6 @@ public class Inventory {
 
   public Map<String, Integer> getPotionStacks() {
     return new HashMap<>(myPotionStacks);
-
   }
 
   /**
@@ -275,5 +274,4 @@ public class Inventory {
 
     System.out.println("Inventory has been reset to default state.");
   }
-
 }
