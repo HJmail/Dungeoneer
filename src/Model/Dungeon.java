@@ -38,9 +38,10 @@ public class Dungeon
 	 */
 	private Point myHeroLocation;
 	
+	/**
+	 * This is the starting point used in some logic.
+	 */
 	private Point myStartLocation;
-	
-	
 	
 	/**
 	 *  This is the basic class constructor.
@@ -54,13 +55,13 @@ public class Dungeon
 		myHeroLocation = new Point();
 		myStartLocation = new Point();
 		
-		generateDungeon();
+		generateDimensions();
 	}
 	
 	/**
 	 * This method generates a random dungeon
 	 */
-	private void generateDungeon()
+	private void generateDimensions()
 	{
 		for(int i = 0; i < myRows; i++) // outer is row
 		{
@@ -71,53 +72,14 @@ public class Dungeon
 				myMaze[i][j] = newRoom;
 			}
 		}
-		// Giving the Room their Directions
-		//setAllRoomDirections();
-		
-		// All of the special room creations happen here
-		//placeEntranceAndExit();
 	}
 	
 	/**
 	 * Checks if a given path is able to go into.
 	 */
-	private EnumSet<Direction> getTraversable()
+	public EnumSet<Direction> getTraversable()
 	{
 		return myMaze[(int)myHeroLocation.getX()][(int)myHeroLocation.getY()].getDirections();
-	}
-	
-	/**
-	 * This sets all the created rooms directions.
-	 */
-	private void setAllRoomDirections()
-	{
-		// IMPORTANT THIS DOES NOT CHANGE BASED ON GIVEN ROOMS OR WALLS
-		// SIMPLY REMOVES DIRECTIONS BASED ON MAP EDGES
-		for(int i = 0; i < myMaze.length; i++) // rows
-		{
-			for(int j = 0; j < myMaze[0].length; j++) // cols
-			{
-				EnumSet<Direction> directions = EnumSet.of(Direction.NORTH, Direction.EAST,
-															Direction.SOUTH, Direction.WEST);
-				if(i == 0) // check for NORTH edges
-				{
-					directions.remove(Direction.NORTH);
-				}
-				if(i == myMaze.length - 1) // check for SOUTH edges
-				{
-					directions.remove(Direction.SOUTH);
-				}
-				if(j == 0) // check for WEST edge
-				{
-					directions.remove(Direction.WEST);
-				}
-				if(j == myMaze[0].length - 1) // checks for EAST edge
-				{
-					directions.remove(Direction.EAST);
-				}
-				myMaze[i][j].setDirections(directions);
-			}
-		}
 	}
 	
 	/**
@@ -130,47 +92,30 @@ public class Dungeon
 		myHeroLocation.setLocation(theRows, theCols);
 	}
 	
-	
 	/**
-	 * This is a helper method that makes sure a given input string is within the array of string
-	 * @param theInput
-	 * @param theArray
-	 * @return
+	 * This method moves the hero if possible 
+	 * @param theDirection The direction to move.
+	 * @return Boolean representing if the move was successful.
 	 */
-	private boolean checkStringArray(final String theInput, final String[] theArray)
-	{
-		boolean isThere = false;
-		for(String s: theArray)
-		{
-			if(s.equals(theInput.toUpperCase()))
-			{
-				isThere = true;
-				break;
-			}
-		}
-		return isThere;
-	}
-	
-	
-	private boolean move(final String theDirection)
+	public boolean move(final Direction theDirection)
 	{
 		boolean moved = true;
 		int x = (int) myHeroLocation.getX();
 		int y = (int) myHeroLocation.getY();
 		
-		if(theDirection.equals("N") && getTraversable().contains(Direction.NORTH))
+		if(getTraversable().contains(theDirection) && theDirection == Direction.NORTH)
 		{
 			moveHero(x - 1, y, Direction.NORTH);
 		}
-		else if(theDirection.equals("E") && getTraversable().contains(Direction.EAST))
+		else if(getTraversable().contains(theDirection) && theDirection == Direction.EAST)
 		{
 			moveHero(x, y + 1, Direction.EAST);
 		}
-		else if(theDirection.equals("S") && getTraversable().contains(Direction.SOUTH))
+		else if(getTraversable().contains(theDirection) && theDirection == Direction.SOUTH)
 		{
 			moveHero(x + 1, y, Direction.SOUTH);
 		}
-		else if(theDirection.equals("W") && getTraversable().contains(Direction.WEST))
+		else if(getTraversable().contains(theDirection) && theDirection == Direction.WEST)
 		{
 			moveHero(x, y - 1, Direction.WEST);
 		}
@@ -181,17 +126,24 @@ public class Dungeon
 		return moved;
 	}
 	
+	/**
+	 * The Logic for moving a hero to a new room and starting new room logic.
+	 * @param theRow Row of new room.
+	 * @param theCol Col of new room.
+	 * @param theDirection the Direction so we can maintain good symbols for discretions.
+	 */
 	private void moveHero(final int theRow, final int theCol, final Direction theDirection)
-	{
+	{ 
+		// getting current row and col
 		int x = (int) myHeroLocation.getX();
 		int y = (int) myHeroLocation.getY();
 		
+		// exiting old room.
 		myMaze[x][y].exit(theDirection);
 		
+		// joining new room
 		setHeroLocation(theRow, theCol);
 		myMaze[theRow][theCol].enter(myHero);
-		
-		activateRoom(myMaze[theRow][theCol]);
 	}
 	
 	public void setRoomDepth(final int theRow, final int theCol, final int theDepth)
@@ -199,9 +151,16 @@ public class Dungeon
 		myMaze[theRow][theCol].setDepth(theDepth);
 	}
 	
-	private void activateRoom(final Room theRoom)
+	
+	private void shopLogic(final Room theRoom)
 	{
-		//check room type
+		Shopkeeper shop = theRoom.getShopkeeper();
+		boolean isShopping = true;
+		while(isShopping)
+		{
+			shop.displayItems();
+			//buyitems
+		}
 	}
 	
 	/**
@@ -215,22 +174,6 @@ public class Dungeon
 	//	moveHero(theRow, theCol);
 	//	myMaze[theRow][theCol].setRoomType(theRoom);
 	//}
-	
-	public int checkMove(final String theInput)
-	{
-		int returnInt = 0; // 0 is success, 1 direction is bad, 2 is bad input
-		String[] goodInput = {"N", "E", "S", "W"};
-		
-		if(checkStringArray(theInput, goodInput) && !move(theInput))
-		{
-			returnInt = 1; // direction doesn't work
-		}
-		else
-		{
-			returnInt = 2; // bad input
-		}
-		return returnInt;
-	}
 	
 	public void setStartLocation(final int theRow, final int theCol)
 	{
@@ -274,30 +217,5 @@ public class Dungeon
 	public Room getRoom(final int theRow, final int theCol)
 	{
 		return myMaze[theRow][theCol];
-	}
-	
-	/**
-	 * This gets a string to represent the dungeon.
-	 */
-	public String toString()
-	{
-		String returnString = "";
-		for(int i = 0; i < myRows; i++)
-		{
-			for(int j = 0; j < myCols; j++)
-			{
-				if((int) myHeroLocation.getX() == i &&
-					(int) myHeroLocation.getY() == j)
-				{
-					returnString += 'C';
-				}
-				else
-				{
-					returnString += myMaze[i][j].getRoomChar();
-				}
-			}
-			returnString += "\n";
-		}
-		return returnString;
 	}
 }

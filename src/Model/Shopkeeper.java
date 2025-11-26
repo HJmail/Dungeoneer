@@ -10,7 +10,8 @@ public class Shopkeeper {
         return "Welcome to my shop!\n" +
                "1. Healing Potion - " + HEALING_POTION_COST + " gold\n" +
                "2. Vision Potion - " + VISION_POTION_COST + " gold\n" +
-               "3. Weapon Upgrade - " + WEAPON_UPGRADE_COST + " gold\n";
+               "3. Weapon Upgrade - " + WEAPON_UPGRADE_COST + " gold\n" +
+               "4. Stop Shopping\n";
     }
 
     public String buyItem(Hero theHero, int theChoice) {
@@ -21,6 +22,8 @@ public class Shopkeeper {
                 return purchase(theHero, VISION_POTION_COST, "Vision Potion");
             case 3:
                 return upgradeWeapon(theHero);
+            case 4:
+            	return "Thank you for Shopping.";
             default:
                 return "Invalid choice.";
         }
