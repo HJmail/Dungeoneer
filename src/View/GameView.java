@@ -49,4 +49,9 @@ public interface GameView
      *  This method prints the end of combat details
      */
     void showCombatResult();
+    
+    /**
+     * Game over view just indicated to the player that the game is over.
+     */
+    void gameOver();
 }

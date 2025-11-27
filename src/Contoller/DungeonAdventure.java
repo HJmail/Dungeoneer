@@ -23,6 +23,8 @@ import View.GameView;
  */
 public class DungeonAdventure 
 {	
+	private static final int PIT_DMG = 4;
+	
 	/**
 	 * This field is the main character 
 	 */
@@ -106,13 +108,6 @@ public class DungeonAdventure
 		myView.showMessage("Game Halted.");
 	}
 	
-	private static void promptShop(final Room theRoom)
-	{
-		Shopkeeper shop = theRoom.getShopkeeper();
-		myView.showMessage(shop.displayItems());
-		
-	}
-	
 	/**
 	 * This method asks the user what difficulty they want.
 	 * @return Integer representing the difficulty.
@@ -125,7 +120,7 @@ public class DungeonAdventure
 	
 	/**
 	 * This method asks the user what class they want to play.
-	 * @return The newly made hero that the user will play.
+	 * @return The newly made hero that the user willS play.
 	 */
 	private static Hero promptHero()
 	{
@@ -133,19 +128,18 @@ public class DungeonAdventure
 		String response = myUserInput.next();
 		String heroName = promptHeroName();
 		Hero userHero = null;
-		if(response == "W")
+		if(response.equals("W"))
 		{
 			userHero = new Warrior(heroName);
 		}
-		else if(response == "T")
+		else if(response.equals("T"))
 		{
 			userHero = new Thief(heroName);
 		}
-		else if(response == "P")
+		else if(response.equals("P"))
 		{
 			userHero = new Priestess(heroName);
 		}
-		myView.showMessage(heroName + " has been created!");
 		return userHero;
 	}
 
@@ -177,8 +171,40 @@ public class DungeonAdventure
 	
 	private static void activateRoom()
 	{
-		RoomType rt = myDungeon.getCurrentRoom().getRoomType();
+		Room cRoom = myDungeon.getCurrentRoom();
+		RoomType rt = cRoom.getRoomType();
+		boolean activated = cRoom.isActivated();
 		
+		if(rt == RoomType.SHOP) // activated not needed (always available)
+		{
+			// shop logic
+			System.out.println("SHOP!");
+			System.out.println(myHero);
+			Shopkeeper shop = cRoom.getShopkeeper();
+			myView.showShopItems(shop.getItems()); // items not ready yet.
+			int input = myView.askShop();
+			shop.buyItem(myHero, input);
+		}
+		else if(rt == RoomType.PIT)
+		{
+			// pit logic
+			System.out.println(myHero);
+			myHero.setHitPoints(myHero.getHitPoints() - PIT_DMG);
+			System.out.println(myHero);
+			myGameStatus = myHero.isAlive();
+			System.out.println("PIT!");
+			if(!myGameStatus)
+			{
+				myView.gameOver();
+			}
+		}
+		else if((rt == RoomType.PILLAR || rt == RoomType.TREASURE)
+				&& !activated)
+		{
+			// pillar or treasure logic
+			System.out.println("LOOT!");
+			//cRoom.get
+		}
 		
 	}
 }

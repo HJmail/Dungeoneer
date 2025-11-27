@@ -3,6 +3,7 @@ package Model;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -40,6 +41,8 @@ public class Room
 	 */
 	private Hero myHero;
 	
+	private Random myRng;
+	
 	/**
 	 *  Represents maze depth.
 	 */
@@ -67,12 +70,14 @@ public class Room
 	public Room(final EnumSet<Direction> theDirections,
 				final RoomType theEvent,
 				final EnumSet<ItemType> theItems,
-				final char theCharRepresentation)
+				final char theCharRepresentation,
+				final Random theRng)
 	{
 		myDirections = EnumSet.copyOf(theDirections);
 		myRoomType = theEvent;
 		myItems = EnumSet.copyOf(theItems);
 		myCharRepresentation = theCharRepresentation;
+		myRng = theRng;
 	}
 	
 	/**
@@ -200,5 +205,25 @@ public class Room
 	public boolean isActivated()
 	{
 		return myIsActivated;
+	}
+	
+	public ArrayList<Item> getItems()
+	{
+		ArrayList<Item> theItems = new ArrayList<>();
+		
+		for(ItemType e: myItems)
+		{
+			//newItem = 
+		}
+		
+		return theItems;
+	}
+	private Item generateItem(final ItemType theEnum)
+	{
+		//switch(ItemType)
+		{
+		
+		}
+		return new Item();
 	}
 }

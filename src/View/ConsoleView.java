@@ -116,4 +116,9 @@ public class ConsoleView implements GameView
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void gameOver()
+	{
+		System.out.println("\nGAME OVER!");
+	}
 }

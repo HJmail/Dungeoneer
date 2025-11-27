@@ -5,6 +5,7 @@ package Model;
  */
 public enum ItemType 
 {
+	
 	// These are the Different types of findable items.
 	HEALING_POTION("This potion seems to glimmer a shiny crimson red."),
 	VISION_POTION("This potion seems to shine white and silver."),
@@ -25,6 +26,8 @@ public enum ItemType
 	{
 		myDescription = theDesc;
 	}
+	
+	
 	
 	/**
 	 * Getter method that returns the description.

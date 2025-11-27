@@ -1,10 +1,15 @@
 package Model;
 
+import java.util.ArrayList;
+
+
 public class Shopkeeper {
 
     private static final int HEALING_POTION_COST = 25;
     private static final int VISION_POTION_COST = 40;
     private static final int WEAPON_UPGRADE_COST = 100;
+    
+    private static final ArrayList<Item> myItems = new ArrayList<Item>();
 
     public String displayItems() {
         return "Welcome to my shop!\n" +
@@ -12,6 +17,11 @@ public class Shopkeeper {
                "2. Vision Potion - " + VISION_POTION_COST + " gold\n" +
                "3. Weapon Upgrade - " + WEAPON_UPGRADE_COST + " gold\n" +
                "4. Stop Shopping\n";
+    }
+    
+    public ArrayList<Item> getItems()
+    {
+    	return myItems; // not a clone
     }
 
     public String buyItem(Hero theHero, int theChoice) {
