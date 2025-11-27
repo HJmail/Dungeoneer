@@ -102,6 +102,12 @@ public class ConsoleView implements GameView
 		}
 		return chosenDirection;
 	}
+	
+	public void showPit(final int thePitDmg)
+	{
+		System.out.println("You have fallen into a pit and taken " +
+						thePitDmg + "Points of Damage." );
+	}
 
 	@Override
 	public void showCombatStart() 

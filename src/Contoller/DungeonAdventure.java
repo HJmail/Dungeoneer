@@ -1,5 +1,6 @@
 package Contoller;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -9,6 +10,7 @@ import Model.DungeonGenerator;
 import Model.RoomType;
 import Model.Shopkeeper;
 import Model.Hero;
+import Model.Item;
 import Model.Priestess;
 import Model.Room;
 import Model.Thief;
@@ -65,6 +67,9 @@ public class DungeonAdventure
 	 */
 	private static long mySeed;
 	
+	private static RoomController myRoomController;
+	
+	
 	/**
 	 * This is the method with the main workflow.
 	 * @param theArgs 
@@ -82,9 +87,6 @@ public class DungeonAdventure
 	{
 		myGameStatus = true;
 		
-		// setting up type of View
-		myView = new ConsoleView(); // will switch to GUI when created...
-		
 		// User Input Scanner and results... (only used when we do console.) will change.
 		myUserInput = new Scanner(System.in);
 		
@@ -94,6 +96,12 @@ public class DungeonAdventure
 		mySeed = promptSeed();
 		
 		myDungeon  = DungeonGenerator.generate(mySeed, myDifficulty, myHero);
+		
+		// other controllers
+		myView = new ConsoleView();
+		CombatController.setView(myView); // setting combat view
+		myRoomController = new RoomController(myHero, myDungeon, myView);
+		
 	}
 	
 	/**
@@ -177,34 +185,25 @@ public class DungeonAdventure
 		
 		if(rt == RoomType.SHOP) // activated not needed (always available)
 		{
-			// shop logic
-			System.out.println("SHOP!");
-			System.out.println(myHero);
-			Shopkeeper shop = cRoom.getShopkeeper();
-			myView.showShopItems(shop.getItems()); // items not ready yet.
-			int input = myView.askShop();
-			shop.buyItem(myHero, input);
+			myRoomController.activateShop();
 		}
 		else if(rt == RoomType.PIT)
 		{
-			// pit logic
-			System.out.println(myHero);
-			myHero.setHitPoints(myHero.getHitPoints() - PIT_DMG);
-			System.out.println(myHero);
-			myGameStatus = myHero.isAlive();
-			System.out.println("PIT!");
-			if(!myGameStatus)
-			{
-				myView.gameOver();
-			}
+			myRoomController.activatePit();
 		}
-		else if((rt == RoomType.PILLAR || rt == RoomType.TREASURE)
-				&& !activated)
+		else if(rt == RoomType.PILLAR && !activated)
 		{
-			// pillar or treasure logic
-			System.out.println("LOOT!");
-			//cRoom.get
+			myRoomController.activatePillar();
 		}
-		
+		else if(rt == RoomType.TREASURE && !activated)
+		{
+			myRoomController.activateTreasure();
+		}
+		else if(rt == RoomType.ENCOUNTER && !activated)
+		{
+			myRoomController.activateEncounter();
+		}
+		// room is nothing.
 	}
+
 }

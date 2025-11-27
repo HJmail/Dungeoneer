@@ -28,17 +28,22 @@ public interface GameView
      */
     void showShopItems(final ArrayList<Item> theItem);
     
+    
     /**
      * This method prompts user for input for the shop.
      * @return Returns the user shop choice input.
      */
     int askShop();
     
+    void showPit(final int thePitDmg);
+    
     /**
      * This method prompt user for a direction for moving.
      * @return Returns the user Direction input.
      */
     Direction askDirection();
+    
+    
     
     /**
      * This method prints the start of combat details.
