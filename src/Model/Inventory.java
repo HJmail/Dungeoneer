@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import view.GameView;
+
 /**
  * Represents the player's inventory, which stores collectible items such as
  * potions, weapons, gold, and the four Pillars of OO. The inventory is
@@ -15,37 +17,37 @@ import java.util.Map;
  * item management functionality for gameplay progression.
  * 
  * <p>@author Cristian Acevedo-Villasana
- * 
- * <p>@version 0.0.1
- * 
- * <p>@date 11/16/25
+ * @version 0.0.2
+ * @date 11/28/25
  */
-
 public class Inventory {
 
   /** Represents the Abstract Pillar whether it has been collected. */
   private boolean myPillarAbstractionCollected;
-  
+
   /** Represents the Encapsulation Pillar whether it has been collected. */
   private boolean myPillarEncapsulationCollected;
-  
+
   /** Represents the Inheritance Pillar whether it has been collected. */
   private boolean myPillarInheritanceCollected;
-  
+
   /** Represents the Polymorphism Pillar whether it has been collected. */
   private boolean myPillarPolymorphismCollected;
-  
+
   /** The maximum number of each potion type that can be stacked. */
   private static final int MAX_POTION_STACK = 3;
-  
+
   /** The maximum total number of items the player can carry. */
   private static final int MAX_ITEMS = 5;
-  
-  /** The list of all item currently stored in the player's inventory. */
+
+  /** The list of all items currently stored in the player's inventory. */
   private final List<Item> myInventory;
-  
+
   /** Tracks how many of each potion type the player holds. */
   private final Map<String, Integer> myPotionStacks;
+
+  /** View used to display inventory messages (GUI log / console). */
+  private transient GameView myView;
 
   /**
    * Constructs an empty inventory with no collected items.
@@ -54,16 +56,37 @@ public class Inventory {
     myInventory = new ArrayList<>();
     myPotionStacks = new HashMap<>();
   }
-    
+
+  /**
+   * Attach a {@link GameView} so the inventory can display messages
+   * through the GUI/console instead of printing directly.
+   *
+   * <p>If no view is set, messages fall back to System.out.
+   *
+   * @param theView the GameView to use for messages
+   */
+  public void setView(final GameView theView) {
+    myView = theView;
+  }
+
+  /** Helper to send messages to the view (or console if view is null). */
+  private void log(final String theMessage) {
+    if (myView != null) {
+      myView.showMessage(theMessage);
+    } else {
+      System.out.println(theMessage);
+    }
+  }
+
   /**
    * Returns the list of all items currently in the player's inventory.
    * 
-   * <p>@return a list of {@link Item} objects contained in the inventory
+   * @return a list of {@link Item} objects contained in the inventory
    */
   public List<Item> getInventory() {
-    return myInventory;  
+    return myInventory;
   }
-  
+
   /**
    * addItem is a method where if the player picks up a Pillar type of
    * - A being Abstract pillar
@@ -73,8 +96,7 @@ public class Inventory {
    * If the player has a pillar it's true and if the player doesn't have a 
    * pillar it it's false.
    * 
-   * <p>@param theItem being the pillar.
-   * Adds an item to the player's inventory.
+   * <p>Adds an item to the player's inventory.
    * Potions are stackable (maximum 3 per type). Pillars are tracked individually.
    * </p>
    *
@@ -85,10 +107,10 @@ public class Inventory {
     if (theItem == null) {
       throw new IllegalArgumentException("Cannot add null item to inventory.");
     }
-    
+
     if (myInventory.size() >= MAX_ITEMS) {
-      throw new IllegalStateException("Inventory full! You cannot carry more than " 
-                                        + MAX_ITEMS + " items.");
+      throw new IllegalStateException("Inventory full! You cannot carry more than "
+                                      + MAX_ITEMS + " items.");
     }
 
     // Handle Potion stacking logic
@@ -97,12 +119,12 @@ public class Inventory {
       int current = myPotionStacks.getOrDefault(key, 0);
 
       if (current >= MAX_POTION_STACK) {
-        System.out.println("You cannot carry more than " + MAX_POTION_STACK + " " + key + "s.");
+        log("You cannot carry more than " + MAX_POTION_STACK + " " + key + "s.");
         return; // skip adding if stack is full
       }
 
       myPotionStacks.put(key, current + 1);
-      System.out.println("Picked up " + key + " (" + (current + 1) + "/" + MAX_POTION_STACK + ")");
+      log("Picked up " + key + " (" + (current + 1) + "/" + MAX_POTION_STACK + ")");
     }
 
     // Always add the item to the list for tracking
@@ -120,21 +142,21 @@ public class Inventory {
       }
     }
   }
-  
+
   /**
    * Uses (consumes or activates) an item by name.
    * Supports both stackable items (like potions) and non-stackable items.
-   * </p>
    *
    * @param theItemName the simple class name of the item (e.g., "HealingPotion")
+   * @throws IllegalArgumentException if the name is null/blank
    * @throws IllegalStateException if the item is not found or cannot be used
    */
   public void useItem(final String theItemName) {
     if (theItemName == null || theItemName.isBlank()) {
       throw new IllegalArgumentException("Item name cannot be null or empty.");
-          
     }
-    
+
+    // Case 1: stackable item (Potion)
     if (myPotionStacks.containsKey(theItemName)) {
       int current = myPotionStacks.get(theItemName);
 
@@ -163,11 +185,12 @@ public class Inventory {
         myPotionStacks.remove(theItemName);
       }
 
-      System.out.println("Used one " + theItemName + ". Remaining: "
-              + myPotionStacks.getOrDefault(theItemName, 0));
+      log("Used one " + theItemName + ". Remaining: "
+          + myPotionStacks.getOrDefault(theItemName, 0));
       return;
     }
 
+    // Case 2: non-stackable item
     Item toUse = null;
     for (Item item : myInventory) {
       if (item.getClass().getSimpleName().equals(theItemName)) {
@@ -183,7 +206,7 @@ public class Inventory {
     toUse.use();
     myInventory.remove(toUse);
   }
- 
+
   /**
    * Removes a specified item from the player's inventory.
    *
@@ -199,8 +222,13 @@ public class Inventory {
         myPotionStacks.remove(key);
       }
     }
-  } 
+  }
 
+  /**
+   * Returns a defensive copy of the potion stacks map.
+   *
+   * @return a copy of the potion stack counts
+   */
   public Map<String, Integer> getPotionStacks() {
     return new HashMap<>(myPotionStacks);
   }
@@ -208,9 +236,8 @@ public class Inventory {
   /**
    * Checks if the player's inventory contains the specified item.
    * 
-   * <p>@param theItem the item to search for
-   * 
-   * <p>@return {@code true} if the item is in the inventory; {@code false} otherwise
+   * @param theItem the item to search for
+   * @return {@code true} if the item is in the inventory; {@code false} otherwise
    */
   public boolean hasItem(final Item theItem) {
     return myInventory.contains(theItem);
@@ -220,20 +247,19 @@ public class Inventory {
    * Determines whether the player can exit the dungeon.
    * The player can only exit if all four pillars (A, E, I, and P) have been collected.
    * 
-   * <p>@return {@code true} if all pillars are collected; {@code false} otherwise
+   * @return {@code true} if all pillars are collected; {@code false} otherwise
    */
   public boolean canExit() {
     return myPillarAbstractionCollected 
-      && myPillarEncapsulationCollected 
-      && myPillarInheritanceCollected 
-      && myPillarPolymorphismCollected; 
+        && myPillarEncapsulationCollected 
+        && myPillarInheritanceCollected 
+        && myPillarPolymorphismCollected; 
   }
-  
+
   /**
    * Returns how many of the four Pillars of OO have been collected.
    * This method counts the number of Pillar collection flags currently set to {@code true}.
    * Useful for displaying player progress (e.g., "3/4 Pillars collected").
-   * </p>
    *
    * @return the number of collected pillars, from 0 to 4
    */
@@ -254,12 +280,10 @@ public class Inventory {
     return count;
   }
 
-  
   /**
    * Clears all items and resets the inventory to its initial state.
    * This method removes every item from the inventory list and potion stacks,
    * and resets all Pillar collection flags to {@code false}.
-   * </p>
    * 
    * <p>Intended for use when starting a new game or resetting the dungeon.</p>
    */
@@ -272,6 +296,6 @@ public class Inventory {
     myPillarInheritanceCollected = false;
     myPillarPolymorphismCollected = false;
 
-    System.out.println("Inventory has been reset to default state.");
+    log("Inventory has been reset to default state.");
   }
 }

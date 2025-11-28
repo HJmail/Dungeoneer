@@ -13,6 +13,20 @@ package model;
  */
 public interface Item {
 
+	
+  /**
+   * Returns the display name of the item (e.g., "Healing Potion",
+   * "Vision Potion", "Gold", "Falchion").
+   *
+   * <p>By default this just returns {@link #getDescription()}, but
+   * concrete items are free to override with a shorter / nicer name.
+   *
+   * @return the item’s display name
+   */
+   default String getName() {
+	 return getDescription();
+   }
+	  
   /**
    * Provides a string description of the item.
    * 

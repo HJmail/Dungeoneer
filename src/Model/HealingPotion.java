@@ -64,4 +64,9 @@ public class HealingPotion extends Potion {
   public String getDescription() {
     return "Healing Potion (" + getRarity() + ", Heals: " + getHealAmount() + " HP)";
   }
+  
+  @Override
+  public String getName() {
+    return "Healing Potion";
+  }
 }

@@ -56,4 +56,9 @@ public class VisionPotion extends Potion {
   public String getDescription() {
     return "Vision Potion (" + getRarity() + ", Duration: " + getDuration() + ")";
   }
+  
+  @Override
+  public String getName() {
+    return "Vision Potion";
+  }
 }

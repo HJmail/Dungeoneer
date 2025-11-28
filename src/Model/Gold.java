@@ -63,4 +63,9 @@ public class Gold implements Item {
   public void use() {
     System.out.println("You have " + myAmount + " gold coins.");
   }
+  
+  @Override
+  public String getName() {
+    return "Gold";
+  }
 }
