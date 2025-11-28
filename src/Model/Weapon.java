@@ -1,3 +1,5 @@
+package model;
+
 /**
  * Represents the weapons for both the heroes and monsters that they can pick
  * up and use. Weapons have a base damage and a rarity which modifies final damage.
@@ -6,7 +8,7 @@
  * 
  * <p>@version 0.0.1
  * 
- * <p>@date 11/1/25
+ * <p>@date 11/16/25
  */
 public class Weapon implements Item {
 
@@ -158,4 +160,3 @@ public class Weapon implements Item {
     return new Weapon("Morning Star", 25, rarity);
   }
 }
-

@@ -1,3 +1,5 @@
+package model;
+
 /**
  * Represents a Vision Potion that reveals hidden parts of the dungeon
  * when consumed by the hero. Duration scales with rarity.
@@ -6,7 +8,7 @@
  * 
  * <p>@version 0.0.1
  * 
- * <p>@date 10/26/25
+ * <p>@date 11/16/25
  */
 public class VisionPotion extends Potion {
 
@@ -53,5 +55,10 @@ public class VisionPotion extends Potion {
   @Override
   public String getDescription() {
     return "Vision Potion (" + getRarity() + ", Duration: " + getDuration() + ")";
+  }
+  
+  @Override
+  public String getName() {
+    return "Vision Potion";
   }
 }

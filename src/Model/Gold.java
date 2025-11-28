@@ -1,3 +1,5 @@
+package model;
+
 /**
  * Represents an additional item Gold class for the player to collect and
  * use for the shop. 
@@ -60,5 +62,10 @@ public class Gold implements Item {
    */
   public void use() {
     System.out.println("You have " + myAmount + " gold coins.");
+  }
+  
+  @Override
+  public String getName() {
+    return "Gold";
   }
 }

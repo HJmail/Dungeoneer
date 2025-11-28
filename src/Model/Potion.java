@@ -1,3 +1,5 @@
+package model;
+
 /**
  * Represents a general Potion item that can be consumed by the player to produce
  * temporary effects such as healing or enhanced vision. Potions have a base
@@ -7,7 +9,7 @@
  * 
  * <p>@version 0.0.1
  * 
- * <p>@date 10/24/25
+ * <p>@date 11/16/25
  */
 public abstract class Potion implements Item {
 
