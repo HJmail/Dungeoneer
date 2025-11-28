@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  *  This is the enum for possible events in rooms.

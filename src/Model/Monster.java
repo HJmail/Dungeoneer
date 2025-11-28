@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 /**
  * Abstract Monster class that extends DungeonCharacter and adds

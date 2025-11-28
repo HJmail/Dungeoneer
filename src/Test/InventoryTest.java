@@ -1,3 +1,5 @@
+package Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -6,6 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import Model.Gold;
+import Model.HealingPotion;
+import Model.Inventory;
+import Model.Pillar;
+import Model.Rarity;
+import Model.VisionPotion;
+import Model.Weapon;
+
 /**
  * Unit tests for the {@link Inventory} class in the Dungeon Adventure project.
  * 
@@ -13,7 +23,7 @@ import org.junit.jupiter.api.Test;
  * 
  * <p>@version 0.0.2
  * 
- * <p>@date 11/09/25
+ * <p>@date 11/16/25
  */
 class InventoryTest {
 
@@ -187,4 +197,3 @@ class InventoryTest {
   }
 
 }
-
