@@ -5,8 +5,12 @@ import java.util.Scanner;
 
 import Model.Direction;
 import Model.Dungeon;
+import Model.GameConfig;
 import Model.Hero;
 import Model.Item;
+import Model.Priestess;
+import Model.Thief;
+import Model.Warrior;
 
 public class ConsoleView implements GameView
 {
@@ -63,6 +67,74 @@ public class ConsoleView implements GameView
 		
 		System.out.println(shopString);
 	}
+	
+	public GameConfig askGameConfig()
+	{		
+		return new GameConfig(askHero(), askDifficulty(), askSeed());
+	}
+	
+	private int askDifficulty()
+	{
+		boolean responseGood = false;
+		int diff = 0;
+		while(!responseGood)
+		{
+			System.out.println("What Difficulty do you want?  Please choose 1-9: ");
+			diff = myUserInput.nextInt();
+			responseGood = (diff > 0 && diff < 9);
+		}
+		return diff;
+	}
+	
+	private Hero askHero()
+	{
+		System.out.println("What is you Hero's Name: ");
+		String heroName = myUserInput.next();
+		Hero userHero = null;
+		while(userHero == null)
+		{
+			System.out.println("What Class do you want to play? (P)riestess, (T)hief, or (W)arrior: ");
+			String response = myUserInput.next().toUpperCase();
+			if(response.equals("W"))
+			{
+				userHero = new Warrior(heroName);
+			}
+			else if(response.equals("T"))
+			{
+				userHero = new Thief(heroName);
+			}
+			else if(response.equals("P"))
+			{
+				userHero = new Priestess(heroName);
+			}
+		}
+		return userHero;
+	}
+	
+	private long askSeed()
+	{
+		while(true)
+		{
+			System.out.println("What Seed do you want? (Input Nothing for Random Seed)");
+			String input = myUserInput.next().trim();
+			
+			if(input.isEmpty())
+			{
+				long randomSeed = System.currentTimeMillis();
+				System.out.println("Using Random Seed: " + randomSeed);
+				return randomSeed;
+			}
+			
+			try 
+			{
+				return Long.parseLong(input);
+			}
+			catch(NumberFormatException e) 
+			{
+				System.out.println("Invalid Seed. Must be a whole number.");
+			}
+		}
+	}
 
 	@Override
 	public int askShop() 
@@ -107,20 +179,6 @@ public class ConsoleView implements GameView
 	{
 		System.out.println("You have fallen into a pit and taken " +
 						thePitDmg + "Points of Damage." );
-	}
-
-	@Override
-	public void showCombatStart() 
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showCombatResult() 
-	{
-		// TODO Auto-generated method stub
-		
 	}
 	
 	public void gameOver()

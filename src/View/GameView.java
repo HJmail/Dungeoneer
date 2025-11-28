@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import Model.Direction;
 import Model.Dungeon;
+import Model.GameConfig;
 import Model.Hero;
 import Model.Item;
 
@@ -22,6 +23,8 @@ public interface GameView
 	 * @param theDungeon the given dungeon.
 	 */
     void showDungeon(final Dungeon theDungeon);
+    
+    GameConfig askGameConfig();
     
     /**
      * This shows the Shop Items for a given shopkeeper's items.
@@ -42,18 +45,6 @@ public interface GameView
      * @return Returns the user Direction input.
      */
     Direction askDirection();
-    
-    
-    
-    /**
-     * This method prints the start of combat details.
-     */
-    void showCombatStart();
-    
-    /**
-     *  This method prints the end of combat details
-     */
-    void showCombatResult();
     
     /**
      * Game over view just indicated to the player that the game is over.

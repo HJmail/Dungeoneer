@@ -207,16 +207,9 @@ public class Room
 		return myIsActivated;
 	}
 	
-	public ArrayList<Item> getItems()
-	{
-		ArrayList<Item> theItems = new ArrayList<>();
-		
-		for(ItemType e: myItems)
-		{
-			//newItem = 
-		}
-		
-		return theItems;
+	public EnumSet<ItemType> getItems()
+	{	
+		return EnumSet.copyOf(myItems);
 	}
 	private Item generateItem(final ItemType theEnum)
 	{

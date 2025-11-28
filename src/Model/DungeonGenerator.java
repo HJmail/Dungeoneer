@@ -13,12 +13,11 @@ import Model.RoomType;
 
 public class DungeonGenerator 
 {
-	public static Dungeon generate(final long theSeed, final int theDifficulty, final Hero theHero)
+	public static Dungeon generate(final Random theRng, final int theDifficulty, final Hero theHero)
 	{
 		Dungeon dungeon = new Dungeon(theHero, theDifficulty);
-		Random rng = new Random(theSeed);
 		
-		createEvents(dungeon, rng, createLayout(dungeon, rng));
+		createEvents(dungeon, theRng, createLayout(dungeon, theRng));
 		
 		return dungeon;
 	}

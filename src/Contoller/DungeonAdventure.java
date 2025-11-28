@@ -7,6 +7,7 @@ import java.util.Scanner;
 import Model.Direction;
 import Model.Dungeon;
 import Model.DungeonGenerator;
+import Model.GameConfig;
 import Model.RoomType;
 import Model.Shopkeeper;
 import Model.Hero;
@@ -25,18 +26,6 @@ import View.GameView;
  */
 public class DungeonAdventure 
 {	
-	private static final int PIT_DMG = 4;
-	
-	/**
-	 * This field is the main character 
-	 */
-	private static Hero myHero;
-	
-	/**
-	 * This field is a scanner for user input.
-	 */
-	private static Scanner myUserInput;
-	
 	/**
 	 * This boolean represents if a game is running.
 	 */
@@ -48,26 +37,15 @@ public class DungeonAdventure
 	private static Dungeon myDungeon;
 	
 	/**
-	 * This field represents the difficulty
-	 */
-	private static int myDifficulty;
-	
-	/**
 	 * This is the Console view.
 	 */
 	private static GameView myView;
 	
-	/**
-	 * Used for temporary random like seed generation
-	 */
-	private static Random myRandom;
-	
-	/**
-	 *  Actual seed for the run.
-	 */
-	private static long mySeed;
+	private static GameConfig myGameConfig;
 	
 	private static RoomController myRoomController;
+	
+	private static Random myRandom;
 	
 	
 	/**
@@ -87,21 +65,22 @@ public class DungeonAdventure
 	{
 		myGameStatus = true;
 		
-		// User Input Scanner and results... (only used when we do console.) will change.
-		myUserInput = new Scanner(System.in);
+		// Setting up View
+		myView = new ConsoleView();
 		
 		// User inputs
-		myDifficulty = promptDifficulty();
-		myHero = promptHero();
-		mySeed = promptSeed();
+		myGameConfig = myView.askGameConfig();
 		
-		myDungeon  = DungeonGenerator.generate(mySeed, myDifficulty, myHero);
-		
-		// other controllers
-		myView = new ConsoleView();
-		CombatController.setView(myView); // setting combat view
-		myRoomController = new RoomController(myHero, myDungeon, myView);
-		
+		myRandom = new Random(myGameConfig.getSeed());
+		myDungeon  = DungeonGenerator.generate(myRandom,
+												myGameConfig.getDifficulty(),
+												myGameConfig.getHero());
+		// other controllers 
+		CombatController.setView(myView);
+		myRoomController = new RoomController(myGameConfig.getHero(),
+											  myDungeon,
+											  myView,
+											  myRandom);	
 	}
 	
 	/**
@@ -116,53 +95,6 @@ public class DungeonAdventure
 		myView.showMessage("Game Halted.");
 	}
 	
-	/**
-	 * This method asks the user what difficulty they want.
-	 * @return Integer representing the difficulty.
-	 */
-	private static int promptDifficulty()
-	{
-		myView.showMessage("What Difficulty do you want?  Please choose 1-9: ");
-		return myUserInput.nextInt();
-	}
-	
-	/**
-	 * This method asks the user what class they want to play.
-	 * @return The newly made hero that the user willS play.
-	 */
-	private static Hero promptHero()
-	{
-		myView.showMessage("What Class do you want to play? (P)riestess, (T)hief, or (W)arrior: ");
-		String response = myUserInput.next();
-		String heroName = promptHeroName();
-		Hero userHero = null;
-		if(response.equals("W"))
-		{
-			userHero = new Warrior(heroName);
-		}
-		else if(response.equals("T"))
-		{
-			userHero = new Thief(heroName);
-		}
-		else if(response.equals("P"))
-		{
-			userHero = new Priestess(heroName);
-		}
-		return userHero;
-	}
-
-	private static String promptHeroName()
-	{
-		myView.showMessage("What is you Hero's Name: ");
-		return myUserInput.next();
-	}
-	
-	private static long promptSeed()
-	{
-		myView.showMessage("What Seed do you want?");
-		return myUserInput.nextInt();
-	}
-	
 	private static void promptMove()
 	{
 		boolean goodResponse = false;
@@ -174,6 +106,7 @@ public class DungeonAdventure
 			Direction chosenDirection = myView.askDirection();
 			goodResponse = myDungeon.move(chosenDirection);
 		}
+		// Room is updated need to activate it.
 		activateRoom();
 	}
 	

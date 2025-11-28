@@ -1,7 +1,11 @@
 package Contoller;
 
+import java.util.Random;
+
 import Model.Dungeon;
 import Model.Hero;
+import Model.ItemType;
+import Model.Pillar;
 import Model.Room;
 import Model.RoomType;
 import Model.Shopkeeper;
@@ -19,13 +23,20 @@ public class RoomController
 	
 	private GameView myView;
 	
+	private Random myRandom;
+	
+	private int myPillarCount;
+	
 	public RoomController(final Hero theHero,
 						final Dungeon theDungeon,
-						final GameView theView)
+						final GameView theView,
+						final Random theRandom)
 	{
 		myHero = theHero;
 		myDungeon = theDungeon;
 		myView = theView;
+		myRandom  = theRandom;
+		myPillarCount = 0;
 	}
 	
 	
@@ -55,17 +66,39 @@ public class RoomController
 	
 	public void activatePillar()
 	{
-	
-		
+		char[] pillars = {'A', 'E', 'I', 'P'};
+		myHero.getInventory().addItem(new Pillar(pillars[myPillarCount]));
+		myPillarCount++;
 	}
 	
 	public void activateTreasure()
 	{
+		int depth = myDungeon.getCurrentRoom().getDepth();
+		for(ItemType it: myDungeon.getCurrentRoom().getItems())
+		{
+			if(it == ItemType.HEALING_POTION)
+			{
+				
+			}
+			else if(it == ItemType.GOLD)
+			{
+				
+			}
+			else if(it == ItemType.VISION_POTION)
+			{
+				
+			}
+			else if(it == ItemType.WEAPON)
+			{
+				
+			}
+		}
 		
 	}
 	
 	public void activateEncounter()
 	{
-		
+		// When the hero wins
+		activateTreasure();
 	}
 }

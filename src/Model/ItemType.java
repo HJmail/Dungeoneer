@@ -11,7 +11,7 @@ public enum ItemType
 	VISION_POTION("This potion seems to shine white and silver."),
 	PILLAR("This seems like a pillar, I wonder what it could be used for."),
 	WEAPON("This can kill!"),
-	Gold("Shiny!");
+	GOLD("Shiny!");
 	
 	/**
 	 * This is a description for the item.
