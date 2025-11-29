@@ -1,21 +1,13 @@
 package Contoller;
 
-import java.util.ArrayList;
 import java.util.Random;
-import java.util.Scanner;
 
 import Model.Direction;
 import Model.Dungeon;
 import Model.DungeonGenerator;
 import Model.GameConfig;
 import Model.RoomType;
-import Model.Shopkeeper;
-import Model.Hero;
-import Model.Item;
-import Model.Priestess;
 import Model.Room;
-import Model.Thief;
-import Model.Warrior;
 import View.ConsoleView;
 import View.GameView;
 
@@ -88,7 +80,7 @@ public class DungeonAdventure
 	 */
 	private static void play()
 	{
-		while(myGameStatus) // currently off
+		while(myGameStatus)
 		{
 			promptMove(); // user input for move
 		}
@@ -114,7 +106,7 @@ public class DungeonAdventure
 	{
 		Room cRoom = myDungeon.getCurrentRoom();
 		RoomType rt = cRoom.getRoomType();
-		boolean activated = cRoom.isActivated();
+		boolean activated = cRoom.isActivated(); 
 		
 		if(rt == RoomType.SHOP) // activated not needed (always available)
 		{
@@ -135,6 +127,10 @@ public class DungeonAdventure
 		else if(rt == RoomType.ENCOUNTER && !activated)
 		{
 			myRoomController.activateEncounter();
+		}
+		else if(cRoom.getItems().size() > 0 && !cRoom.isLooted() && activated)
+		{
+			myRoomController.activateTreasure(); // loots again.
 		}
 		// room is nothing.
 	}

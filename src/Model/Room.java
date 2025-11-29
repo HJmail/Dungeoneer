@@ -3,8 +3,6 @@ package Model;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Random;
-
 
 /**
  * This class represents one room within the dungeon.
@@ -27,11 +25,6 @@ public class Room
 	private EnumSet<ItemType> myItems;
 	
 	/**
-	 * This character field represents what is shown on the map.
-	 */
-	private char myCharRepresentation;
-	
-	/**
 	 * This List holds all DungeonCharacters within the room. 
 	 */
 	private List<Monster> myMonstersInRoom;
@@ -39,9 +32,7 @@ public class Room
 	/**
 	 * This field holds a reference to hero if they are here.
 	 */
-	private Hero myHero;
-	
-	private Random myRng;
+	//private Hero myHero;
 	
 	/**
 	 *  Represents maze depth.
@@ -52,11 +43,14 @@ public class Room
 	
 	private boolean myIsActivated;
 	
+	private boolean myIsVisable;
+	
+	private boolean myIsLooted;
+	
 	public Room()
 	{
 		myDirections = EnumSet.noneOf(Direction.class);
 		myRoomType = RoomType.NONE;
-		myCharRepresentation = myRoomType.getChar();
 		myItems = EnumSet.noneOf(ItemType.class);
 	}
 	
@@ -69,24 +63,11 @@ public class Room
 	 */
 	public Room(final EnumSet<Direction> theDirections,
 				final RoomType theEvent,
-				final EnumSet<ItemType> theItems,
-				final char theCharRepresentation,
-				final Random theRng)
+				final EnumSet<ItemType> theItems)
 	{
 		myDirections = EnumSet.copyOf(theDirections);
 		myRoomType = theEvent;
 		myItems = EnumSet.copyOf(theItems);
-		myCharRepresentation = theCharRepresentation;
-		myRng = theRng;
-	}
-	
-	/**
-	 * This enters the Hero into the room.
-	 * @param theHero The Hero that entered the room. 
-	 */
-	public void enter(final Hero theHero)
-	{
-		myHero = theHero;
 	}
 	
 	public void exit(final Direction theDirection)
@@ -103,7 +84,6 @@ public class Room
 				setRoomType(RoomType.TRAVELED_EW);
 			}
 		}
-		myHero = null;
 	}
 	
 	/**
@@ -154,7 +134,7 @@ public class Room
 	 */
 	public void setDirections(final EnumSet<Direction> theDirections)
 	{
-		myDirections = EnumSet.copyOf(theDirections);
+		myDirections = EnumSet.copyOf(theDirections); 
 	}
 	
 	public void setDepth(final int theDepth)
@@ -211,12 +191,24 @@ public class Room
 	{	
 		return EnumSet.copyOf(myItems);
 	}
-	private Item generateItem(final ItemType theEnum)
+	
+	public void setVisability(final boolean theView)
 	{
-		//switch(ItemType)
-		{
-		
-		}
-		return new Item();
+		myIsVisable = theView;
+	}
+	
+	public boolean getVisability()
+	{
+		return myIsVisable;
+	}
+	
+	public boolean isLooted()
+	{
+		return myIsLooted;
+	}
+	
+	public void setIsLooted(final boolean theLooted)
+	{
+		myIsLooted = theLooted;
 	}
 }

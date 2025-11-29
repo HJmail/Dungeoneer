@@ -181,6 +181,11 @@ public class ConsoleView implements GameView
 						thePitDmg + "Points of Damage." );
 	}
 	
+    public void showPillar(final char theChar)
+    {
+    	System.out.println("You found the " + theChar + "Pillar!");
+    }
+	
 	public void gameOver()
 	{
 		System.out.println("\nGAME OVER!");

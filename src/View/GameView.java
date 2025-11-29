@@ -46,6 +46,8 @@ public interface GameView
      */
     Direction askDirection();
     
+    void showPillar(final char theChar);
+    
     /**
      * Game over view just indicated to the player that the game is over.
      */

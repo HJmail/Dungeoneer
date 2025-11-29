@@ -143,37 +143,12 @@ public class Dungeon
 		
 		// joining new room
 		setHeroLocation(theRow, theCol);
-		myMaze[theRow][theCol].enter(myHero);
 	}
 	
 	public void setRoomDepth(final int theRow, final int theCol, final int theDepth)
 	{
 		myMaze[theRow][theCol].setDepth(theDepth);
 	}
-	
-	
-	private void shopLogic(final Room theRoom)
-	{
-		Shopkeeper shop = theRoom.getShopkeeper();
-		boolean isShopping = true;
-		while(isShopping)
-		{
-			shop.displayItems();
-			//buyitems
-		}
-	}
-	
-	/**
-	 * Sets the given room to  the 
-	 * @param theRow
-	 * @param theCol
-	 * @param theEvent
-	 */
-	//public void setRoomTypeTEST(final int theRow, final int theCol, final RoomType theRoom)
-	//{
-	//	moveHero(theRow, theCol);
-	//	myMaze[theRow][theCol].setRoomType(theRoom);
-	//}
 	
 	public void setStartLocation(final int theRow, final int theCol)
 	{

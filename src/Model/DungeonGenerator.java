@@ -171,7 +171,7 @@ public class DungeonGenerator
 				{
 					if(roll <= 20) // 0-20
 					{
-						room.setRoomType(RoomType.ENCOUNTER);
+						room.setRoomType(RoomType.ENCOUNTER); // need generation code... Skeleton and gremlin?
 						room.setItems(EnumSet.of(getRandomItem(theRng)));
 					}
 					else if(roll <= 60) // 21-60
@@ -197,7 +197,7 @@ public class DungeonGenerator
 				{
 					if(roll <= 50)
 					{
-						room.setRoomType(RoomType.ENCOUNTER);
+						room.setRoomType(RoomType.ENCOUNTER); // all monsters?
 						room.setItems(EnumSet.of(ItemType.WEAPON, getRandomItem(theRng)));
 					}
 					else if(roll <= 75)
@@ -221,7 +221,7 @@ public class DungeonGenerator
 	private static ItemType getRandomItem(final Random theRandom)
 	{
 		int roll = theRandom.nextInt(3);
-		ItemType item = ItemType.Gold;
+		ItemType item = ItemType.GOLD;
 		
 		if(roll == 1 )
 		{
