@@ -3,10 +3,10 @@ package view;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import model.Dungeon;
-import model.Hero;
 import model.Direction;
+import model.Dungeon;
 import model.GameConfig;
+import model.Hero;
 import model.Item;
 import model.Priestess;
 import model.Thief;

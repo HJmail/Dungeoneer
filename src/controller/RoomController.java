@@ -2,7 +2,6 @@ package controller;
 
 import java.util.Random;
 
-import view.GameView;
 import model.Dungeon;
 import model.HealingPotion;
 import model.Hero;
@@ -14,6 +13,7 @@ import model.Room;
 import model.Shopkeeper;
 import model.VisionPotion;
 import model.Weapon;
+import view.GameView;
 
 public class RoomController 
 {

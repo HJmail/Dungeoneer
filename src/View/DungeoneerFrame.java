@@ -18,14 +18,14 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import model.Thief;
-import model.Priestess;
-import model.Warrior;
 import model.Direction;
 import model.Dungeon;
 import model.GameConfig;
 import model.Hero;
 import model.Item;
+import model.Priestess;
+import model.Thief;
+import model.Warrior;
 
 
 /**

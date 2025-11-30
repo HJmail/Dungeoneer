@@ -2,15 +2,14 @@ package controller;
 
 import java.util.Random;
 
-//import view.ConsoleView;
-import view.GameView;
-import view.GuiView;
 import model.Direction;
 import model.Dungeon;
 import model.DungeonGenerator;
 import model.GameConfig;
 import model.Room;
 import model.RoomType;
+import view.GameView;
+import view.GuiView;
 
 /**
  *  This class is the main logic holding class for the Dungeoneer Game
