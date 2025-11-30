@@ -4,16 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -22,9 +21,12 @@ import javax.swing.JTextArea;
 import model.Thief;
 import model.Priestess;
 import model.Warrior;
+import model.Direction;
 import model.Dungeon;
+import model.GameConfig;
 import model.Hero;
-import view.DungeonBoardPanel;
+import model.Item;
+
 
 /**
  * Swing-based GUI for the Dungeoneer game.
@@ -209,11 +211,6 @@ public class DungeoneerFrame extends JFrame implements GameView {
         myGamePanel.repaint();  // redraw tiles
     }
 
-    @Override 
-    public void showHeroStats(final Hero theHero) {
-        refreshHeroStats();
-    }
-
     private void refreshHeroStats() {
         // These depend on your Hero API; adjust if field names differ
         int currentHp = myHero.getHitPoints();
@@ -243,4 +240,46 @@ public class DungeoneerFrame extends JFrame implements GameView {
         // Later: custom drawing of dungeon/hero in myGamePanel.
         // For now we do nothing here.
     }
+
+	@Override
+	public GameConfig askGameConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void showShopItems(ArrayList<Item> theItem) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int askShop() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void showPit(int thePitDmg) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Direction askDirection() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void showPillar(char theChar) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameOver() {
+		// TODO Auto-generated method stub
+		
+	}
 }

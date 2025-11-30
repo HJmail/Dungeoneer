@@ -1,13 +1,6 @@
-package Model;
+package model;
 
 import java.util.Map;
-
-import Model.Gremlin;
-import Model.Monster;
-import Model.Ogre;
-import Model.Skeleton;
-import Model.MonsterData;
-import Model.MonsterDatabase;
 
 /**
  * A factory class that creates Monster objects using

@@ -1,20 +1,20 @@
-package Test;
+package test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import model.Gremlin;
+import model.Hero;
+import model.Monster;
+import model.Ogre;
+import model.Shopkeeper;
+import model.Skeleton;
+import model.Warrior;
+
 import java.util.List;
 import java.util.ArrayList;
-
-import Model.Gremlin;
-import Model.Hero;
-import Model.Warrior;
-import Model.Monster;
-import Model.Ogre;
-import Model.Shopkeeper;
-import Model.Skeleton;
 
 class CombatTest {
 

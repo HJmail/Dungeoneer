@@ -1,20 +1,24 @@
 package model;
 
+/**
+ * Abstract Hero class representing the player-controlled character.
+ * Heroes collect items, pick up pillars, and can buy items from the Shopkeeper.
+ *
+ * Supports inventory, blocking, and special skills.
+ * 
+ * @author Hiba
+ * @version 0.0.6 (03/02/2025)
+ */
 public abstract class Hero extends DungeonCharacter {
 
     /** Probability that the hero blocks an incoming attack. */
     protected double myChanceToBlock;
 
+    /** The Hero's inventory (potions, pillars, gold, weapons, etc.). */
+    protected Inventory myInventory;
+
     /**
      * Constructs a Hero with all necessary statistics.
-     *
-     * @param theName Hero name
-     * @param theHitPoints Starting hit points
-     * @param theMinDamage Minimum attack damage
-     * @param theMaxDamage Maximum attack damage
-     * @param theAttackSpeed Speed (affects number of attacks)
-     * @param theChanceToHit Chance to hit the opponent
-     * @param theChanceToBlock Chance to block incoming attacks
      */
     public Hero(String theName,
                 int theHitPoints,
@@ -24,12 +28,14 @@ public abstract class Hero extends DungeonCharacter {
                 double theChanceToHit,
                 double theChanceToBlock) {
 
-        // Matches the updated DungeonCharacter constructor!
         super(theName, theHitPoints, theMinDamage, theMaxDamage,
                 theAttackSpeed, theChanceToHit);
 
         myChanceToBlock = theChanceToBlock;
-        myGold = 0; // Heroes start with no gold by default
+        myGold = 0;
+
+        // ⭐ Every Hero begins with an empty inventory
+        myInventory = new Inventory();
     }
 
     /** Attempts to block an attack. */
@@ -41,19 +47,28 @@ public abstract class Hero extends DungeonCharacter {
         return myChanceToBlock;
     }
 
-    public String defendAction() {
-        if (defend()) {
-            return myName + " blocks the attack!";
-        }
-        return myName + " fails to block!";
-    }
-
     public void setChanceToBlock(final double theChanceToBlock) {
         myChanceToBlock = theChanceToBlock;
     }
-    
-    public abstract String specialSkill(DungeonCharacter opponent);
-    
-    //Add String method 
 
+    /**
+     * Returns the Hero's inventory so other parts of the game
+     * (like Shopkeeper, DungeonAdventure, or Room) can add items.
+     */
+    public Inventory getInventory() {
+        return myInventory;
+    }
+
+    /**
+     * Adds an item to the hero's inventory.
+     * Rooms and Shopkeeper will call this.
+     */
+    public void addToInventory(Item theItem) {
+        myInventory.addItem(theItem);
+    }
+    
+    /**
+     * Each Hero type must implement their special skill.
+     */
+    public abstract String specialSkill(DungeonCharacter opponent);
 }
