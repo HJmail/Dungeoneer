@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import Model.Direction;
 import Model.Dungeon;
 import Model.GameConfig;
-import Model.Hero;
 import Model.Item;
 
 public interface GameView 
@@ -24,6 +23,10 @@ public interface GameView
 	 */
     void showDungeon(final Dungeon theDungeon);
     
+    /**
+     * 
+     * @return
+     */
     GameConfig askGameConfig();
     
     /**

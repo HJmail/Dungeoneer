@@ -10,6 +10,7 @@ import Model.RoomType;
 import Model.Room;
 import View.ConsoleView;
 import View.GameView;
+import View.GuiView;
 
 /**
  *  This class is the main logic holding class for the Dungeoneer Game
@@ -57,8 +58,9 @@ public class DungeonAdventure
 	{
 		myGameStatus = true;
 		
-		// Setting up View
-		myView = new ConsoleView();
+		// Setting up View ... can be Console based or GUI based.
+		//myView = new ConsoleView();
+		myView = new GuiView();
 		
 		// User inputs
 		myGameConfig = myView.askGameConfig();

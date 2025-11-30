@@ -2,11 +2,6 @@
 
 import java.awt.Point;
 import java.util.EnumSet;
-import java.util.List;
-import java.util.Random;
-
-import Contoller.CombatController;
-import Model.RoomType;
 
 /**
  * This class represents the dungeon the player must traverse.
