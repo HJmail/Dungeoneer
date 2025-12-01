@@ -170,6 +170,16 @@ public class DungeonGenerator
 					if(roll <= 20) // 0-20
 					{
 						room.setRoomType(RoomType.ENCOUNTER); // need generation code... Skeleton and gremlin?
+						// spawn monsters
+						List<Monster> monsters = new ArrayList<>();
+						int monsterCount = (depth <= 3) ? 1 : (depth <= 5 ? 2 : 3);
+
+						for (int i = 0; i < monsterCount; i++) {
+						    monsters.add(getMonsterForDepth(depth, theRng));
+						}
+
+						room.setMonsters(monsters);
+						
 						room.setItems(EnumSet.of(getRandomItem(theRng)));
 					}
 					else if(roll <= 60) // 21-60
@@ -196,6 +206,15 @@ public class DungeonGenerator
 					if(roll <= 50)
 					{
 						room.setRoomType(RoomType.ENCOUNTER); // all monsters?
+						List<Monster> monsters = new ArrayList<>();
+	                    int monsterCount = 2 + theRng.nextInt(2); // 2–3 monsters
+
+	                    for (int i = 0; i < monsterCount; i++) {
+	                        monsters.add(getMonsterForDepth(depth, theRng));
+	                    }
+
+	                    room.setMonsters(monsters);
+	                    
 						room.setItems(EnumSet.of(ItemType.WEAPON, getRandomItem(theRng)));
 					}
 					else if(roll <= 75)
@@ -270,5 +289,18 @@ public class DungeonGenerator
 		}
 		return result;
 	}
+	private static Monster getMonsterForDepth(int depth, Random rng) {
+	    if (depth <= 2) {
+	        return MonsterFactory.createMonster("gremlin");
+	    }
+	    if (depth <= 4) {
+	        return MonsterFactory.createMonster("skeleton");
+	    }
+	    if (rng.nextDouble() < 0.7) {
+	        return MonsterFactory.createMonster("skeleton");
+	    }
+	    return MonsterFactory.createMonster("ogre");
+	}
+
 }
 
