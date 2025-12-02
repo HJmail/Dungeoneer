@@ -291,15 +291,15 @@ public class DungeonGenerator
 	}
 	private static Monster getMonsterForDepth(int depth, Random rng) {
 	    if (depth <= 2) {
-	        return MonsterFactory.createMonster("gremlin");
+	        return MonsterFactory.createMonster("Gremlin");
 	    }
 	    if (depth <= 4) {
-	        return MonsterFactory.createMonster("skeleton");
+	        return MonsterFactory.createMonster("Skeleton");
 	    }
 	    if (rng.nextDouble() < 0.7) {
-	        return MonsterFactory.createMonster("skeleton");
+	        return MonsterFactory.createMonster("Skeleton");
 	    }
-	    return MonsterFactory.createMonster("ogre");
+	    return MonsterFactory.createMonster("Ogre");
 	}
 
 }
