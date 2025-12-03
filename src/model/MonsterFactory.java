@@ -31,9 +31,9 @@ public class MonsterFactory {
             return null;
         }
 
-        switch (theName) {
+        switch (theName.toLowerCase()) {
 
-            case "Ogre":
+            case "ogre":
                 return new Ogre(
                         data.myName,
                         data.myHitPoints,
@@ -46,7 +46,7 @@ public class MonsterFactory {
                         data.myMaxHeal
                 );
 
-            case "Skeleton":
+            case "skeleton":
                 return new Skeleton(
                         data.myName,
                         data.myHitPoints,
@@ -59,7 +59,7 @@ public class MonsterFactory {
                         data.myMaxHeal
                 );
 
-            case "Gremlin":
+            case "gremlin":
                 return new Gremlin(
                         data.myName,
                         data.myHitPoints,

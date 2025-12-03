@@ -1,25 +1,28 @@
 package model;
 
-/**
- * Abstract Hero class representing the player-controlled character.
- * Heroes collect items, pick up pillars, and can buy items from the Shopkeeper.
- *
- * Supports inventory, blocking, and special skills.
- * 
- * @author Hiba
- * @version 0.0.6 (03/02/2025)
- */
 public abstract class Hero extends DungeonCharacter {
 
     /** Probability that the hero blocks an incoming attack. */
     protected double myChanceToBlock;
 
-    /** The Hero's inventory (potions, pillars, gold, weapons, etc.). */
-    protected Inventory myInventory;
+    /** Each hero has their own inventory. */
+    protected final Inventory myInventory;
+
+    /** The maximum HP this hero can have. */
+    private  int myMaxHitPoints;
 
     /**
      * Constructs a Hero with all necessary statistics.
+     *
+     * @param theName Hero name
+     * @param theHitPoints Starting (and max) hit points
+     * @param theMinDamage Minimum attack damage
+     * @param theMaxDamage Maximum attack damage
+     * @param theAttackSpeed Speed (affects number of attacks)
+     * @param theChanceToHit Chance to hit the opponent
+     * @param theChanceToBlock Chance to block incoming attacks
      */
+
     public Hero(String theName,
                 int theHitPoints,
                 int theMinDamage,
@@ -29,14 +32,19 @@ public abstract class Hero extends DungeonCharacter {
                 double theChanceToBlock) {
 
         super(theName, theHitPoints, theMinDamage, theMaxDamage,
-                theAttackSpeed, theChanceToHit);
+              theAttackSpeed, theChanceToHit);
 
         myChanceToBlock = theChanceToBlock;
         myGold = 0;
 
-        // ⭐ Every Hero begins with an empty inventory
+        // max HP is whatever we started with
+        myMaxHitPoints = theHitPoints;
+
+        // every hero starts with an inventory, and we tell the inventory who owns it
         myInventory = new Inventory();
+        myInventory.setOwner(this);   // <-- IMPORTANT
     }
+
 
     /** Attempts to block an attack. */
     public boolean defend() {
@@ -47,28 +55,47 @@ public abstract class Hero extends DungeonCharacter {
         return myChanceToBlock;
     }
 
+    public String defendAction() {
+        if (defend()) {
+            return myName + " blocks the attack!";
+        }
+        return myName + " fails to block!";
+    }
+
     public void setChanceToBlock(final double theChanceToBlock) {
         myChanceToBlock = theChanceToBlock;
     }
 
-    /**
-     * Returns the Hero's inventory so other parts of the game
-     * (like Shopkeeper, DungeonAdventure, or Room) can add items.
-     */
+    /** Public getter so the GUI can access the hero's inventory. */
     public Inventory getInventory() {
         return myInventory;
     }
 
     /**
-     * Adds an item to the hero's inventory.
-     * Rooms and Shopkeeper will call this.
+     * Adds the specified amount of gold to this hero.
+     * Negative amounts are allowed for spending, but
+     * gold will never drop below zero.
      */
-    public void addToInventory(Item theItem) {
-        myInventory.addItem(theItem);
+    public void addGold(final int theAmount) {
+        myGold += theAmount;
+        if (myGold < 0) {
+            myGold = 0;
+        }
+    }
+
+    /** Maximum HP for this hero (used to avoid overhealing). */
+    public int getMaxHitPoints() {
+        return myMaxHitPoints;
     }
     
-    /**
-     * Each Hero type must implement their special skill.
-     */
+    public void setMaxHitPoints(final int theMax) {
+        myMaxHitPoints = theMax;
+    }
+
+    // This should just assign, not clamp again
+    public void setHitPoints(final int theHp) {
+        myHitPoints = theHp;
+    }
+
     public abstract String specialSkill(DungeonCharacter opponent);
 }

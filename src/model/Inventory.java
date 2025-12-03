@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import view.GameView;
+import model.Pillar;
+import model.Potion;
+
 
 /**
  * Represents the player's inventory, which stores collectible items such as
@@ -42,6 +45,8 @@ public class Inventory {
 
   /** The list of all items currently stored in the player's inventory. */
   private final List<Item> myInventory;
+  
+  private Hero myOwner;
 
   /** Tracks how many of each potion type the player holds. */
   private final Map<String, Integer> myPotionStacks;
@@ -103,45 +108,78 @@ public class Inventory {
    * @param theItem the item to add (must not be null)
    * @throws IllegalArgumentException if theItem is null
    */
-  public void addItem(final Item theItem) {
-    if (theItem == null) {
-      throw new IllegalArgumentException("Cannot add null item to inventory.");
-    }
-
-    if (myInventory.size() >= MAX_ITEMS) {
-      throw new IllegalStateException("Inventory full! You cannot carry more than "
-                                      + MAX_ITEMS + " items.");
-    }
-
-    // Handle Potion stacking logic
-    if (theItem instanceof Potion) {
-      String key = theItem.getClass().getSimpleName();
-      int current = myPotionStacks.getOrDefault(key, 0);
-
-      if (current >= MAX_POTION_STACK) {
-        log("You cannot carry more than " + MAX_POTION_STACK + " " + key + "s.");
-        return; // skip adding if stack is full
+  /**
+   * Adds an item to the player's inventory.
+   *
+   * @param theItem item to add (must not be null)
+   * @return true if the item was actually added/stacked,
+   *         false if it was rejected (full inventory / full stack).
+   */
+  public boolean addItem(final Item theItem) {
+      if (theItem == null) {
+          throw new IllegalArgumentException("Cannot add null item to inventory.");
       }
 
-      myPotionStacks.put(key, current + 1);
-      log("Picked up " + key + " (" + (current + 1) + "/" + MAX_POTION_STACK + ")");
-    }
+      // ---------- PILLARS (do not count against MAX_ITEMS) ----------
+      if (theItem instanceof Pillar pillar) {
+          myInventory.add(theItem);
 
-    // Always add the item to the list for tracking
-    myInventory.add(theItem);
+          char type = Character.toUpperCase(pillar.getPillarType());
+          switch (type) {
+              case 'A' -> myPillarAbstractionCollected = true;
+              case 'E' -> myPillarEncapsulationCollected = true;
+              case 'I' -> myPillarInheritanceCollected = true;
+              case 'P' -> myPillarPolymorphismCollected = true;
+              default -> { /* ignore unknown */ }
+          }
 
-    // Handle Pillar collection logic
-    if (theItem instanceof Pillar) {
-      char type = Character.toUpperCase(((Pillar) theItem).getPillarType());
-      switch (type) {
-        case 'A' -> myPillarAbstractionCollected = true;
-        case 'E' -> myPillarEncapsulationCollected = true;
-        case 'I' -> myPillarInheritanceCollected = true;
-        case 'P' -> myPillarPolymorphismCollected = true;
-        default -> { /* do nothing */ }
+          System.out.println("Picked up pillar: " + type);
+          return true;
       }
-    }
+
+      // ---------- POTIONS (stackable up to MAX_POTION_STACK) ----------
+      if (theItem instanceof Potion) {
+          String key = theItem.getClass().getSimpleName();
+          int current = myPotionStacks.getOrDefault(key, 0);
+
+          // Stack already full?
+          if (current >= MAX_POTION_STACK) {
+              System.out.println("You cannot carry more than "
+                                 + MAX_POTION_STACK + " " + key + "s.");
+              return false;
+          }
+
+          // First potion of this type uses an inventory slot
+          if (current == 0 && getNonPillarItemCount() >= MAX_ITEMS) {
+              System.out.println("Your inventory is full. You can't carry another " + key + ".");
+              return false;
+          }
+
+          myPotionStacks.put(key, current + 1);
+
+          // Only store one representative potion object in the list
+          if (current == 0) {
+              myInventory.add(theItem);
+          }
+
+          System.out.println("Picked up " + key + " ("
+                             + (current + 1) + "/" + MAX_POTION_STACK + ")");
+          return true;
+      }
+
+      // ---------- OTHER ITEMS (weapons, etc.) ----------
+      if (getNonPillarItemCount() >= MAX_ITEMS) {
+          System.out.println("Your inventory is full. You cannot carry more than "
+                             + MAX_ITEMS + " items.");
+          return false;
+      }
+
+      myInventory.add(theItem);
+      System.out.println("Picked up item: "
+                         + theItem.getClass().getSimpleName());
+      return true;
   }
+
 
   /**
    * Uses (consumes or activates) an item by name.
@@ -152,60 +190,137 @@ public class Inventory {
    * @throws IllegalStateException if the item is not found or cannot be used
    */
   public void useItem(final String theItemName) {
-    if (theItemName == null || theItemName.isBlank()) {
-      throw new IllegalArgumentException("Item name cannot be null or empty.");
-    }
-
-    // Case 1: stackable item (Potion)
-    if (myPotionStacks.containsKey(theItemName)) {
-      int current = myPotionStacks.get(theItemName);
-
-      if (current <= 0) {
-        throw new IllegalStateException("No " + theItemName + " left to use!");
+      if (theItemName == null || theItemName.isBlank()) {
+          throw new IllegalArgumentException("Item name cannot be null or empty.");
       }
 
-      // find one potion in list
+      // 1) Find a matching item object in the list
       Item toUse = null;
       for (Item item : myInventory) {
-        if (item.getClass().getSimpleName().equals(theItemName)) {
-          toUse = item;
-          break;
-        }
+          if (item.getClass().getSimpleName().equals(theItemName)) {
+              toUse = item;
+              break;
+          }
       }
 
       if (toUse == null) {
-        throw new IllegalStateException("Item not found in inventory list.");
+          throw new IllegalStateException("Item not found in inventory: " + theItemName);
       }
 
-      toUse.use();  // activate its effect
+      // 2) If it’s a potion, use stack logic
+      if (toUse instanceof Potion) {
+          String key = theItemName;  // e.g. "HealingPotion"
+          int current = myPotionStacks.getOrDefault(key, 0);
+
+          if (current <= 0) {
+              throw new IllegalStateException("No " + key + " left to use!");
+          }
+
+          // --- Apply potion effect based on subtype ---
+          if (toUse instanceof HealingPotion hp) {
+              if (myOwner != null) {
+                  int cur = myOwner.getHitPoints();
+                  int max = myOwner.getMaxHitPoints();
+
+                  int heal = hp.getHealAmount();
+                  int newHp = cur + heal;
+                  if (newHp > max) {
+                      heal = max - cur;     // actual healed amount
+                      newHp = max;
+                  }
+
+                  myOwner.setHitPoints(newHp);
+                  log("Healed " + heal + " HP. Now at " + newHp + "/" + max);
+
+                  // Ask the GUI to refresh HP bar, etc.
+                  if (myView != null) {
+                      myView.showHeroStats(myOwner);
+                  }
+              }
+          } else {
+              // Other potions (VisionPotion, etc.)
+              toUse.use();
+          }
+
+          // --- Decrement stack, but only remove the item when stack hits 0 ---
+          current -= 1;
+          if (current > 0) {
+              myPotionStacks.put(key, current);
+              // KEEP the representative potion object in myInventory
+          } else {
+              myPotionStacks.remove(key);
+              myInventory.remove(toUse);   // remove only when last one is used
+          }
+
+          log("Used one " + key + ". Remaining: " + current);
+          return;
+      }
+
+      // 3) Non-potion items: just use and remove
+      toUse.use();
       myInventory.remove(toUse);
-
-      myPotionStacks.put(theItemName, current - 1);
-      if (myPotionStacks.get(theItemName) <= 0) {
-        myPotionStacks.remove(theItemName);
-      }
-
-      log("Used one " + theItemName + ". Remaining: "
-          + myPotionStacks.getOrDefault(theItemName, 0));
-      return;
-    }
-
-    // Case 2: non-stackable item
-    Item toUse = null;
-    for (Item item : myInventory) {
-      if (item.getClass().getSimpleName().equals(theItemName)) {
-        toUse = item;
-        break;
-      }
-    }
-
-    if (toUse == null) {
-      throw new IllegalStateException("Item not found in inventory.");
-    }
-
-    toUse.use();
-    myInventory.remove(toUse);
   }
+  
+  /**
+   * Drops (discards) one instance of an item by its simple class name.
+   * For potions, only one is removed from the stack. For other items
+   * the whole item is removed. Pillars are not dropped.
+   *
+   * @param theItemName simple class name, e.g. "HealingPotion"
+   */
+  public void dropItem(final String theItemName) {
+      if (theItemName == null || theItemName.isBlank()) {
+          throw new IllegalArgumentException("Item name cannot be null or empty.");
+      }
+
+      // Find a matching item in the inventory
+      Item toDrop = null;
+      for (Item item : myInventory) {
+          if (item.getClass().getSimpleName().equals(theItemName)) {
+              toDrop = item;
+              break;
+          }
+      }
+
+      if (toDrop == null) {
+          throw new IllegalStateException("Item not found in inventory: " + theItemName);
+      }
+
+      // Don't allow dropping pillars (too important)
+      if (toDrop instanceof Pillar) {
+          log("You decide not to drop such an important artifact.");
+          return;
+      }
+
+      // --- Potions: adjust stack count and only remove the object when stack hits 0 ---
+      if (toDrop instanceof Potion) {
+          String key = theItemName;  // e.g., "HealingPotion"
+          int current = myPotionStacks.getOrDefault(key, 0);
+
+          if (current <= 0) {
+              throw new IllegalStateException("No " + key + " left to drop!");
+          }
+
+          current -= 1;
+
+          if (current > 0) {
+              // Still have some left: update count, keep representative object in list
+              myPotionStacks.put(key, current);
+          } else {
+              // This was the last one: remove from both map and list
+              myPotionStacks.remove(key);
+              myInventory.remove(toDrop);
+          }
+
+          log("Dropped one " + key + ". Remaining: " + current);
+          return;
+      }
+
+      // --- Non-potion, non-pillar items (weapons, etc.) ---
+      myInventory.remove(toDrop);
+      log("Dropped " + theItemName + ".");
+  }
+
 
   /**
    * Removes a specified item from the player's inventory.
@@ -214,14 +329,7 @@ public class Inventory {
    */
   public void removeItem(final Item theItem) {
     myInventory.remove(theItem);
-
-    if (theItem instanceof Potion) {
-      String key = theItem.getClass().getSimpleName();
-      myPotionStacks.merge(key, -1, Integer::sum);
-      if (myPotionStacks.getOrDefault(key, 0) <= 0) {
-        myPotionStacks.remove(key);
-      }
-    }
+      
   }
 
   /**
@@ -242,6 +350,10 @@ public class Inventory {
   public boolean hasItem(final Item theItem) {
     return myInventory.contains(theItem);
   }
+  
+  public void setOwner(final Hero theOwner) {
+	    myOwner = theOwner;
+	  }
 
   /**
    * Determines whether the player can exit the dungeon.
@@ -276,6 +388,17 @@ public class Inventory {
     }
     if (myPillarPolymorphismCollected) {
       count++;
+    }
+    return count;
+  }
+
+  /** Number of non-pillar items currently in the inventory. */
+  private int getNonPillarItemCount() {
+    int count = 0;
+    for (Item item : myInventory) {
+      if (!(item instanceof Pillar)) {
+        count++;
+      }
     }
     return count;
   }
