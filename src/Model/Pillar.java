@@ -76,4 +76,9 @@ public class Pillar implements Item {
       default -> "Unknown";
     };
   }
+  
+  @Override
+  public String getName() {
+    return "Pillar of " + getPillarMeaning();
+  }
 }

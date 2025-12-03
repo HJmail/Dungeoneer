@@ -1,8 +1,9 @@
-package model;
+ package model;
 
 /**
  *  This is the enum for possible events in rooms.
  */
+
 public enum RoomType 
 {
 	// type of events
@@ -29,4 +30,14 @@ public enum RoomType
 	{
 		return myChar;
 	}
-}
+	
+	private DungeonTile myTile = DungeonTile.FLOOR;
+
+	public DungeonTile getTile() {
+	    return myTile;
+	}
+
+	public void setTile(DungeonTile theTile) {
+	    myTile = theTile;
+	}
+} 
