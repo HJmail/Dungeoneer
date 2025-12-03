@@ -189,5 +189,13 @@ public class ConsoleView implements GameView
 	{
 		System.out.println("\nGAME OVER!");
 	}
+	
+	@Override
+	public void showHeroStats(final Hero theHero) {
+	    System.out.println("=== HERO STATS ===");
+	    System.out.println("Name: " + theHero.getName());
+	    System.out.println("HP: " + theHero.getHitPoints());
+	    System.out.println("Gold: " + theHero.getGold());
+	    System.out.println("===================");
+	}
 }
-

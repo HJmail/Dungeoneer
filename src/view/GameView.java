@@ -7,6 +7,7 @@ import model.Direction;
 import model.Dungeon;
 import model.GameConfig;
 import model.Item;
+import model.Hero;
 
 public interface GameView 
 {
@@ -21,6 +22,8 @@ public interface GameView
 	 * @param theDungeon the given dungeon.
 	 */
     void showDungeon(final Dungeon theDungeon);
+    
+    void showHeroStats(Hero theHero);
     
     /**
      * 
