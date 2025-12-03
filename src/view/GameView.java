@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import model.Direction;
 import model.Dungeon;
 import model.GameConfig;
+import model.Hero;
 import model.Inventory;
 import model.Item;
 
@@ -61,4 +62,6 @@ public interface GameView
      * Game over view just indicated to the player that the game is over.
      */
     void gameOver();
+
+	void showHeroStats(Hero myOwner);
 }

@@ -1,32 +1,19 @@
 package view;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSlider;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 import model.Direction;
 import model.Dungeon;
 import model.GameConfig;
 import model.Hero;
-import model.HeroFactory;
 import model.Inventory;
 import model.Item;
+import model.Potion;
 
 public class GuiView implements GameView
 {	
@@ -181,36 +168,69 @@ public class GuiView implements GameView
 	{
 		boolean goodResponse = false;
 		List<Item> inv = theInventory.getInventory();
-		while(!goodResponse || inv.size() > 0)
+		
+		while(!goodResponse && inv.size() > 0)
 		{
-			System.out.println("Would You like to select anything from Inventory? y/n :");
-			String input = myUserInput.next().trim().toLowerCase();
-			if(input.equals("y"))
+			boolean input = promptYesNo("Would you like to interact with Inventory? y/n:");
+			if(input)
 			{
 				for(int i = 0; i < inv.size(); i++)
 				{
 					Item item = inv.get(i);
-					System.out.println(i + ". " + item.getName());
+					System.out.println(i+1 + ". " + item.getName());
 				}
 				System.out.println((inv.size() + 1) + ". cancel");
 				
 				int itemSelection = 0;
 				while(itemSelection > inv.size() + 1 || itemSelection < 1) // not in range
 				{
-					itemSelection = myUserInput.nextInt();
-					if(itemSelection == inv.size() + 1)
+					itemSelection = myUserInput.nextInt() - 1;
+					if(itemSelection == inv.size())
 					{
 						break;
 					}
+					else if(inv.get(itemSelection) instanceof Potion) // not ideal but works...
+					{ //only potions can get used
+						boolean consume = promptYesNo("Would you like to consume this potion? y/n:");
+						if(consume) System.out.println("Consume"); // consume potion logic...
+					}
+					else // weapon 
+					{
+						boolean drop = promptYesNo("Would you like to drop this Weapon? y/n:");
+						if(drop) System.out.println("Drop"); // drop logic.
+					}
 				}
-				
 			}
-			else if(input.equals("n"))
+			else 
 			{
 				goodResponse = true;
 				break;
 			}
 		}
-		if(inv.size() > 0) System.out.println("Your inventory is empty.");
+		if(inv.size() <= 0) System.out.println("Your inventory is empty.");
+	}
+
+
+	private boolean promptYesNo(final String theString)
+	{
+		while(true)
+		{
+			System.out.println(theString);
+			String input = myUserInput.next().trim().toLowerCase();
+			if(input.equals("y"))
+			{
+				return true;
+			}
+			else if(input.equals("n"))
+			{
+				return false;
+			}
+		}
+	}
+
+	@Override
+	public void showHeroStats(Hero myOwner) {
+		// TODO Auto-generated method stub
+		
 	}
 }

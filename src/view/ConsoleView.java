@@ -1,6 +1,7 @@
 package view;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import model.Direction;
@@ -9,6 +10,7 @@ import model.GameConfig;
 import model.Hero;
 import model.Inventory;
 import model.Item;
+import model.Potion;
 import model.Priestess;
 import model.Thief;
 import model.Warrior;
@@ -214,13 +216,72 @@ public class ConsoleView implements GameView
 	}
 
 	@Override
-	public void askInventory() {
-		// TODO Auto-generated method stub
+	public void askInventory(final Inventory theInventory) 
+	{
+		boolean goodResponse = false;
+		List<Item> inv = theInventory.getInventory();
 		
+		while(!goodResponse && inv.size() > 0)
+		{
+			boolean input = promptYesNo("Would you like to interact with Inventory? y/n:");
+			if(input)
+			{
+				for(int i = 0; i < inv.size(); i++)
+				{
+					Item item = inv.get(i);
+					System.out.println(i+1 + ". " + item.getName());
+				}
+				System.out.println((inv.size() + 1) + ". cancel");
+				
+				int itemSelection = 0;
+				while(itemSelection > inv.size() + 1 || itemSelection < 1) // not in range
+				{
+					itemSelection = myUserInput.nextInt() - 1;
+					if(itemSelection == inv.size())
+					{
+						break;
+					}
+					else if(inv.get(itemSelection) instanceof Potion) // not ideal but works...
+					{ //only potions can get used
+						boolean consume = promptYesNo("Would you like to consume this potion? y/n:");
+						if(consume) System.out.println("Consume"); // consume potion logic...
+					}
+					else // weapon 
+					{
+						boolean drop = promptYesNo("Would you like to drop this Weapon? y/n:");
+						if(drop) System.out.println("Drop"); // drop logic.
+					}
+				}
+				
+			}
+			else 
+			{
+				goodResponse = true;
+				break;
+			}
+		}
+		if(inv.size() <= 0) System.out.println("Your inventory is empty.");
+	}
+	
+	private boolean promptYesNo(final String theString)
+	{
+		while(true)
+		{
+			System.out.println(theString);
+			String input = myUserInput.next().trim().toLowerCase();
+			if(input.equals("y"))
+			{
+				return true;
+			}
+			else if(input.equals("n"))
+			{
+				return false;
+			}
+		}
 	}
 
 	@Override
-	public void askInventory(Inventory theInventory) {
+	public void showHeroStats(Hero myOwner) {
 		// TODO Auto-generated method stub
 		
 	}

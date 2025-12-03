@@ -92,7 +92,7 @@ public class DungeonAdventure
 	
 	private static void promptInvetory()
 	{
-		myView.askInventory();
+		myView.askInventory(myGameConfig.getHero().getInventory());
 	}
 	
 	private static void promptMove()
