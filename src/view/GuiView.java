@@ -52,6 +52,12 @@ public class GuiView implements GameView
 	{
 		myUserInput = new Scanner(System.in);
 	}
+	
+	@Override
+	public void showHeroStats(final Hero theHero) {
+	    // GUI version does not manually print stats;
+	    // DungeoneerFrame handles updating the HUD.
+	}
     
 	@Override
 	public void showMessage(final String theMessage) 
