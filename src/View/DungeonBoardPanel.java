@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Scanner;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import model.DungeonTile;
 
 /**
      * Graphical dungeon board in the center, using the same tiles as the demo.
@@ -24,13 +25,6 @@ import javax.swing.JPanel;
 
         private static final String MAP_FILE = "city_map1.txt";
         private static final int TILE_SIZE = 60;
-
-        private enum DungeonTile {
-            FLOOR, WALL, PIT, VOID,
-            ENTRANCE, EXIT,
-            DOOR_N, DOOR_S, DOOR_E, DOOR_W,
-            HORIZONTAL, VERTICAL, INTERSECTION
-        }
         
      // Which way the hero is facing
         private enum Facing { UP, DOWN, LEFT, RIGHT }
@@ -41,6 +35,8 @@ import javax.swing.JPanel;
         private final Map<Facing, Image> myHeroImages =
                 new EnumMap<>(Facing.class);
 
+        private Image myDeadHeroImage;
+        private boolean myHeroDead = false;
 
         private DungeonTile[][] myGrid;
         private int myRows;
@@ -49,13 +45,18 @@ import javax.swing.JPanel;
         // Where to draw the hero
         private int myHeroX;
         private int myHeroY;
+        
+        private int myEntranceX;
+        private int myEntranceY;
 
         // Tile images
         private final Map<DungeonTile, Image> myTileImages = new HashMap<>();
 
-        public DungeonBoardPanel(final String heroSpritePath) {
+        public DungeonBoardPanel(final String heroSpritePath,
+        		                 final String deadSpritePath) {
 
         	loadHeroImages(heroSpritePath);
+        	myDeadHeroImage = new ImageIcon(deadSpritePath).getImage();
         	
             // read the ASCII map
             try (Scanner in = new Scanner(new File(MAP_FILE))) {
@@ -75,7 +76,7 @@ import javax.swing.JPanel;
             }
 
             loadTileImages();
-            setPreferredSize(new Dimension(myCols * TILE_SIZE, myRows * TILE_SIZE));
+            //setPreferredSize(new Dimension(myCols * TILE_SIZE, myRows * TILE_SIZE));
             setBackground(Color.BLACK);
            
         }
@@ -136,11 +137,16 @@ import javax.swing.JPanel;
                         // Entrance tile: put hero there
                         myHeroY = r;
                         myHeroX = c;
+                        
+                     // Remember entrance for respawn
+                        myEntranceY = r;
+                        myEntranceX = c;
                     }
                 }
             }
         }
 
+        /** Map ASCII chars (from city_map1.txt) to tile types. */
         /** Map ASCII chars (from city_map1.txt) to tile types. */
         private DungeonTile convertASCII(final char ch) {
             return switch (ch) {
@@ -157,11 +163,29 @@ import javax.swing.JPanel;
                 case '>' -> DungeonTile.DOOR_E;
                 case '<' -> DungeonTile.DOOR_W;
                 case ' ' -> DungeonTile.VOID;
-                default  -> DungeonTile.FLOOR;
+
+                // items
+                case '$' -> DungeonTile.GOLD;
+                case 'H' -> DungeonTile.HEALING_POTION;
+                case 'V' -> DungeonTile.VISION_POTION;
+
+                // weapons
+                case '1' -> DungeonTile.SPEAR;
+                case '2' -> DungeonTile.FALCHION;
+                case '3' -> DungeonTile.FLAIL;
+                case '4' -> DungeonTile.MORNING_STAR;
+                case '5' -> DungeonTile.STICK;
+
+                // pillars  (match your city_map1.txt: A, N, I, P)
+                case 'A' -> DungeonTile.ABSTRACTION_PILLAR;
+                case 'N' -> DungeonTile.ENCAPSULATION_PILLAR;  // N for eNcapsulation
+                case 'I' -> DungeonTile.INHERITANCE_PILLAR;
+                case 'P' -> DungeonTile.POLYMORPHISM_PILLAR;
+
+                default -> DungeonTile.FLOOR;
             };
         }
 
-        /** Load terrain textures (same image files as the demo). */
         private void loadTileImages() {
             myTileImages.put(DungeonTile.WALL,
                     new ImageIcon("Dungeoneer_Terrain/wall.png").getImage());
@@ -186,10 +210,39 @@ import javax.swing.JPanel;
             myTileImages.put(DungeonTile.DOOR_W,
                     new ImageIcon("Dungeoneer_Terrain/door_west.png").getImage());
 
-            // For now, maze pieces use the floor texture
+            // existing items
+            myTileImages.put(DungeonTile.GOLD,
+                    new ImageIcon("Dungeoneer_Items/gold.png").getImage());
+            myTileImages.put(DungeonTile.HEALING_POTION,
+                    new ImageIcon("Dungeoneer_Items/potion_healing.png").getImage());
+            myTileImages.put(DungeonTile.VISION_POTION,
+                    new ImageIcon("Dungeoneer_Items/potion_vision.png").getImage());
+
+            // NEW: each weapon gets its own sprite
+            myTileImages.put(DungeonTile.SPEAR,
+                    new ImageIcon("Dungeoneer_Items/spear.png").getImage());
+            myTileImages.put(DungeonTile.FALCHION,
+                    new ImageIcon("Dungeoneer_Items/falchion.png").getImage());
+            myTileImages.put(DungeonTile.FLAIL,
+                    new ImageIcon("Dungeoneer_Items/flail.png").getImage());
+            myTileImages.put(DungeonTile.MORNING_STAR,
+                    new ImageIcon("Dungeoneer_Items/morning_star.png").getImage());
+            myTileImages.put(DungeonTile.STICK,
+                    new ImageIcon("Dungeoneer_Items/stick.png").getImage());
+
+            myTileImages.put(DungeonTile.ABSTRACTION_PILLAR,
+                    new ImageIcon("Dungeoneer_Items/abstraction_pillar.png").getImage());
+            myTileImages.put(DungeonTile.ENCAPSULATION_PILLAR,
+                    new ImageIcon("Dungeoneer_Items/encapsulation_pillar.png").getImage());
+            myTileImages.put(DungeonTile.INHERITANCE_PILLAR,
+                    new ImageIcon("Dungeoneer_Items/inheritance_Pillar.png").getImage());
+            myTileImages.put(DungeonTile.POLYMORPHISM_PILLAR,
+                    new ImageIcon("Dungeoneer_Items/polymorphism_pillar.png").getImage());
+
+            // Maze pieces still using floor texture
             Image floor = myTileImages.get(DungeonTile.FLOOR);
-            myTileImages.put(DungeonTile.HORIZONTAL,  floor);
-            myTileImages.put(DungeonTile.VERTICAL,    floor);
+            myTileImages.put(DungeonTile.HORIZONTAL, floor);
+            myTileImages.put(DungeonTile.VERTICAL, floor);
             myTileImages.put(DungeonTile.INTERSECTION, floor);
         }
 
@@ -198,29 +251,64 @@ import javax.swing.JPanel;
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g;
 
-            // Draw tiles
+            // --- 1) Tiles + item overlays ---
             for (int r = 0; r < myRows; r++) {
                 for (int c = 0; c < myCols; c++) {
                     DungeonTile tile = myGrid[r][c];
-                    java.awt.Image img = myTileImages.get(tile);
-                    if (img == null) {
-                        img = myTileImages.get(DungeonTile.FLOOR);
+
+                    // BASE TILE
+                    Image baseImg;
+                    if (isItemTile(tile)
+                            || tile == DungeonTile.HORIZONTAL
+                            || tile == DungeonTile.VERTICAL
+                            || tile == DungeonTile.INTERSECTION) {
+                        baseImg = myTileImages.get(DungeonTile.FLOOR);
+                    } else {
+                        baseImg = myTileImages.get(tile);
+                        if (baseImg == null) {
+                            baseImg = myTileImages.get(DungeonTile.FLOOR);
+                        }
                     }
-                    g2.drawImage(img,
+
+                    g2.drawImage(baseImg,
                                  c * TILE_SIZE,
                                  r * TILE_SIZE,
                                  TILE_SIZE,
                                  TILE_SIZE,
                                  this);
+
+                    // ITEM OVERLAY
+                    if (isItemTile(tile)) {
+                        Image itemImg = myTileImages.get(tile);
+                        if (itemImg != null) {
+                            g2.drawImage(itemImg,
+                                         c * TILE_SIZE,
+                                         r * TILE_SIZE,
+                                         TILE_SIZE,
+                                         TILE_SIZE,
+                                         this);
+                            // If you want a smaller inset, use:
+                            // int off = 6, size = TILE_SIZE - 2 * off;
+                            // g2.drawImage(itemImg,
+                            //              c * TILE_SIZE + off,
+                            //              r * TILE_SIZE + off,
+                            //              size, size, this);
+                        }
+                    }
                 }
             }
 
-         // Draw the hero sprite on top
-            Image heroImg = myHeroImages.get(myFacing);
-            if (heroImg == null) {
-                // Fallback to DOWN if something went wrong
-                heroImg = myHeroImages.get(Facing.DOWN);
+            // --- 2) Hero sprite on top ---
+            Image heroImg;
+            if (myHeroDead && myDeadHeroImage != null && myDeadHeroImage.getWidth(this) > 0) {
+                heroImg = myDeadHeroImage;
+            } else {
+                heroImg = myHeroImages.get(myFacing);
+                if (heroImg == null) {
+                    heroImg = myHeroImages.get(Facing.DOWN);
+                }
             }
+
             if (heroImg != null) {
                 g2.drawImage(heroImg,
                              myHeroX * TILE_SIZE,
@@ -229,8 +317,8 @@ import javax.swing.JPanel;
                              TILE_SIZE,
                              this);
             }
-
         }
+
         
         public void moveHero(final int dx, final int dy) {
             int newX = myHeroX + dx;
@@ -241,7 +329,7 @@ import javax.swing.JPanel;
             }
 
             DungeonTile target = myGrid[newY][newX];
-            if (target == DungeonTile.WALL || target == DungeonTile.PIT) {
+            if (target == DungeonTile.WALL) {
                 return;
             }
 
@@ -260,4 +348,88 @@ import javax.swing.JPanel;
             myHeroY = newY;
             repaint();
         }
-    }
+        
+     // In DungeonBoardPanel
+        @Override
+        public Dimension getPreferredSize() {
+            if (myGrid == null) {
+                // default if nothing loaded yet
+                return new Dimension(10 * TILE_SIZE, 10 * TILE_SIZE);
+            }
+            return new Dimension(myCols * TILE_SIZE, myRows * TILE_SIZE);
+        }
+        
+        public boolean isHeroOnPit() {
+            return myGrid[myHeroY][myHeroX] == DungeonTile.PIT;
+        }
+
+        public int getHeroX() {
+            return myHeroX;
+        }
+
+        public int getHeroY() {
+            return myHeroY;
+        }
+
+        public void resetHeroToEntrance() {
+            myHeroX = myEntranceX;
+            myHeroY = myEntranceY;
+            myFacing = Facing.DOWN; // or whatever default you like
+            repaint();
+        }
+
+        public void setHeroDead(final boolean theDead) {
+            myHeroDead = theDead;
+            repaint();
+        }
+
+        public DungeonTile getTileUnderHero() {
+            return myGrid[myHeroY][myHeroX];
+        }
+
+        public void clearTileUnderHero() {
+            myGrid[myHeroY][myHeroX] = DungeonTile.FLOOR;
+            repaint();
+        }
+
+        public boolean isHeroOnWeapon() {
+            DungeonTile t = myGrid[myHeroY][myHeroX];
+            return t == DungeonTile.SPEAR
+                || t == DungeonTile.FALCHION
+                || t == DungeonTile.FLAIL
+                || t == DungeonTile.MORNING_STAR
+                || t == DungeonTile.STICK;
+        }
+
+        // === NEW: helper methods your DungeoneerFrame is calling ===
+
+        public boolean isHeroOnGold() {
+            return myGrid[myHeroY][myHeroX] == DungeonTile.GOLD;
+        }
+
+        public boolean isHeroOnHealingPotion() {
+            return myGrid[myHeroY][myHeroX] == DungeonTile.HEALING_POTION;
+        }
+
+        public boolean isHeroOnVisionPotion() {
+            return myGrid[myHeroY][myHeroX] == DungeonTile.VISION_POTION;
+        }
+        
+        /** Tiles that are drawn as items on top of a floor tile. */
+        private boolean isItemTile(final DungeonTile tile) {
+            return tile == DungeonTile.GOLD
+                || tile == DungeonTile.HEALING_POTION
+                || tile == DungeonTile.VISION_POTION
+                || tile == DungeonTile.SPEAR
+                || tile == DungeonTile.FALCHION
+                || tile == DungeonTile.FLAIL
+                || tile == DungeonTile.MORNING_STAR
+                || tile == DungeonTile.STICK
+                || tile == DungeonTile.ABSTRACTION_PILLAR
+                || tile == DungeonTile.ENCAPSULATION_PILLAR
+                || tile == DungeonTile.INHERITANCE_PILLAR
+                || tile == DungeonTile.POLYMORPHISM_PILLAR;
+        }
+  }
+        
+ 
