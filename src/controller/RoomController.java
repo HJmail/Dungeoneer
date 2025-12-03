@@ -2,171 +2,97 @@ package controller;
 
 import java.util.Random;
 
-import model.Dungeon;
-import model.HealingPotion;
-import model.Hero;
-import model.Item;
-import model.ItemType;
-import model.Pillar;
-import model.Rarity;
+import model.DungeonTile;
 import model.Room;
-import model.Shopkeeper;
-import model.VisionPotion;
+import model.Rarity;
 import model.Weapon;
-import view.GameView;
+import model.HealingPotion;
+import model.VisionPotion;
+import model.Pillar;
+import model.Gold;
 
-public class RoomController 
-{
-	private static int PIT_DMG = 4;
-	
-	private static int QUIT_SHOP = 4;
-	
-	private static int HEAL_POT = 4;
-	
-	private static int VISION_POT = 1;
-	
-	private Hero myHero;
-	
-	private Dungeon myDungeon;
-	
-	private GameView myView;
-	
-	private Random myRandom;
-	
-	private int myPillarCount;
-	
-	public RoomController(final Hero theHero,
-						final Dungeon theDungeon,
-						final GameView theView,
-						final Random theRandom)
-	{
-		myHero = theHero;
-		myDungeon = theDungeon;
-		myView = theView;
-		myRandom  = theRandom;
-		myPillarCount = 0;
-	}
-	
-	
-	public void activateShop()
-	{
-		// shop logic
-		boolean isDone = false;
-		while(!isDone) // not done
-		{
-			Room room = myDungeon.getCurrentRoom();
-			Shopkeeper shop = room.getShopkeeper();
-			myView.showShopItems(shop.getItems()); // need to fix later
-			int input = myView.askShop();
-			myView.showMessage("\n" + shop.buyItem(myHero, input) + "\n");
-			isDone = (input == QUIT_SHOP);
-		}
-	}
-	
-	public boolean activatePit()
-	{
-		// pit logic
-		myHero.setHitPoints(myHero.getHitPoints() - PIT_DMG);
-		myView.showPit(PIT_DMG);
-		return myHero.isAlive();
-		
-	}
-	
-	public void activatePillar()
-	{
-		char[] pillars = {'A', 'E', 'I', 'P'};
-		myHero.getInventory().addItem(new Pillar(pillars[myPillarCount]));
-		myView.showPillar(pillars[myPillarCount]);
-		myPillarCount++;
-	}
-	
-	public void activateTreasure()
-	{
-		int depth = myDungeon.getCurrentRoom().getDepth();
-		for(ItemType it: myDungeon.getCurrentRoom().getItems())
-		{
-			int roll = myRandom.nextInt(100);
-			Rarity rarity = getRarity(roll);
-			
-			if(it == ItemType.HEALING_POTION)
-			{
-				addToInvetory(new HealingPotion(HEAL_POT, rarity));
-			}
-			else if(it == ItemType.GOLD)
-			{
-				int goldrng = (int) (depth * (8 + (roll * 0.1)));
-				myHero.setGold(myHero.getGold() + goldrng);
-			}
-			else if(it == ItemType.VISION_POTION)
-			{
-				addToInvetory(new VisionPotion(VISION_POT, rarity));
-			}
-			else if(it == ItemType.WEAPON)
-			{
-				Weapon newWeapon;
-				int weaponRoll = myRandom.nextInt(4);
-				switch(weaponRoll)
-				{
-					case 1:
-						newWeapon = Weapon.createSpear(rarity);
-					case 2:
-						newWeapon = Weapon.createFlail(rarity);
-					case 3:
-						newWeapon = Weapon.createFalchion(rarity);
-					case 4:
-						newWeapon = Weapon.createMorningStar(rarity);
-					default:
-						newWeapon = Weapon.createStick(rarity);
-				}
-				addToInvetory(newWeapon);
-			}
-		}
-	}
-	
-	private void addToInvetory(final Item theItem)
-	{ 
-		try
-		{
-			myHero.getInventory().addItem(theItem);
-		}
-		catch(IllegalStateException e)
-		{
-			myDungeon.getCurrentRoom().setIsLooted(false);
-			myView.showMessage("Could not collect a item");
-		}
-	}
-	
-	public void activateEncounter()
-	{
-		//CombatController.battleMultiple(myHero,
-		//					myDungeon.getCurrentRoom().getMonsters());
-		
-		// When the hero wins
-		if(myHero.isAlive());
-		{
-			activateTreasure();
-		}
-	}
-	
-	public Rarity getRarity(final int theRoll)
-	{ 	// Roll is 1-100
-		Rarity rarity = Rarity.COMMON;
-		if(theRoll > 50 && theRoll < 75)
-		{
-			rarity = Rarity.UNCOMMON;
-		}
-		else if(theRoll > 75 && theRoll < 88)
-		{
-			rarity = Rarity.RARE;
-		}
-		else if(theRoll > 88 && theRoll < 94)
-		{
-			rarity = Rarity.EPIC;
-		}
-		else if(theRoll > 94)
-		{
-			rarity = Rarity.LEGENDARY;
-		}
-		return rarity;
-	}
+/**
+ * Handles adding loot to rooms.
+ */
+public class RoomController {
+
+    private final Random myRng = new Random();
+
+    /**
+     * Places loot in the room based on tile type.
+     */
+    public void addLoot(Room theRoom, DungeonTile theTile) {
+
+        switch (theTile) {
+
+        case GOLD -> {
+            theRoom.addItem(new Gold(25));  // or any amount you want
+            theRoom.setIsLooted(true);
+        }
+
+
+        case HEALING_POTION -> {
+            theRoom.addItem(new HealingPotion(25, Rarity.COMMON));
+            theRoom.setIsLooted(true);
+        }
+
+        case VISION_POTION -> {
+            theRoom.addItem(new VisionPotion(3, Rarity.UNCOMMON));
+            theRoom.setIsLooted(true);
+        }
+
+        // --- Weapon tiles ---
+        case STICK -> {
+            theRoom.addItem(new Weapon("Stick", 8, Rarity.COMMON));
+            theRoom.setIsLooted(true);
+        }
+        case SPEAR -> {
+            theRoom.addItem(new Weapon("Spear", 10, Rarity.UNCOMMON));
+            theRoom.setIsLooted(true);
+        }
+        case FALCHION -> {
+            theRoom.addItem(new Weapon("Falchion", 12, Rarity.UNCOMMON));
+            theRoom.setIsLooted(true);
+        }
+        case FLAIL -> {
+            theRoom.addItem(new Weapon("Flail", 14, Rarity.RARE));
+            theRoom.setIsLooted(true);
+        }
+        case MORNING_STAR -> {
+            theRoom.addItem(new Weapon("Morning Star", 16, Rarity.RARE));
+            theRoom.setIsLooted(true);
+        }
+
+        // --- Pillars ---
+        case ABSTRACTION_PILLAR -> {
+            theRoom.addItem(new Pillar('A'));
+            theRoom.setIsLooted(true);
+        }
+        case ENCAPSULATION_PILLAR -> {
+            theRoom.addItem(new Pillar('E'));
+            theRoom.setIsLooted(true);
+        }
+        case INHERITANCE_PILLAR -> {
+            theRoom.addItem(new Pillar('I'));
+            theRoom.setIsLooted(true);
+        }
+        case POLYMORPHISM_PILLAR -> {
+            theRoom.addItem(new Pillar('P'));
+            theRoom.setIsLooted(true);
+        }
+
+        default -> {
+            // Nothing dropped in this room.
+        }
+        }
+    }
+
+    /** Random rarity helper. */
+    private Rarity randomRarity() {
+        int roll = myRng.nextInt(100);
+        if (roll < 50) return Rarity.COMMON;
+        if (roll < 80) return Rarity.UNCOMMON;
+        if (roll < 95) return Rarity.RARE;
+        return Rarity.LEGENDARY;
+    }
 }
