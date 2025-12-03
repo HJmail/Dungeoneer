@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import model.Direction;
 import model.Dungeon;
 import model.GameConfig;
+import model.Inventory;
 import model.Item;
 
 public interface GameView 
@@ -16,6 +17,8 @@ public interface GameView
 	 */
 	void showMessage(final String message);
 	
+	void askInventory(final Inventory theInventory);
+	
 	/**
 	 * Prints the given dungeon into console.
 	 * @param theDungeon the given dungeon.
@@ -23,8 +26,8 @@ public interface GameView
     void showDungeon(final Dungeon theDungeon);
     
     /**
-     * 
-     * @return
+     *  Gets needed data for the game set up.
+     * @return GameConfig containing all game set up.
      */
     GameConfig askGameConfig();
     
@@ -33,6 +36,10 @@ public interface GameView
      */
     void showShopItems(final ArrayList<Item> theItem);
     
+    /**
+     * This asks the user to select form attack or special attack while in combat.
+     */
+    void askCombat();
     
     /**
      * This method prompts user for input for the shop.

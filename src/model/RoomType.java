@@ -6,15 +6,12 @@ package model;
 public enum RoomType 
 {
 	// type of events
-	NONE('*'),
+	NONE('n'),
 	PIT('o'),
 	ENCOUNTER('x'),
 	PILLAR('l'),
 	EXIT('E'),
 	START('e'),
-	TRAVELED('~'),
-	TRAVELED_NS('|'),
-	TRAVELED_EW('-'),
 	SHOP('s'),
 	TREASURE('t');
 	

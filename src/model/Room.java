@@ -72,18 +72,8 @@ public class Room
 	
 	public void exit(final Direction theDirection)
 	{
-		if(myRoomType != RoomType.START 
-				&& myRoomType != RoomType.EXIT) 
-		{
-			if(theDirection == Direction.NORTH || theDirection.opposite() == Direction.NORTH)
-			{	
-				setRoomType(RoomType.TRAVELED_NS);
-			}
-			else
-			{
-				setRoomType(RoomType.TRAVELED_EW);
-			}
-		}
+		setActivated(true);
+		setVisability(true);
 	}
 	
 	/**
@@ -198,7 +188,7 @@ public class Room
 		myIsVisable = theView;
 	}
 	
-	public boolean getVisability()
+	public boolean isVisable()
 	{
 		return myIsVisable;
 	}

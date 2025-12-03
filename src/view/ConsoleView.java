@@ -7,6 +7,7 @@ import model.Direction;
 import model.Dungeon;
 import model.GameConfig;
 import model.Hero;
+import model.Inventory;
 import model.Item;
 import model.Priestess;
 import model.Thief;
@@ -43,6 +44,10 @@ public class ConsoleView implements GameView
 				{
 					dungeon += 'C';
 				}
+				else if(!theDungeon.getRoom(i, j).isVisable())
+				{
+					dungeon += '*';
+				}
 				else
 				{
 					dungeon += theDungeon.getRoom(i, j).getRoomChar();
@@ -51,7 +56,6 @@ public class ConsoleView implements GameView
 			}
 			dungeon += "\n";
 		}
-		
 		System.out.println("\n" + dungeon);
 	}
 	
@@ -151,6 +155,7 @@ public class ConsoleView implements GameView
 		Direction chosenDirection = null;
 		while(chosenDirection == null)
 		{
+			System.out.println();
 			System.out.println("What direction do you want to move? (N)orth, (E)ast, (S)outh, and (W)est: ");
 			String input  = myUserInput.next().toUpperCase();
 			switch(input)
@@ -188,6 +193,36 @@ public class ConsoleView implements GameView
 	public void gameOver()
 	{
 		System.out.println("\nGAME OVER!");
+	}
+
+	@Override
+	public void askCombat()  // change to int later
+	{
+		boolean goodResponse = false;
+		while(!goodResponse)
+		{
+			System.out.println("What do you choose for your combat turn?\n" +
+								"1. Normal attack\n" +
+								"2. Special attack\n" +
+								"3. Healing Potion \n");
+
+			int input = myUserInput.nextInt();
+			if(input > 0 && input < 4) goodResponse = true;
+		}
+		// send to combat controller?
+		// return in
+	}
+
+	@Override
+	public void askInventory() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void askInventory(Inventory theInventory) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

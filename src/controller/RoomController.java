@@ -69,7 +69,6 @@ public class RoomController
 		myHero.setHitPoints(myHero.getHitPoints() - PIT_DMG);
 		myView.showPit(PIT_DMG);
 		return myHero.isAlive();
-		
 	}
 	
 	public void activatePillar()
@@ -138,8 +137,8 @@ public class RoomController
 	
 	public void activateEncounter()
 	{
-		//CombatController.battleMultiple(myHero,
-		//					myDungeon.getCurrentRoom().getMonsters());
+		CombatController.battleMultiple(myHero,
+							myDungeon.getCurrentRoom().getMonsters());
 		
 		// When the hero wins
 		if(myHero.isAlive());

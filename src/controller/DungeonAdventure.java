@@ -83,9 +83,16 @@ public class DungeonAdventure
 	{
 		while(myGameStatus)
 		{
+			promptInvetory();
 			promptMove(); // user input for move
+			checkHitPoints();
 		}
 		myView.showMessage("Game Halted.");
+	}
+	
+	private static void promptInvetory()
+	{
+		myView.askInventory();
 	}
 	
 	private static void promptMove()
@@ -95,12 +102,23 @@ public class DungeonAdventure
 		while(!goodResponse) // keep prompting until good input.
 		{
 			myView.showDungeon(myDungeon);
-			myView.showMessage(myDungeon.getTraversable().toString());
+			
+			myView.showMessage(myDungeon.getTraversable().toString()); // THIS IS FOR TESTING ONLY
+			
 			Direction chosenDirection = myView.askDirection();
 			goodResponse = myDungeon.move(chosenDirection);
 		}
 		// Room is updated need to activate it.
 		activateRoom();
+	}
+	
+	private static void checkHitPoints()
+	{
+		if(!myGameConfig.getHero().isAlive())
+		{
+			myGameStatus = false;
+			myView.gameOver();
+		}
 	}
 	
 	private static void activateRoom()

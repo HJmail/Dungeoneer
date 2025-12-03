@@ -128,7 +128,10 @@ public class Dungeon
 		int y = (int) myHeroLocation.getY();
 		
 		// exiting old room.
-		myMaze[x][y].exit(theDirection);
+		Room oldRoom = myMaze[x][y];
+		oldRoom.exit(theDirection);
+		oldRoom.setVisability(true);
+		oldRoom.setActivated(true);
 		
 		// joining new room
 		setHeroLocation(theRow, theCol);
