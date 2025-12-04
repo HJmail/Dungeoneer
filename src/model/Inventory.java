@@ -133,7 +133,7 @@ public class Inventory {
               default -> { /* ignore unknown */ }
           }
 
-          System.out.println("Picked up pillar: " + type);
+          log("Picked up pillar: " + type);
           return true;
       }
 
@@ -144,14 +144,14 @@ public class Inventory {
 
           // Stack already full?
           if (current >= MAX_POTION_STACK) {
-              System.out.println("You cannot carry more than "
+              log("You cannot carry more than "
                                  + MAX_POTION_STACK + " " + key + "s.");
               return false;
           }
 
           // First potion of this type uses an inventory slot
           if (current == 0 && getNonPillarItemCount() >= MAX_ITEMS) {
-              System.out.println("Your inventory is full. You can't carry another " + key + ".");
+              log("Your inventory is full. You can't carry another " + key + ".");
               return false;
           }
 
@@ -162,21 +162,21 @@ public class Inventory {
               myInventory.add(theItem);
           }
 
-          System.out.println("Picked up " + key + " ("
+          log("Picked up " + key + " ("
                              + (current + 1) + "/" + MAX_POTION_STACK + ")");
           return true;
       }
 
       // ---------- OTHER ITEMS (weapons, etc.) ----------
       if (getNonPillarItemCount() >= MAX_ITEMS) {
-          System.out.println("Your inventory is full. You cannot carry more than "
+          log("Your inventory is full. You cannot carry more than "
                              + MAX_ITEMS + " items.");
           return false;
       }
 
       myInventory.add(theItem);
-      System.out.println("Picked up item: "
-                         + theItem.getClass().getSimpleName());
+      log("Picked up item: "
+                         + theItem.getName());
       return true;
   }
 

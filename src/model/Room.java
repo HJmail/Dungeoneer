@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.List;
  */
 public class Room 
 {	
+	private static final int ROOM_DIMENSION = 13;
+	
 	/**
 	 * This EnumSet represents the directions that exist
 	 */
@@ -29,10 +32,9 @@ public class Room
 	 */
 	private List<Monster> myMonstersInRoom;
 	
-	/**
-	 * This field holds a reference to hero if they are here.
-	 */
-	//private Hero myHero;
+	private Tile[][] myTiles; 
+	
+	private boolean[][] myFullTiles;
 	
 	/**
 	 *  Represents maze depth.
@@ -47,27 +49,36 @@ public class Room
 	
 	private boolean myIsLooted;
 	
+	
 	public Room()
 	{
 		myDirections = EnumSet.noneOf(Direction.class);
 		myRoomType = RoomType.NONE;
 		myItems = EnumSet.noneOf(ItemType.class);
+		myTiles = new Tile[ROOM_DIMENSION][ROOM_DIMENSION];
+		myFullTiles = new boolean[ROOM_DIMENSION][ROOM_DIMENSION];
 	}
 	
-	/**
-	 * This is the Room constructor when we have all the data already.
-	 * @param theDirections This is a EnumSet that represents existing doors relative to this room.
-	 * @param theFeatures This is a EnumSet that represents the existing Features within this room.
-	 * @param theItems This is the EnumSet that represents the existing Items within this room that is lootable.
-	 * @param theCharRepresentation This is a char that represents the room on the map.
-	 */
-	public Room(final EnumSet<Direction> theDirections,
-				final RoomType theEvent,
-				final EnumSet<ItemType> theItems)
+	public Tile[][] getTiles()
 	{
-		myDirections = EnumSet.copyOf(theDirections);
-		myRoomType = theEvent;
-		myItems = EnumSet.copyOf(theItems);
+		return myTiles.clone();
+	}
+	
+	public boolean[][] getFullTiles()
+	{
+		return myFullTiles.clone();
+	}
+	
+	public void setTile(final Point theTile, final TileType theType)
+	{
+		int row = (int) theTile.getX();
+		int col = (int) theTile.getY();
+		
+		if(myFullTiles[row][col]) // checks if open... 
+		{
+			myFullTiles[row][col] = false; // closes the tile
+			myTiles[row][col] = new Tile(theType);
+		}
 	}
 	
 	public void exit(final Direction theDirection)

@@ -147,7 +147,7 @@ public class RoomController
 		}
 	}
 	
-	public Rarity getRarity(final int theRoll)
+	private Rarity getRarity(final int theRoll)
 	{ 	// Roll is 1-100
 		Rarity rarity = Rarity.COMMON;
 		if(theRoll > 50 && theRoll < 75)

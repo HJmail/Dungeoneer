@@ -84,7 +84,6 @@ public class GuiView implements GameView
 	    {
 	        System.exit(0);
 	    }
-	
 		return myGameConfigPanel.getGameConfig();
 	}
 
@@ -97,7 +96,6 @@ public class GuiView implements GameView
 							"2. Vision Potion - " + 40 + " gold\n" +
 							"3. Weapon Upgrade - " + 100 + " gold\n" +
 							"4. Stop Shopping\n";
-		
 		System.out.println(shopString);
 	}
 
