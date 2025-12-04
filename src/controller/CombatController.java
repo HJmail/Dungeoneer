@@ -35,23 +35,40 @@ public class CombatController {
 
     while (hero.isAlive() && monster.isAlive()) {
 
-      // HERO TURN
-      for (int i = 0; i < heroAttacks && monster.isAlive(); i++) {
+    	// HERO TURN
+    	for (int i = 0; i < heroAttacks && monster.isAlive(); i++) {
 
-        int damage = hero.attack(monster);
+    	    String choice = myView.askCombatChoice(hero, monster);
 
-        if (damage == -1) {
-          log(hero.getName() + " MISSES!");
-        } else {
-          log(hero.getName() + " hits " + monster.getName() 
-               + " for " + damage + " damage!");
-        }
+    	    // --- SPECIAL ATTACK ---
+    	    if (choice.equals("SPECIAL")) {
+    	        String resultMsg = hero.specialSkill(monster);
+    	        log(resultMsg);
 
-        if (!monster.isAlive()) {
-          log(monster.getName() + " has been defeated!");
-          return "HERO_WIN";
-        }
-      }
+    	        // Check if monster died from special attack
+    	        if (!monster.isAlive()) {
+    	            log(monster.getName() + " has been defeated!");
+    	            return "HERO_WIN";
+    	        }
+
+    	        continue; // skip normal attack
+    	    }
+
+    	    // --- NORMAL ATTACK ---
+    	    int damage = hero.attack(monster);
+
+    	    if (damage == -1) {
+    	        log(hero.getName() + " MISSES!");
+    	    } else {
+    	        log(hero.getName() + " hits " + monster.getName()
+    	            + " for " + damage + " damage!");
+    	    }
+
+    	    if (!monster.isAlive()) {
+    	        log(monster.getName() + " has been defeated!");
+    	        return "HERO_WIN";
+    	    }
+    	}
 
       // MONSTER TURN
       for (int i = 0; i < monsterAttacks && hero.isAlive(); i++) {

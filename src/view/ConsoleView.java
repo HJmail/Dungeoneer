@@ -8,6 +8,7 @@ import model.Dungeon;
 import model.GameConfig;
 import model.Hero;
 import model.Item;
+import model.Monster;
 import model.Priestess;
 import model.Thief;
 import model.Warrior;
@@ -198,4 +199,21 @@ public class ConsoleView implements GameView
 	    System.out.println("Gold: " + theHero.getGold());
 	    System.out.println("===================");
 	}
+	
+	@Override
+	public String askCombatChoice(final Hero hero, final Monster monster) {
+	    System.out.println(hero.getName() + ", you are fighting " + monster.getName());
+	    System.out.println("Choose your attack:");
+	    System.out.println("1. Normal Attack");
+	    System.out.println("2. Special Skill");
+
+	    int choice = myUserInput.nextInt();
+	    myUserInput.nextLine(); // consume newline
+
+	    if (choice == 2) {
+	        return "SPECIAL";
+	    }
+	    return "NORMAL";
+	}
+
 }

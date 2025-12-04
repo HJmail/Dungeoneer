@@ -24,6 +24,7 @@ import model.Dungeon;
 import model.GameConfig;
 import model.Hero;
 import model.Item;
+import model.Monster;
 import model.Priestess;
 import model.Thief;
 import model.Warrior;
@@ -347,6 +348,15 @@ public class GuiView implements GameView
 	      return diff + " - Veteran. You won't survive...";
 	    }
 	  }
+	
+	@Override
+	public String askCombatChoice(final Hero hero, final Monster monster) {
+	    // Simple temporary implementation:
+	    System.out.println(hero.getName() + " is fighting " + monster.getName()
+	                       + " (GUI stub) – defaulting to NORMAL attack.");
+	    return "NORMAL";
+	}
+
 	
 	private GameConfig getGameConfig()
 	{

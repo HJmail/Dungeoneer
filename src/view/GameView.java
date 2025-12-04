@@ -7,6 +7,7 @@ import model.Direction;
 import model.Dungeon;
 import model.GameConfig;
 import model.Item;
+import model.Monster;
 import model.Hero;
 
 public interface GameView 
@@ -52,6 +53,9 @@ public interface GameView
     Direction askDirection();
     
     void showPillar(final char theChar);
+    
+    String askCombatChoice(Hero hero, Monster monster);
+
     
     /**
      * Game over view just indicated to the player that the game is over.

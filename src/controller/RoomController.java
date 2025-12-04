@@ -7,6 +7,7 @@ import model.Room;
 import model.Rarity;
 import model.Weapon;
 import model.HealingPotion;
+import model.Hero;
 import model.VisionPotion;
 import model.Pillar;
 import model.Gold;
@@ -17,6 +18,7 @@ import model.Gold;
 public class RoomController {
 
     private final Random myRng = new Random();
+    
 
     /**
      * Places loot in the room based on tile type.
@@ -85,6 +87,24 @@ public class RoomController {
             // Nothing dropped in this room.
         }
         }
+    }
+    
+    public static String activateEncounter(Hero hero, Room room) {
+
+        // No monsters, no encounter
+        if (room.getMonsters().isEmpty()) {
+            return "NO_MONSTERS";
+        }
+
+        // Run combat
+        String result = CombatController.battleMultiple(hero, room.getMonsters());
+
+        // If hero won, clear monsters from the room
+        if (result.equals("HERO_WIN")) {
+            room.getMonsters().clear();
+        }
+
+        return result;
     }
 
     /** Random rarity helper. */

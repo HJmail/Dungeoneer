@@ -3,6 +3,8 @@ package model;
 import java.awt.Point;
 import java.util.EnumSet;
 
+import controller.RoomController;
+
 /**
  * This class represents the dungeon the player must traverse.
  */
@@ -33,11 +35,15 @@ public class Dungeon
 	 */
 	private Point myStartLocation;
 	
+	private Hero myHero;
+	
 	/**
 	 *  This is the basic class constructor.
 	 */
 	public Dungeon(final Hero theHero, final int theDifficulty)
 	{
+		myHero = theHero;
+		
 		myRows = theDifficulty + 4;
 		myCols = theDifficulty + 4;
 		myMaze = new Room[myRows][myCols];
@@ -122,16 +128,28 @@ public class Dungeon
 	 * @param theDirection the Direction so we can maintain good symbols for discretions.
 	 */
 	private void moveHero(final int theRow, final int theCol, final Direction theDirection)
-	{ 
-		// getting current row and col
-		int x = (int) myHeroLocation.getX();
-		int y = (int) myHeroLocation.getY();
-		
-		// exiting old room.
-		myMaze[x][y].exit(theDirection);
-		
-		// joining new room
-		setHeroLocation(theRow, theCol);
+	{
+	    // old location
+	    int oldX = (int) myHeroLocation.getX();
+	    int oldY = (int) myHeroLocation.getY();
+
+	    // exit old room
+	    myMaze[oldX][oldY].exit(theDirection);
+
+	    // move the hero
+	    setHeroLocation(theRow, theCol);
+
+	    // new room
+	    Room newRoom = myMaze[theRow][theCol];
+
+	    // hero enters room (activates pits, etc.)
+	    newRoom.enter(myHero);
+
+	    // ⭐ ACTIVATE ENCOUNTER ⭐
+	    String result = RoomController.activateEncounter(myHero, newRoom);
+
+	    // If GUI/Console wants to react to combat (optional)
+	    // You can return result through move() later if needed.
 	}
 	
 	public void setRoomDepth(final int theRow, final int theCol, final int theDepth)

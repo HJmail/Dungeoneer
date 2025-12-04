@@ -44,6 +44,7 @@ import model.DungeonTile;
 import model.Pillar;
 import model.Potion;
 import model.Item;
+import model.Monster;
 import model.GameConfig;
 
 import view.GameView;
@@ -766,5 +767,26 @@ public class DungeoneerFrame extends JFrame implements GameView {
      dispose();
      System.exit(0);
  }
+ @Override
+ public String askCombatChoice(final Hero hero, final Monster monster) {
+     Object[] options = {"Normal Attack", "Special Skill"};
+
+     int choice = javax.swing.JOptionPane.showOptionDialog(
+             this,
+             hero.getName() + " vs " + monster.getName() + "\nChoose your attack:",
+             "Combat Choice",
+             javax.swing.JOptionPane.DEFAULT_OPTION,
+             javax.swing.JOptionPane.QUESTION_MESSAGE,
+             null,
+             options,
+             options[0]
+     );
+
+     if (choice == 1) {
+         return "SPECIAL";
+     }
+     return "NORMAL";
+ }
+
    
 }
