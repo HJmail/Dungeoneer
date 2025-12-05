@@ -231,4 +231,9 @@ public class GuiView implements GameView
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public String showRoom(final Room theRoom)
+	{
+		
+	}
 }

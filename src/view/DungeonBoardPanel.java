@@ -22,7 +22,7 @@ import javax.swing.JPanel;
     	
         private static final long serialVersionUID = 1L;
 
-        private static final String MAP_FILE = "city_map1.txt";
+        //private static final String MAP_FILE = "city_map1.txt";
         private static final int TILE_SIZE = 60;
 
         private enum DungeonTile {

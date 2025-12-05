@@ -9,6 +9,7 @@ import model.GameConfig;
 import model.Hero;
 import model.Inventory;
 import model.Item;
+import model.Room;
 
 public interface GameView 
 {
@@ -64,4 +65,6 @@ public interface GameView
     void gameOver();
 
 	void showHeroStats(Hero myOwner);
+	
+	void showRoom(final Room theRoom);
 }

@@ -49,6 +49,7 @@ public class Room
 	
 	private boolean myIsLooted;
 	
+	private Point myHeroRoomLocation;
 	
 	public Room()
 	{
@@ -57,16 +58,32 @@ public class Room
 		myItems = EnumSet.noneOf(ItemType.class);
 		myTiles = new Tile[ROOM_DIMENSION][ROOM_DIMENSION];
 		myFullTiles = new boolean[ROOM_DIMENSION][ROOM_DIMENSION];
+		myHeroRoomLocation = new Point(0,0);
 	}
 	
-	public Tile[][] getTiles()
+	public Tile getTile(final Point thePoint)
 	{
-		return myTiles.clone();
+		return myTiles[(int) thePoint.getX()][(int) thePoint.getY()];
+	}
+	
+	public int getTilesRows()
+	{
+		return myTiles.length;
+	}
+	
+	public int getTilesCols()
+	{
+		return myTiles[0].length;
 	}
 	
 	public boolean[][] getFullTiles()
 	{
 		return myFullTiles.clone();
+	}
+	
+	public void setMiddleTile(final TileType theType)
+	{
+		setTile(new Point(ROOM_DIMENSION/2 + 1, ROOM_DIMENSION/2 + 1), theType);
 	}
 	
 	public void setTile(final Point theTile, final TileType theType)

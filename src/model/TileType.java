@@ -12,9 +12,30 @@ public enum TileType
     DOOR_S('v', "door_south"),
     DOOR_E('>', "door_east"),
     DOOR_W('<', "door_west"),
+    
     HORIZONTAL('-', "null"),
     VERTICAL('|', "null"),
-    INTERSECTION('+', "null");
+    INTERSECTION('+', "null"),
+    
+    SPEAR('1', "null"),
+    FALCHION('2', "null"),
+    FLAIL('3', "null"),
+    MORNING_STAR('4', "null"),
+    STICK('5', "null"),
+    
+    GOLD('$', "null"),
+    HEALING_POTION('H', "null"),
+    VISION_POTION('V', "null"),
+    
+    ABSTRACTION_PILLAR('A', "null"),
+    ENCAPSULATION_PILLAR('C', "null"),
+    INHERITANCE_PILLAR('I', "null"),
+    POLYMORPHISM_PILLAR('P', "null"),
+	
+	GREMLIN('G', "gremlin_down.png"),
+	SKELETON('S', "skeleton_down.png"),
+	OGRE('Z', "ogre_down.png");
+	
 	
     private static final String PATH = "Dungeoneer_Terrain/";
     
@@ -36,5 +57,14 @@ public enum TileType
     public char getChar()
     {
     	return myChar;
+    }
+    
+    public static TileType fromChar(final char c) 
+    {
+        for (TileType type : values()) 
+        {
+            if (type.myChar == c) return type;
+        }
+        return FLOOR; // default
     }
 }
