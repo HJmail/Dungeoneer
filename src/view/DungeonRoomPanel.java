@@ -193,17 +193,13 @@ public class DungeonRoomPanel extends JPanel
 		Point heroPos = myRoom.getHeroTileLocation();
 		
 
-        int col = heroPos.x;
-        int row = heroPos.y;
+        int col = heroPos.y;
+        int row = heroPos.x;
 
         Image heroImg = myHeroImages.get(myFacing);
         
         if (heroImg != null) 
-        {
-        	 int w = heroImg.getWidth(null);
-             int h = heroImg.getHeight(null);
-             //System.out.printf("heroImg size = %d x %d%n", w, h);
-        	
+        {	
             theGraphics.drawImage(
                 heroImg,
                 col * TILE_SIZE,

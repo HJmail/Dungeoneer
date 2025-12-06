@@ -16,7 +16,7 @@ import view.GuiView;
 /**
  *  This class is the main logic holding class for the Dungeoneer Game
  *  @author Skyler Z Broussard
- *  @version 0.0.1  10/20/2025
+ *  @version 0.0.1  10/20/2025	
  */
 public class DungeonAdventure 
 {	

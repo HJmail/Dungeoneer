@@ -101,19 +101,18 @@ public class Dungeon
 	
 	private void goThroughDoor(final Direction theDir)
 	{
-	    int roomRow = myHeroRoomLocation.y;
-	    int roomCol = myHeroRoomLocation.x;
+	    int roomRow = myHeroRoomLocation.x;
+	    int roomCol = myHeroRoomLocation.y;
 	    
 	    roomRow += theDir.dy();  
 	    roomCol += theDir.dx();
 	    
-	    myHeroRoomLocation = new Point(roomCol, roomRow);
+	    myHeroRoomLocation = new Point(roomRow, roomCol);
 	    Room nRoom = getCurrentRoom();
 	    Direction entry = theDir.opposite();
 	    Point entryPos = findDoor(nRoom, entry);
 	    
 	    nRoom.setHeroTileLocation(entryPos);
-	    
 	}
 	
 	private Point findDoor(final Room theRoom, final Direction theDir)
@@ -125,11 +124,11 @@ public class Dungeon
 	    int midCol = cols / 2;
 		return switch (theDir) 
 		{
-	        case NORTH -> new Point(midCol, 0);           // top wall
-	        case SOUTH -> new Point(midCol, rows - 1);    // bottom wall
-	        case WEST  -> new Point(0, midRow);           // left wall
-	        case EAST  -> new Point(cols - 1, midRow);    // right wall
-	    };	
+		        case NORTH -> new Point(0, midCol);      // top wall (row 0, middle col)
+		        case SOUTH -> new Point(rows - 1, midCol);      // bottom wall
+		        case WEST  -> new Point(midRow, 0);           // left wall
+		        case EAST  -> new Point(midRow, cols - 1);    // right wall
+		};
 	}
 	
 	/**

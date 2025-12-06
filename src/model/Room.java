@@ -69,10 +69,7 @@ public class Room
 	{
 		Tile tile = getTile(thePoint);
 		TileType type = tile.getTileType();
-		boolean isDoor = (type == TileType.DOOR_N ||
-							type == TileType.DOOR_E ||
-							type == TileType.DOOR_S ||
-							type == TileType.DOOR_W);
+		
 		
 		if(tile.hasItem())
 		{
@@ -82,17 +79,12 @@ public class Room
 		{
 			theHero.setHitPoints(theHero.getHitPoints() - PIT_DMG);
 		}
-		else if(isDoor)
-		{
-			
-		}
-		// else is normal tile.
 	}
 	
 	public boolean canMoveTo(final Point thePoint)
 	{
-		int row = thePoint.y;
-		int col = thePoint.x;
+		int row = (int) thePoint.getX();
+		int col = (int) thePoint.getY();
 		
 	    if (row < 0 || row >= getTilesRows() || col < 0 || col >= getTilesCols()) 
 	    {

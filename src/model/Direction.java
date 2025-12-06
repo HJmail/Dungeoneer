@@ -138,6 +138,6 @@ public enum Direction {
 
 	public Point translate(final Point theOld) 
 	{
-		return new Point(theOld.x + dx(), theOld.y + dy());
+		return new Point(theOld.x + dy(), theOld.y + dx());
 	}
 }
