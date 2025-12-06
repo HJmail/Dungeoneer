@@ -14,6 +14,7 @@ import model.Hero;
 import model.Inventory;
 import model.Item;
 import model.Potion;
+import model.Room;
 
 public class GuiView implements GameView
 {	
@@ -232,8 +233,8 @@ public class GuiView implements GameView
 		
 	}
 	
-	public String showRoom(final Room theRoom)
+	public void showRoom(final Room theRoom)
 	{
-		
+		String stringOfRoom = theRoom.toString();
 	}
 }

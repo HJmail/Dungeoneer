@@ -160,7 +160,6 @@ public class Room
 		myDepth = theDepth;
 	}
 
-	
 	public void addMonster(final Monster theCharacter)
 	{
 		myMonstersInRoom.add(theCharacter);
@@ -230,5 +229,22 @@ public class Room
 	{
 		myIsLooted = theLooted;
 	}
+	
+	public String toString()
+	{
+		String returnString = "";
+		
+		for(int row = 0; row < getTilesRows(); row++)
+		{
+			for(int col = 0; col < getTilesCols(); col++) // we will check for heros at UI
+			{
+				returnString += myTiles[row][col].getTileType().getChar();
+			}
+		}
+		
+		return returnString;
+		
+	}
+
 }
 

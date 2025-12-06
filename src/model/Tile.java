@@ -29,4 +29,14 @@ public class Tile
 	{
 		myCharacter = theCharacter;
 	}
+	
+	public boolean hasHero()
+	{
+		return myCharacter instanceof Hero;
+	}
+	
+	public TileType getTileType()
+	{
+		return  myTileType;
+	}
 }
