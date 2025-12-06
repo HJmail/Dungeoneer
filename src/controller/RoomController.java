@@ -6,6 +6,7 @@ import model.DungeonTile;
 import model.Room;
 import model.Rarity;
 import model.Weapon;
+import view.GameView;
 import model.HealingPotion;
 import model.Hero;
 import model.VisionPotion;
@@ -89,19 +90,23 @@ public class RoomController {
         }
     }
     
-    public static String activateEncounter(Hero hero, Room room) {
+    public static String activateEncounter(final Hero theHero,
+            final Room theRoom,
+            final GameView theView) {
 
         // No monsters, no encounter
-        if (room.getMonsters().isEmpty()) {
+        if (theRoom.getMonsters().isEmpty()) {
             return "NO_MONSTERS";
         }
 
         // Run combat
-        String result = CombatController.battleMultiple(hero, room.getMonsters());
+        String result = CombatController.battleMultiple(theHero,
+                theRoom.getMonsters(),
+                theView);
 
         // If hero won, clear monsters from the room
         if (result.equals("HERO_WIN")) {
-            room.getMonsters().clear();
+            theRoom.getMonsters().clear();
         }
 
         return result;

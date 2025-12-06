@@ -3,7 +3,9 @@ package view;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -404,4 +406,12 @@ public class GuiView implements GameView
 		
 		return new GameConfig(myHero, difficulty, mySeed);
 	}
+	@Override
+	public void showVisionArea(final List<Point> theVisibleRooms) {
+	    System.out.println("Vision Potion activated! Revealed rooms:");
+	    for (Point p : theVisibleRooms) {
+	        System.out.println(" -> (" + p.x + ", " + p.y + ")");
+	    }
+	}
+
 }

@@ -76,29 +76,42 @@ public class DungeonAdventure {
         myConsoleView = new ConsoleView();
         myConsoleView.showMessage("Starting Dungeoneer...");
 
-        // Single setup dialog – also sets mySeed & myDifficulty
+        // Select hero + difficulty + seed
         myHero = promptHero();
 
-        // Generate lobby + four branch dungeons using different seeds
+        // Generate all dungeons FIRST
         lobbyDungeon = DungeonGenerator.generate(new Random(mySeed), myDifficulty, myHero);
         northDungeon = DungeonGenerator.generate(new Random(mySeed + 1), myDifficulty, myHero);
         southDungeon = DungeonGenerator.generate(new Random(mySeed + 2), myDifficulty, myHero);
         eastDungeon  = DungeonGenerator.generate(new Random(mySeed + 3), myDifficulty, myHero);
-
-        // Randomly choose which branch is the "true exit" dungeon
-        char[] dirs = {'N', 'S', 'E', 'W'};
-        exitDungeonKey = dirs[new Random(mySeed).nextInt(dirs.length)];
+        westDungeon  = DungeonGenerator.generate(new Random(mySeed + 4), myDifficulty, myHero);
 
         currentArea = 'L';
         currentDungeon = lobbyDungeon;
+        myHero.setCurrentDungeon(currentDungeon);
 
-        // Create and show the GUI window
-        myGui = new DungeoneerFrame(currentDungeon, myHero);
+        myConsoleView.setDungeon(currentDungeon);
+        
+        // Now create GUI ONCE
+        myGui = new DungeoneerFrame(lobbyDungeon, myHero);
+
+        // Bind the GUI view to all dungeons
+        lobbyDungeon.setView(myGui);
+        northDungeon.setView(myGui);
+        southDungeon.setView(myGui);
+        eastDungeon.setView(myGui);
+        westDungeon.setView(myGui);
+
+        // Random exit dungeon
+        char[] dirs = {'N', 'S', 'E', 'W'};
+        exitDungeonKey = dirs[new Random(mySeed).nextInt(dirs.length)];
+
+        // Show GUI
         myGui.setVisible(true);
-
         myGui.showMessage("Welcome to Dungeoneer!");
         myGui.showDungeon(currentDungeon);
     }
+
 
     /* ---------- Hero setup dialog ---------- */
 
@@ -282,6 +295,7 @@ public class DungeonAdventure {
         }
 
         currentArea = side;
+        myHero.setCurrentDungeon(currentDungeon);
 
         myGui.showMessage("You step through the " + directionName(side) + " door...");
 

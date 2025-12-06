@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.EnumSet;
 
 import controller.RoomController;
+import view.GameView;
 
 /**
  * This class represents the dungeon the player must traverse.
@@ -40,6 +41,9 @@ public class Dungeon
 	/**
 	 *  This is the basic class constructor.
 	 */
+	
+	private GameView myView;
+
 	public Dungeon(final Hero theHero, final int theDifficulty)
 	{
 		myHero = theHero;
@@ -136,21 +140,32 @@ public class Dungeon
 	    // exit old room
 	    myMaze[oldX][oldY].exit(theDirection);
 
-	    // move the hero
+	    // move hero
 	    setHeroLocation(theRow, theCol);
 
 	    // new room
 	    Room newRoom = myMaze[theRow][theCol];
 
-	    // hero enters room (activates pits, etc.)
+	    // enter the new room (pits, pickups)
 	    newRoom.enter(myHero);
 
-	    // ⭐ ACTIVATE ENCOUNTER ⭐
-	    String result = RoomController.activateEncounter(myHero, newRoom);
+	    // activate encounter
+	    String result =
+	        RoomController.activateEncounter(myHero, newRoom, myView);
 
-	    // If GUI/Console wants to react to combat (optional)
-	    // You can return result through move() later if needed.
+	    // hero died in battle
+	    if (result.equals("HERO_LOSE")) {
+	        myView.gameOver();
+	        return;
+	    }
+
+	    // update GUI (HP bar, minimap, room state)
+	    if (myView != null) {
+	        myView.showHeroStats(myHero);
+	        myView.showDungeon(this);
+	    }
 	}
+
 	
 	public void setRoomDepth(final int theRow, final int theCol, final int theDepth)
 	{
@@ -200,4 +215,28 @@ public class Dungeon
 	{
 		return myMaze[theRow][theCol];
 	}
+	
+	public void setView(final GameView theView) {
+	    myView = theView;
+	}
+	
+	public Point getHeroLocation() {
+	    return new Point(myHeroLocation);
+	}
+
+	public String debugPrintDungeon() {
+	    StringBuilder sb = new StringBuilder();
+
+	    for (int r = 0; r < myRows; r++) {
+	        for (int c = 0; c < myCols; c++) {
+	            Room room = myMaze[r][c];
+	            sb.append(room.getRoomChar()).append(' ');
+	        }
+	        sb.append('\n');
+	    }
+
+	    return sb.toString();
+	}
+
+
 }

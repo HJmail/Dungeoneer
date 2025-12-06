@@ -1,27 +1,21 @@
 package model;
 
-public class Priestess extends Hero {
+import java.io.Serializable;
+
+public class Priestess extends Hero implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public Priestess(String theName) {
-        super(theName,
-              75,     // hit points
-              25,     // min damage
-              45,     // max damage
-              5,      // attack speed
-              0.7,    // chance to hit
-              0.3);   // chance to block
-
+        super(theName, 75, 25, 45, 5, 0.7, 0.3);
         myImagePath = "images/priestess.png";
-        myGold = 120; // If you want gold → set it here, not in the constructor
+        myGold = 120;
     }
-    
+
     @Override
     public String specialSkill(DungeonCharacter opponent) {
-        // Priestess heals herself
-        int healAmount = (int) (Math.random() * (30 - 20 + 1)) + 20; // Heal 20–30 HP
+        int healAmount = (int)(Math.random() * (30 - 20 + 1)) + 20;
         myHitPoints += healAmount;
-
-        return myName + " heals for " + healAmount + " hit points!";
+        return myName + " heals for " + healAmount + " HP!";
     }
-
 }

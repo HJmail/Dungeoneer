@@ -8,122 +8,206 @@ import view.GameView;
 
 public class CombatController {
 
-  private static GameView myView;
+    private static Hero myHero;
+    private static Monster myMonster;
+    private static GameView myView;
 
-  public static void setView(GameView theView) {
-    myView = theView;
-  }
+    private static int myHeroAttacksRemaining;
+    private static int myMonsterAttacksRemaining;
 
-  private static void log(String msg) {
-    if (myView != null) {
-      myView.showMessage(msg);
-    } else {
-      System.out.println(msg);  // fallback
+    private static boolean myBattleActive;
+
+    // -----------------------------------------------------
+    // SET VIEW
+    // -----------------------------------------------------
+    public static void setView(final GameView theView) {
+        myView = theView;
     }
-  }
 
-  public static String battle(Hero hero, Monster monster) {
-
-    int heroSpeed = hero.getAttackSpeed();
-    int monsterSpeed = monster.getAttackSpeed();
-
-    int heroAttacks = Math.max(1, heroSpeed);
-    int monsterAttacks = Math.max(1, monsterSpeed);
-
-    log("\n️ A wild " + monster.getName() + " appears!");
-    log("Combat begins!\n");
-
-    while (hero.isAlive() && monster.isAlive()) {
-
-    	// HERO TURN
-    	for (int i = 0; i < heroAttacks && monster.isAlive(); i++) {
-
-    	    String choice = myView.askCombatChoice(hero, monster);
-
-    	    // --- SPECIAL ATTACK ---
-    	    if (choice.equals("SPECIAL")) {
-    	        String resultMsg = hero.specialSkill(monster);
-    	        log(resultMsg);
-
-    	        // Check if monster died from special attack
-    	        if (!monster.isAlive()) {
-    	            log(monster.getName() + " has been defeated!");
-    	            return "HERO_WIN";
-    	        }
-
-    	        continue; // skip normal attack
-    	    }
-
-    	    // --- NORMAL ATTACK ---
-    	    int damage = hero.attack(monster);
-
-    	    if (damage == -1) {
-    	        log(hero.getName() + " MISSES!");
-    	    } else {
-    	        log(hero.getName() + " hits " + monster.getName()
-    	            + " for " + damage + " damage!");
-    	    }
-
-    	    if (!monster.isAlive()) {
-    	        log(monster.getName() + " has been defeated!");
-    	        return "HERO_WIN";
-    	    }
-    	}
-
-      // MONSTER TURN
-      for (int i = 0; i < monsterAttacks && hero.isAlive(); i++) {
-        int damage = monster.attack(hero);
-
-        if (damage == -1) {
-          log(monster.getName() + " MISSES!");
-        } else if (hero.defend()) {
-          log(hero.getName() + " BLOCKS the attack!");
+    private static void log(final String theMessage) {
+        if (myView != null) {
+            myView.showMessage(theMessage);
         } else {
-          hero.setHitPoints(hero.getHitPoints() - damage);
-          log(monster.getName() + " hits " + hero.getName() 
-              + " for " + damage + " damage!");
+            System.out.println(theMessage);
         }
-      }
+    }
 
-      if (monster.isAlive()) {
-        String healMsg = monster.heal();
-        if (healMsg.contains("heals")) {
-          log(" " + healMsg);
+    // -----------------------------------------------------
+    // START BATTLE (CALLED BY DUNGEON LOGIC OR GUI)
+    // -----------------------------------------------------
+    public static void startBattle(final Hero theHero,
+                                   final Monster theMonster,
+                                   final GameView theView) {
+
+        myHero = theHero;
+        myMonster = theMonster;
+        myView = theView;
+
+        myBattleActive = true;
+
+        myHeroAttacksRemaining = Math.max(1, myHero.getAttackSpeed());
+        myMonsterAttacksRemaining = Math.max(1, myMonster.getAttackSpeed());
+
+        log("A wild " + myMonster.getName() + " appears!");
+        log("Combat begins!");
+
+        myView.showHeroStats(myHero);
+
+        nextTurn();
+    }
+
+    // -----------------------------------------------------
+    // NEXT TURN FLOW CONTROLLER
+    // -----------------------------------------------------
+    public static void nextTurn() {
+
+        if (!myBattleActive) {
+            return;
         }
-      }
 
-      log("\n[Status] " + hero.getName() + ": " 
-          + hero.getHitPoints() + " HP | " 
-          + monster.getName() + ": " 
-          + monster.getHitPoints() + " HP\n");
-    }
-    
-    if (!hero.isAlive()) {
-      log("\n " + hero.getName() + " has been slain...");
-      return "HERO_LOSE";
-    }
+        // Hero dead?
+        if (!myHero.isAlive()) {
+            log(myHero.getName() + " has been defeated...");
+            myBattleActive = false;
+            return;
+        }
 
-    return "HERO_WIN";
-  }
+        // Monster dead?
+        if (!myMonster.isAlive()) {
+            log(myMonster.getName() + " has been slain!");
+            myBattleActive = false;
+            return;
+        }
 
-  public static String battleMultiple(Hero hero, List<Monster> monsters) {
-    log("\n️ A group of monsters appears!");
-    monsters.removeIf(m -> !m.isAlive());
+        // If hero still has attacks this round
+        if (myHeroAttacksRemaining > 0) {
+            myView.askCombatChoice(myHero, myMonster);
+            return;
+        }
 
-    for (Monster monster : monsters) {
-
-      log("\n========== Encounter ==========");
-      log(" Monster: " + monster.getName());
-      log("===============================\n");
-
-      String result = battle(hero, monster);
-
-      if (result.equals("HERO_LOSE")) {
-        return "HERO_LOSE";
-      }
+        // Otherwise, monster takes turn
+        monsterTurn();
     }
 
-    log("\n All monsters defeated!");
-    return "HERO_WIN";
-  }
+    // -----------------------------------------------------
+    // HERO ACTION (NORMAL OR SPECIAL)
+    // CALLED BY GUI BUTTONS
+    // -----------------------------------------------------
+    public static void heroAction(final String theChoice) {
+
+        if (!myBattleActive) {
+            return;
+        }
+
+        String resultMessage;
+
+        // Special skill
+        if ("SPECIAL".equals(theChoice)) {
+            resultMessage = myHero.specialSkill(myMonster);
+            log(resultMessage);
+
+        } else { // Normal attack
+            int damage = myHero.attack(myMonster);
+
+            if (damage == -1) {
+                log(myHero.getName() + " MISSES!");
+            } else {
+                log(myHero.getName() + " hits "
+                    + myMonster.getName() + " for " + damage + " damage!");
+            }
+        }
+
+        myHeroAttacksRemaining--;
+
+        // If monster died
+        if (!myMonster.isAlive()) {
+            log(myMonster.getName() + " is defeated!");
+            myBattleActive = false;
+            return;
+        }
+
+        nextTurn();
+    }
+
+    // -----------------------------------------------------
+    // MONSTER TURN LOGIC
+    // -----------------------------------------------------
+    private static void monsterTurn() {
+
+        if (!myBattleActive) {
+            return;
+        }
+
+        if (myMonsterAttacksRemaining > 0) {
+
+            int damage = myMonster.attack(myHero);
+
+            if (damage == -1) {
+                log(myMonster.getName() + " MISSES!");
+            } 
+            else if (myHero.defend()) {
+                log(myHero.getName() + " BLOCKS the attack!");
+            }
+            else {
+                myHero.setHitPoints(myHero.getHitPoints() - damage);
+                log(myMonster.getName() + " hits "
+                        + myHero.getName() + " for " + damage + " damage!");
+            }
+
+            myMonsterAttacksRemaining--;
+            myView.showHeroStats(myHero);
+
+            if (!myHero.isAlive()) {
+                log(myHero.getName() + " has fallen...");
+                myBattleActive = false;
+                return;
+            }
+
+            nextTurn();
+            return;
+        }
+
+        // Reset attacks for next round
+        myHeroAttacksRemaining = Math.max(1, myHero.getAttackSpeed());
+        myMonsterAttacksRemaining = Math.max(1, myMonster.getAttackSpeed());
+
+        nextTurn();
+    }
+
+
+    // -----------------------------------------------------
+    // MULTIPLE MONSTERS (ENCOUNTER LOGIC)
+    // -----------------------------------------------------
+    public static String battleMultiple(final Hero theHero,
+                                        final List<Monster> theMonsters,
+                                        final GameView theView) {
+
+        log("A group of monsters appears!");
+
+        for (Monster monster : theMonsters) {
+
+            if (monster == null || !monster.isAlive()) {
+                continue;
+            }
+
+            log("\n=== Combat Start: " + monster.getName() + " ===");
+
+            // Start a full turn-based battle
+            startBattle(theHero, monster, theView);
+
+            // Wait until this battle ends
+            while (myBattleActive) {
+                // GUI calls nextTurn() + heroAction()
+                try {
+                    Thread.sleep(30);
+                } catch (InterruptedException e) { }
+            }
+
+            if (!theHero.isAlive()) {
+                return "HERO_LOSE";
+            }
+        }
+
+        return "HERO_WIN";
+    }
 }

@@ -1,12 +1,16 @@
 package model;
 
+import java.io.Serializable;
+
 /**
  * Abstract base class representing all characters in the dungeon. Supports both
  * console and GUI-based interactions.
  *
  * @author Hiba
  */
-public abstract class DungeonCharacter {
+public abstract class DungeonCharacter implements Serializable{
+	
+	private static final long serialVersionUID = 1L;
 
 	/** Character's name. */
 	protected String myName;
@@ -30,7 +34,7 @@ public abstract class DungeonCharacter {
 	protected int myGold;
 
 	/** Path to this character's image for GUI use. */
-	protected String myImagePath;
+	protected transient String myImagePath;
 
 	/**
 	 * Constructs a DungeonCharacter with its stats. This is used by both Monsters

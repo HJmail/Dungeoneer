@@ -1,6 +1,8 @@
 package view;
 
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import model.Direction;
@@ -17,7 +19,8 @@ public class ConsoleView implements GameView
 {
 	
 	Scanner myUserInput;
-	
+	private Dungeon myDungeon;
+
 	public ConsoleView()
 	{
 		myUserInput = new Scanner(System.in);
@@ -186,10 +189,13 @@ public class ConsoleView implements GameView
     	System.out.println("You found the " + theChar + "Pillar!");
     }
 	
-	public void gameOver()
-	{
-		System.out.println("\nGAME OVER!");
-	}
+    @Override
+    public void gameOver() {
+        System.out.println("\nGAME OVER!");
+        System.out.println("\n=== FINAL DUNGEON REVEAL ===");
+        System.out.println(myDungeon.debugPrintDungeon());
+    }
+
 	
 	@Override
 	public void showHeroStats(final Hero theHero) {
@@ -215,5 +221,17 @@ public class ConsoleView implements GameView
 	    }
 	    return "NORMAL";
 	}
+	
+	@Override
+	public void showVisionArea(final List<Point> theVisibleRooms) {
+	    System.out.println("Vision Potion used! Rooms revealed:");
+	    for (Point p : theVisibleRooms) {
+	        System.out.println("(" + p.x + ", " + p.y + ")");
+	    }
+	}
+	public void setDungeon(Dungeon theDungeon) {
+	    myDungeon = theDungeon;
+	}
+
 
 }

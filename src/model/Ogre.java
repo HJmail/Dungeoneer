@@ -1,21 +1,16 @@
 package model;
 
-public class Ogre extends Monster {
+import java.io.Serializable;
 
-    public Ogre(String name,
-                int hitPoints,
-                int minDamage,
-                int maxDamage,
-                int attackSpeed,
-                double chanceToHit,
-                double chanceToHeal,
-                int minHeal,
-                int maxHeal) {
+public class Ogre extends Monster implements Serializable {
 
-        super(name, hitPoints, minDamage, maxDamage,
-              attackSpeed, chanceToHit, chanceToHeal,
-              minHeal, maxHeal);
+    private static final long serialVersionUID = 1L;
 
+    public Ogre(String name, int hp, int mind, int maxd,
+                int spd, double hit, double healChance,
+                int minHeal, int maxHeal) {
+
+        super(name, hp, mind, maxd, spd, hit, healChance, minHeal, maxHeal);
         myImagePath = "images/ogre.png";
     }
 }

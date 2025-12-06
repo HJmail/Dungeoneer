@@ -1,7 +1,10 @@
 package model;
 
-public abstract class Hero extends DungeonCharacter {
+import java.io.Serializable;
 
+public abstract class Hero extends DungeonCharacter {
+	private static final long serialVersionUID = 1L;
+	
     /** Probability that the hero blocks an incoming attack. */
     protected double myChanceToBlock;
 
@@ -43,6 +46,16 @@ public abstract class Hero extends DungeonCharacter {
         // every hero starts with an inventory, and we tell the inventory who owns it
         myInventory = new Inventory();
         myInventory.setOwner(this);   // <-- IMPORTANT
+    }
+
+    private transient Dungeon myCurrentDungeon;
+
+    public void setCurrentDungeon(final Dungeon theDungeon) {
+        myCurrentDungeon = theDungeon;
+    }
+
+    public Dungeon getCurrentDungeon() {
+        return myCurrentDungeon;
     }
 
 

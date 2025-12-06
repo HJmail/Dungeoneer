@@ -9,6 +9,9 @@ import model.GameConfig;
 import model.Item;
 import model.Monster;
 import model.Hero;
+import java.awt.Point;
+import java.util.List;
+
 
 public interface GameView 
 {
@@ -38,6 +41,7 @@ public interface GameView
     void showShopItems(final ArrayList<Item> theItem);
     
     
+    
     /**
      * This method prompts user for input for the shop.
      * @return Returns the user shop choice input.
@@ -54,6 +58,9 @@ public interface GameView
     
     void showPillar(final char theChar);
     
+    void showVisionArea(List<Point> theVisibleRooms);
+
+    
     String askCombatChoice(Hero hero, Monster monster);
 
     
@@ -61,4 +68,6 @@ public interface GameView
      * Game over view just indicated to the player that the game is over.
      */
     void gameOver();
+    
+    
 }

@@ -1,43 +1,35 @@
 package model;
 
-public class Thief extends Hero {
+import java.io.Serializable;
+
+public class Thief extends Hero implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public Thief(String theName) {
-        super(theName,
-              75,     // hit points
-              20,     // min damage
-              40,     // max damage
-              6,      // attack speed
-              0.8,    // chance to hit
-              0.4);   // chance to block
-
+        super(theName, 75, 20, 40, 6, 0.8, 0.4);
         myImagePath = "images/thief.png";
         myGold = 80;
     }
-    
+
     @Override
     public String specialSkill(DungeonCharacter opponent) {
         double roll = Math.random();
 
-        // 40% chance successful → extra attack this round
-        if (roll <= 0.4) {
-            int damage1 = this.attack(opponent);
-            int damage2 = this.attack(opponent);
-            return myName + " performs a SURPRISE ATTACK for " + damage1 + 
-                   " damage and gets an EXTRA attack for " + damage2 + " damage!";
+        if (roll <= 0.4) { // surprise attack success
+            int dmg1 = attack(opponent);
+            int dmg2 = attack(opponent);
+            return myName + " lands a SURPRISE ATTACK for " + dmg1 +
+                   " + EXTRA attack for " + dmg2 + " damage!";
         }
 
-        // 20% chance caught → no attack at all
-        if (roll <= 0.6) {  // 0.4 to 0.6 = 20%
-            return myName + " is caught while trying a surprise attack and does NO damage!";
+        if (roll <= 0.6) { // caught
+            return myName + " is caught trying a surprise attack — no damage done!";
         }
 
-        // 40% normal attack
-        int normalDamage = this.attack(opponent);
-        if (normalDamage == -1) {
-            return myName + "'s surprise attack turns into a normal attack but it MISSES!";
-        }
-        return myName + "'s surprise attack turns into a normal attack for " + normalDamage + " damage!";
+        // normal fallback attack
+        int normal = attack(opponent);
+        if (normal == -1) return myName + " attacks normally but misses!";
+        return myName + " attacks normally for " + normal + " damage!";
     }
-
 }

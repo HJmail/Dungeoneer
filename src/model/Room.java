@@ -262,5 +262,90 @@ public void exit(Direction d) {
   // Direction unused here but required for RoomController / Dungeon
   myHero = null;
 }
+@Override
+public String toString() {
+
+    // -----------------------------------------------------
+    // Determine center symbol (what is inside the room)
+    // -----------------------------------------------------
+    char center = ' ';
+
+    // Hero in room?
+    if (myHero != null) {
+        center = 'C';    // C = current hero; assignment sometimes uses i for entrance, but C = clear
+    }
+    else if (!myMonsters.isEmpty()) {
+        center = 'M';    // M = monster (at least one)
+    }
+    else if (myTile == DungeonTile.PIT || myHasPit) {
+        center = 'X';    // Pit
+    }
+    else if (!myItems.isEmpty()) {
+
+        // Show single-letter code based on item type
+        Item item = myItems.get(0);
+
+        if (item instanceof Pillar p) {
+            center = Character.toUpperCase(p.getPillarType());
+        }
+        else if (item instanceof HealingPotion) {
+            center = 'H';
+        }
+        else if (item instanceof VisionPotion) {
+            center = 'V';
+        }
+        else if (item instanceof Gold) {
+            center = '$';
+        }
+        else {
+            // Weapon or other item
+            center = 'W';
+        }
+    }
+    else if (myTile == DungeonTile.ENTRANCE) {
+        center = 'i';       // entrance (assignment uses lowercase 'i')
+    }
+    else if (myTile == DungeonTile.EXIT) {
+        center = 'O';       // exit
+    }
+    else if (myTile == DungeonTile.FLOOR) {
+        center = ' ';
+    }
+
+
+    // -----------------------------------------------------
+    // Build top row (*-*)
+    // -----------------------------------------------------
+    StringBuilder sb = new StringBuilder();
+
+    // North wall or door
+    if (myDirections.contains(Direction.NORTH)) {
+        sb.append("*-*");
+    } else {
+        sb.append("***");
+    }
+
+    sb.append("\n");
+
+    // -----------------------------------------------------
+    // Middle row (|C|, |P|, | |)
+    // -----------------------------------------------------
+    char west = myDirections.contains(Direction.WEST) ? '|' : '*';
+    char east = myDirections.contains(Direction.EAST) ? '|' : '*';
+
+    sb.append(west).append(center).append(east).append("\n");
+
+    // -----------------------------------------------------
+    // Bottom row (*-*)
+    // -----------------------------------------------------
+    if (myDirections.contains(Direction.SOUTH)) {
+        sb.append("*-*");
+    } else {
+        sb.append("***");
+    }
+
+    return sb.toString();
+}
+
 
 }
