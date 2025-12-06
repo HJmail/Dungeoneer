@@ -13,7 +13,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import model.GameConfig;
-import model.Hero;
 import model.Room;
 import model.Tile;
 import model.TileType;
@@ -71,6 +70,18 @@ public class DungeonRoomPanel extends JPanel
 		drawHero(theGraphics);
 	}
 	
+	private void loadHeroImages2()
+	{
+	    Image hero = new ImageIcon("/Dungeoneer Characters/hero_down.png").getImage();
+	    System.out.println("hero size = " + hero.getWidth(null) + " x " + hero.getHeight(null));
+	    System.out.println("Working dir = " + System.getProperty("user.dir"));
+	    
+	    myHeroImages.put(Facing.DOWN, hero);
+	    myHeroImages.put(Facing.UP, hero);
+	    myHeroImages.put(Facing.LEFT, hero);
+	    myHeroImages.put(Facing.RIGHT, hero);
+	}
+	
 	private void loadTileImages()
 	{
 		for(TileType type: TileType.values())
@@ -90,20 +101,21 @@ public class DungeonRoomPanel extends JPanel
 	
 	private void loadHeroImages() 
 	{
-		String heroSpritePath = myGameConfig.getHero().getImagePath() + ".png";
-		
-        Image down = new ImageIcon(heroSpritePath).getImage();
+		String heroSpritePath = myGameConfig.getHero().getImagePath() + "_down.png";
+		URL url = getClass().getResource(heroSpritePath);	
+        Image down = new ImageIcon(url).getImage();
         myHeroImages.put(Facing.DOWN, down);
 
         // Try to derive base + extension, e.g. "Dungeoneer_Characters/warrior" + "_down" + ".png"
         int dotIndex = heroSpritePath.lastIndexOf('.');
         int underscoreIndex = heroSpritePath.lastIndexOf('_');
-
+        
+        
         if (dotIndex > underscoreIndex && underscoreIndex != -1) 
         {
             String base = heroSpritePath.substring(0, underscoreIndex); // before "_down"
             String ext  = heroSpritePath.substring(dotIndex);           // ".png"
-
+            
             loadHeroImageOrFallback(base + "_up"    + ext, Facing.UP,    down);
             loadHeroImageOrFallback(base + "_left"  + ext, Facing.LEFT,  down);
             loadHeroImageOrFallback(base + "_right" + ext, Facing.RIGHT, down);
@@ -123,8 +135,9 @@ public class DungeonRoomPanel extends JPanel
     {
 		Image img = new ImageIcon(path).getImage();
 		// If loading failed, width will be <= 0
-		if (img == null || img.getWidth(null) <= 0) {
-		img = fallback;
+		if (img == null || img.getWidth(null) <= 0) 
+		{
+			img = fallback;
 		}
 		myHeroImages.put(facing, img);
     }	
@@ -144,6 +157,9 @@ public class DungeonRoomPanel extends JPanel
 	            TileType base = type.getBaseType();
 	            Image baseImg = myTileImages.get(base);
 	            
+	            //if(type.isDoor()) System.out.println("Door Placed: " + row + ", " + col);	
+	            	            
+			
 	            if (baseImg != null) 
 	            {
 	                theGraphics.drawImage(baseImg,
@@ -171,9 +187,10 @@ public class DungeonRoomPanel extends JPanel
 		}
 	}
 	
+	
 	private void drawHero(final Graphics theGraphics)
 	{
-		Point heroPos = myRoom.getMyHeroRoomLocation();
+		Point heroPos = myRoom.getHeroTileLocation();
 		
 
         int col = heroPos.x;
@@ -183,20 +200,27 @@ public class DungeonRoomPanel extends JPanel
         
         if (heroImg != null) 
         {
-            theGraphics.drawImage(heroImg,
-                        col * TILE_SIZE,
-                        row * TILE_SIZE,
-                        TILE_SIZE,
-                        TILE_SIZE,
-                        null);
-        } 
+        	 int w = heroImg.getWidth(null);
+             int h = heroImg.getHeight(null);
+             //System.out.printf("heroImg size = %d x %d%n", w, h);
+        	
+            theGraphics.drawImage(
+                heroImg,
+                col * TILE_SIZE,
+                row * TILE_SIZE,
+                TILE_SIZE,
+                TILE_SIZE,
+                this
+            );
+        }
         else 
         {
+            // Fallback: text or a small square if something goes wrong
             theGraphics.setColor(Color.BLUE);
             theGraphics.drawString("@",
-                         col * TILE_SIZE + TILE_SIZE / 3,
-                         row * TILE_SIZE + TILE_SIZE * 2 / 3);
-
+                col * TILE_SIZE + TILE_SIZE / 3,
+                row * TILE_SIZE + TILE_SIZE * 2 / 3
+            );
         }
 	}
 }

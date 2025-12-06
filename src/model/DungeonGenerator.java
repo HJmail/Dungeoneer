@@ -38,6 +38,7 @@ public class DungeonGenerator
 		theDungeon.getRoom(startRow, startCol).setRoomType(RoomType.START);;
 		theDungeon.setRoomDepth(startRow, startCol, 0);
 		theDungeon.getRoom(startRow, startCol).setActivated(true);
+		theDungeon.setStartLocation(startRow, startCol);
 		
 		// Double ended queue
 		Deque<Point> stack = new ArrayDeque<>();

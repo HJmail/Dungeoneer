@@ -11,7 +11,7 @@ public class Priestess extends Hero {
               0.7,    // chance to hit
               0.3);   // chance to block
 
-        myImagePath = "/Dungeon Characters/priestess";
+        myImagePath = "/Dungeoneer Characters/priestess";
         myGold = 120; // If you want gold → set it here, not in the constructor
     }
     

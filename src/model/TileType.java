@@ -11,11 +11,7 @@ public enum TileType
     DOOR_S('v', "Dungeoneer Terrain/door_south.png", null, true, Direction.SOUTH),
     DOOR_E('>', "Dungeoneer Terrain/door_east.png", null, true, Direction.EAST),
     DOOR_W('<', "Dungeoneer Terrain/door_west.png", null, true, Direction.WEST),
-    SHOP('s', "null", FLOOR, false),
-    
-    //HORIZONTAL('-', "null"),
-    //VERTICAL('|', "null"),
-    //INTERSECTION('+', "null"),
+    SHOP('s', "Dungeoneer Characters/shop.png", FLOOR, false),
     
     SPEAR('1', "Dungeoneer Items/spear.png", FLOOR, true),
     FALCHION('2', "Dungeoneer Items/falchion.png", FLOOR, true),

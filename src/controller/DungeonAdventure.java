@@ -73,7 +73,12 @@ public class DungeonAdventure
 		myDungeon  = DungeonGenerator.generate(myRandom,
 												myGameConfig.getDifficulty(),
 												myGameConfig.getHero());
+		
 		myRoomGenerator.generate(myDungeon, myRandom);
+		
+		Room startRoom = myDungeon.getCurrentRoom();
+		myDungeon.setHeroTileLocation(new Point(startRoom.getTilesRows()/2,
+										startRoom.getTilesCols()/2));
 		
 		// other controllers 
 		CombatController.setView(myView);

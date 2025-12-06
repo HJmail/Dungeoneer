@@ -24,11 +24,9 @@ public class Dungeon
 	private int myCols;
 	
 	/**
-	 *  This holds the Hero's location.
+	 *  This holds the Hero's room location.
 	 */
 	private Point myHeroRoomLocation;
-	
-	private Point myHeroTileLocation;
 	
 	/**
 	 * This is the starting point used in some logic.
@@ -77,7 +75,7 @@ public class Dungeon
 	{
 	    Room room = getCurrentRoom();
 
-	    Point oldPos = myHeroTileLocation;
+	    Point oldPos = getHeroTileLocation();
 	    Point nextPos = theDir.translate(oldPos);
 	    
 	    if(!room.canMoveTo(nextPos))
@@ -90,12 +88,14 @@ public class Dungeon
 	    
 	    if(type.isDoor())
 	    {
+	    	System.out.println("Reached Door");
 	    	Direction doorDir = type.getDoorDirection();
 	    	goThroughDoor(doorDir);
 	    	return;
 	    }
 	    
-	    myHeroTileLocation = nextPos;
+	    System.out.println("Moved to:" + nextPos + " TYPE=" + type + " isDoor=" + type.isDoor());
+	    setHeroTileLocation(nextPos);
 	    room.activateTile(nextPos, theHero);
 	}
 	
@@ -112,7 +112,7 @@ public class Dungeon
 	    Direction entry = theDir.opposite();
 	    Point entryPos = findDoor(nRoom, entry);
 	    
-	    nRoom.setMyHeroLocation(entryPos);
+	    nRoom.setHeroTileLocation(entryPos);
 	    
 	}
 	
@@ -144,12 +144,12 @@ public class Dungeon
 	
 	public void setHeroTileLocation(final Point thePoint)
 	{
-		myHeroTileLocation = thePoint;
+		getCurrentRoom().setHeroTileLocation(thePoint);
 	}
 	
 	public Point getHeroTileLocation()
 	{
-		return myHeroTileLocation;
+		return getCurrentRoom().getHeroTileLocation();
 	}
 	
 	/**
@@ -216,6 +216,7 @@ public class Dungeon
 	public void setStartLocation(final int theRow, final int theCol)
 	{
 		myStartLocation.setLocation(theRow, theCol);
+		setHeroLocation(theRow, theCol);
 	}
 	
 	public Point getStartPoint()

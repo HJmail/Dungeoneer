@@ -98,7 +98,12 @@ public class Room
 	    {
 	    	return false;
 	    }
-	    Tile target = getTile(new Point(row, col));
+	    Tile target = getTile(thePoint);
+	    
+	    System.out.println("canMoveTo " + thePoint +
+                " TYPE=" + target.getTileType() +
+                " walkable=" + target.isWalkable());
+	    
 	    return target.isWalkable();
 	}
 	
@@ -285,14 +290,14 @@ public class Room
 		myIsLooted = theLooted;
 	}
 	
-	public void setMyHeroLocation(final Point theNewPoint)
+	public void setHeroTileLocation(final Point theNewPoint)
 	{
 		myHeroTileLocation = theNewPoint;
 	}
 	
-	public Point getMyHeroRoomLocation()
+	public Point getHeroTileLocation()
 	{
-		return new Point(myHeroTileLocation);
+		return myHeroTileLocation;
 	}
 	
 	public String toString()

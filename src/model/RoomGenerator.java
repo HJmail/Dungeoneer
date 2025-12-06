@@ -34,7 +34,6 @@ public class RoomGenerator
 			for(int col = 0; col < cols; col++)
 			{
 				Room room = theDungeon.getRoom(row, col);
-				//System.out.println(room.getRoomType());
 				createLayout(room);
 				if (room.getRoomType() != RoomType.NONE) createEvents(room, theRng);
 			}
@@ -151,7 +150,6 @@ public class RoomGenerator
 			// placing monsters
 			for(int i = 0; i < monsters.size(); i++)
 			{
-				//System.out.println(notFull);
 				int index = theRng.nextInt(notFull.size());
 				Point roomPoint = notFull.get(index);
 				notFull.remove(index);
@@ -193,7 +191,6 @@ public class RoomGenerator
 			{
 				theRoom.getTile(pillarPoint).setItem(new Pillar(pillars[myPillarCount]));
 			}
-			System.out.println(myPillarCount);
 			myPillarCount++;
 		}
 	}
@@ -201,16 +198,16 @@ public class RoomGenerator
 	private void generatePitRoom(final Room theRoom,
 								final Random theRng)
 	{
-		int numberOfPits = (theRoom.getDepth() * 2) + 4;
+		int numberOfPits = theRoom.getDepth() + 4;
 		List<Point> notFull = getNotFull(theRoom);
 		
 		for(int i = 0; i < numberOfPits; i++)
 		{
-			int index = theRng.nextInt(notFull.size() - 1);
-			Point roomPoint = notFull.get(index);
-			notFull.remove(index);
-			
-			theRoom.setTile(roomPoint, TileType.PIT);
+				int index = theRng.nextInt(notFull.size() - 1);
+				Point roomPoint = notFull.get(index);
+				notFull.remove(index);
+				
+				theRoom.setTile(roomPoint, TileType.PIT);
 		}
 	}
 	
