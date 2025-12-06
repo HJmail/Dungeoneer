@@ -13,7 +13,7 @@ public class DungeonGenerator
 {
 	public static Dungeon generate(final Random theRng, final int theDifficulty, final Hero theHero)
 	{
-		Dungeon dungeon = new Dungeon(theHero, theDifficulty);
+		Dungeon dungeon = new Dungeon(theDifficulty);
 		
 		createEvents(dungeon, theRng, createLayout(dungeon, theRng));
 		

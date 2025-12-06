@@ -11,7 +11,7 @@ public class Thief extends Hero {
               0.8,    // chance to hit
               0.4);   // chance to block
 
-        myImagePath = "images/thief.png";
+        myImagePath = "/Dungeon Characters/thief";
         myGold = 80;
     }
     

@@ -1,5 +1,6 @@
 package controller;
 
+import java.awt.Point;
 import java.util.Random;
 
 import model.Direction;
@@ -7,6 +8,7 @@ import model.Dungeon;
 import model.DungeonGenerator;
 import model.GameConfig;
 import model.Room;
+import model.RoomGenerator;
 import model.RoomType;
 import view.GameView;
 import view.GuiView;
@@ -39,12 +41,14 @@ public class DungeonAdventure
 	
 	private static Random myRandom;
 	
+	private static RoomGenerator myRoomGenerator;
+	
 	
 	/**
 	 * This is the method with the main workflow.
 	 * @param theArgs 
 	 */
-	public static void main(final String theArgs[])
+	public DungeonAdventure()
 	{
 		setupGame();
 		play();
@@ -53,13 +57,14 @@ public class DungeonAdventure
 	/**
 	 * This method starts creating the required fields for all other functionalities.
 	 */
-	private static void setupGame() 
+	private void setupGame() 
 	{
 		myGameStatus = true;
 		
 		// Setting up View ... can be Console based or GUI based.
 		//myView = new ConsoleView();
-		myView = new GuiView();
+		myView = new GuiView(this);
+		myRoomGenerator =  new RoomGenerator();
 		
 		// User inputs
 		myGameConfig = myView.askGameConfig();
@@ -68,6 +73,8 @@ public class DungeonAdventure
 		myDungeon  = DungeonGenerator.generate(myRandom,
 												myGameConfig.getDifficulty(),
 												myGameConfig.getHero());
+		myRoomGenerator.generate(myDungeon, myRandom);
+		
 		// other controllers 
 		CombatController.setView(myView);
 		myRoomController = new RoomController(myGameConfig.getHero(),
@@ -79,23 +86,32 @@ public class DungeonAdventure
 	/**
 	 * This method plays the game when called, until myGameStatus becomes false.
 	 */
-	private static void play()
+	private void play()
 	{
 		while(myGameStatus)
 		{
-			promptInvetory();
-			promptMove(); // user input for move
-			checkHitPoints();
+			myView.showRoom(myDungeon.getCurrentRoom());
+			//promptInvetory();
+			//promptMove(); // user input for move
+			//checkHitPoints();
+			
+			//myGameStatus = false;
 		}
 		myView.showMessage("Game Halted.");
 	}
 	
-	private static void promptInvetory()
+	public void moveHero(final Direction theDirection)
+	{
+		myDungeon.stepHero(theDirection, myGameConfig.getHero());
+		myView.showRoom(myDungeon.getCurrentRoom());
+	}
+	
+	private void promptInvetory()
 	{
 		myView.askInventory(myGameConfig.getHero().getInventory());
 	}
 	
-	private static void promptMove()
+	private void promptMove()
 	{
 		boolean goodResponse = false;
 		
@@ -112,7 +128,7 @@ public class DungeonAdventure
 		activateRoom();
 	}
 	
-	private static void checkHitPoints()
+	private void checkHitPoints()
 	{
 		if(!myGameConfig.getHero().isAlive())
 		{
@@ -121,7 +137,7 @@ public class DungeonAdventure
 		}
 	}
 	
-	private static void activateRoom()
+	private void activateRoom()
 	{
 		Room cRoom = myDungeon.getCurrentRoom();
 		RoomType rt = cRoom.getRoomType();
@@ -152,6 +168,11 @@ public class DungeonAdventure
 			myRoomController.activateTreasure(); // loots again.
 		}
 		// room is nothing.
+	}
+	
+	public GameConfig getGameConfig()
+	{
+		return myGameConfig;
 	}
 
 }

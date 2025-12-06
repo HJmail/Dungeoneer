@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.Point;
 import java.util.Random;
 
 /**
@@ -134,4 +135,9 @@ public enum Direction {
             default    -> 0;
     };
   }
+
+	public Point translate(final Point theOld) 
+	{
+		return new Point(theOld.x + dx(), theOld.y + dy());
+	}
 }

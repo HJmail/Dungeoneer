@@ -41,7 +41,6 @@ import javax.swing.JPanel;
         private final Map<Facing, Image> myHeroImages =
                 new EnumMap<>(Facing.class);
 
-
         private DungeonTile[][] myGrid;
         private int myRows;
         private int myCols;

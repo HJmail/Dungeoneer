@@ -24,9 +24,11 @@ public class Dungeon
 	private int myCols;
 	
 	/**
-	 *  This array holds the Hero's location.
+	 *  This holds the Hero's location.
 	 */
-	private Point myHeroLocation;
+	private Point myHeroRoomLocation;
+	
+	private Point myHeroTileLocation;
 	
 	/**
 	 * This is the starting point used in some logic.
@@ -36,12 +38,12 @@ public class Dungeon
 	/**
 	 *  This is the basic class constructor.
 	 */
-	public Dungeon(final Hero theHero, final int theDifficulty)
+	public Dungeon(final int theDifficulty)
 	{
 		myRows = theDifficulty + 4;
 		myCols = theDifficulty + 4;
 		myMaze = new Room[myRows][myCols];
-		myHeroLocation = new Point();
+		myHeroRoomLocation = new Point();
 		myStartLocation = new Point();
 		
 		generateDimensions();
@@ -68,17 +70,86 @@ public class Dungeon
 	 */
 	public EnumSet<Direction> getTraversable()
 	{
-		return myMaze[(int)myHeroLocation.getX()][(int)myHeroLocation.getY()].getDirections();
+		return myMaze[(int)myHeroRoomLocation.getX()][(int)myHeroRoomLocation.getY()].getDirections();
+	}
+	
+	public void stepHero(Direction theDir, Hero theHero)
+	{
+	    Room room = getCurrentRoom();
+
+	    Point oldPos = myHeroTileLocation;
+	    Point nextPos = theDir.translate(oldPos);
+	    
+	    if(!room.canMoveTo(nextPos))
+	    {
+	    	return;
+	    }
+	    
+	    Tile tile = room.getTile(nextPos);
+	    TileType type = tile.getTileType();
+	    
+	    if(type.isDoor())
+	    {
+	    	Direction doorDir = type.getDoorDirection();
+	    	goThroughDoor(doorDir);
+	    	return;
+	    }
+	    
+	    myHeroTileLocation = nextPos;
+	    room.activateTile(nextPos, theHero);
+	}
+	
+	private void goThroughDoor(final Direction theDir)
+	{
+	    int roomRow = myHeroRoomLocation.y;
+	    int roomCol = myHeroRoomLocation.x;
+	    
+	    roomRow += theDir.dy();  
+	    roomCol += theDir.dx();
+	    
+	    myHeroRoomLocation = new Point(roomCol, roomRow);
+	    Room nRoom = getCurrentRoom();
+	    Direction entry = theDir.opposite();
+	    Point entryPos = findDoor(nRoom, entry);
+	    
+	    nRoom.setMyHeroLocation(entryPos);
+	    
+	}
+	
+	private Point findDoor(final Room theRoom, final Direction theDir)
+	{
+		int rows = theRoom.getTilesRows();
+	    int cols = theRoom.getTilesCols();
+
+	    int midRow = rows / 2;
+	    int midCol = cols / 2;
+		return switch (theDir) 
+		{
+	        case NORTH -> new Point(midCol, 0);           // top wall
+	        case SOUTH -> new Point(midCol, rows - 1);    // bottom wall
+	        case WEST  -> new Point(0, midRow);           // left wall
+	        case EAST  -> new Point(cols - 1, midRow);    // right wall
+	    };	
 	}
 	
 	/**
-	 * This method just changes the hero location.
+	 * This method just changes the hero location for rooms.
 	 * @param theRows The new row the Hero will be.
 	 * @param theCols The new col the Hero will be.
 	 */
 	private void setHeroLocation(final int theRows, final int theCols)
 	{
-		myHeroLocation.setLocation(theRows, theCols);
+		myHeroRoomLocation.setLocation(theRows, theCols);
+	}
+	
+	public void setHeroTileLocation(final Point thePoint)
+	{
+		myHeroTileLocation = thePoint;
+	}
+	
+	public Point getHeroTileLocation()
+	{
+		return myHeroTileLocation;
 	}
 	
 	/**
@@ -89,8 +160,8 @@ public class Dungeon
 	public boolean move(final Direction theDirection)
 	{
 		boolean moved = true;
-		int x = (int) myHeroLocation.getX();
-		int y = (int) myHeroLocation.getY();
+		int x = (int) myHeroRoomLocation.getX();
+		int y = (int) myHeroRoomLocation.getY();
 		
 		if(getTraversable().contains(theDirection) && theDirection == Direction.NORTH)
 		{
@@ -124,8 +195,8 @@ public class Dungeon
 	private void moveHero(final int theRow, final int theCol, final Direction theDirection)
 	{ 
 		// getting current row and col
-		int x = (int) myHeroLocation.getX();
-		int y = (int) myHeroLocation.getY();
+		int x = (int) myHeroRoomLocation.getX();
+		int y = (int) myHeroRoomLocation.getY();
 		
 		// exiting old room.
 		Room oldRoom = myMaze[x][y];
@@ -172,8 +243,8 @@ public class Dungeon
 	
 	public Room getCurrentRoom()
 	{
-		int x = (int) myHeroLocation.getX();
-		int y = (int) myHeroLocation.getY();
+		int x = (int) myHeroRoomLocation.getX();
+		int y = (int) myHeroRoomLocation.getY();
 		return getRoom(x, y);
 	}
 	
@@ -184,5 +255,23 @@ public class Dungeon
 	public Room getRoom(final int theRow, final int theCol)
 	{
 		return myMaze[theRow][theCol];
+	}
+	
+	public String toString()
+	{
+		String dungeon = "";
+		
+		for(int i = 0; i < myRows; i++)
+		{
+			for(int j = 0; j < myCols; j++)
+			{
+				dungeon += getRoom(i, j).getRoomChar();
+				dungeon += ' ';
+			}
+			dungeon += "\n";
+		}
+		
+		System.out.println("\n" + dungeon);
+		return dungeon;
 	}
 }

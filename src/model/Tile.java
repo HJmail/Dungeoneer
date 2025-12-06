@@ -35,6 +35,23 @@ public class Tile
 		return myCharacter instanceof Hero;
 	}
 	
+	public boolean isWalkable()
+	{
+		return myTileType.isWalkable();
+	}
+	
+	public boolean hasItem()
+	{
+		return (myItem != null);
+	}
+	
+	public Item getItem()
+	{
+		Item i = myItem;
+		myItem = null;
+		return i;
+	}
+	
 	public TileType getTileType()
 	{
 		return  myTileType;

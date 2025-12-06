@@ -11,7 +11,7 @@ public class Warrior extends Hero {
               0.8,   // chance to hit
               0.2);  // chance to block
 
-        myImagePath = "images/warrior.png";
+        myImagePath = "/Dungeon Characters/warrior";
         myGold = 100;
     }
     

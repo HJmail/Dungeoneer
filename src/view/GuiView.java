@@ -1,12 +1,21 @@
 package view;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
+import controller.DungeonAdventure;
 import model.Direction;
 import model.Dungeon;
 import model.GameConfig;
@@ -20,13 +29,82 @@ public class GuiView implements GameView
 {	
     Scanner myUserInput; // temp for testing
     
-    GameConfigPanel myGameConfigPanel;
+    private JFrame myMainFrame;
     
-	public GuiView()
+    private JPanel myMainPanel;
+    
+    private GameConfigPanel myGameConfigPanel;
+    
+    private DungeonRoomPanel myDungeonRoomPanel;
+    
+    private DungeonAdventure myController;
+    
+	public GuiView(final DungeonAdventure theDA)
 	{
 		myUserInput = new Scanner(System.in);
 		myGameConfigPanel = new GameConfigPanel();
+		myMainFrame = new JFrame();
+		myMainPanel = new JPanel(new BorderLayout());
+		myController = theDA;
+		
+		myMainFrame.setContentPane(myMainPanel);
+		myMainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		myMainFrame.pack();
+		myMainFrame.setLocationRelativeTo(null);
+		myMainFrame.setVisible(true);
+		
+        setupKeyBindings();
 	}
+	
+	private void setupKeyBindings() 
+	{
+	    myMainPanel.setFocusable(true);
+
+	    InputMap im = myMainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+	    ActionMap am = myMainPanel.getActionMap();
+
+	    im.put(KeyStroke.getKeyStroke('w'), "moveUp");
+	    im.put(KeyStroke.getKeyStroke('a'), "moveLeft");
+	    im.put(KeyStroke.getKeyStroke('s'), "moveDown");
+	    im.put(KeyStroke.getKeyStroke('d'), "moveRight");
+
+	    am.put("moveUp", new AbstractAction() 
+	    {
+	        @Override
+	        public void actionPerformed(ActionEvent e) 
+	        {
+	            myController.moveHero(Direction.NORTH);
+	        }
+	    });
+
+	    am.put("moveLeft", new AbstractAction() 
+	    {
+	        @Override
+	        public void actionPerformed(ActionEvent e) 
+	        {
+	            myController.moveHero(Direction.WEST);
+	        }
+	    });
+
+	    am.put("moveDown", new AbstractAction() 
+	    {
+	        @Override
+	        public void actionPerformed(ActionEvent e) 
+	        {
+	            myController.moveHero(Direction.SOUTH);
+	        }
+	    });
+
+	    am.put("moveRight", new AbstractAction() 
+	    {
+	        @Override
+	        public void actionPerformed(ActionEvent e) 
+	        {
+	            myController.moveHero(Direction.EAST);
+	        }
+	    });
+	}
+
     
 	@Override
 	public void showMessage(final String theMessage) 
@@ -37,7 +115,6 @@ public class GuiView implements GameView
 	@Override
 	public void showDungeon(final Dungeon theDungeon) 
 	{
-		// NEED TO IMPLEMENT GUI HERE
 		String dungeon = "";
 		int myRows = theDungeon.getRows();
 		int myCols = theDungeon.getCols();
@@ -104,7 +181,7 @@ public class GuiView implements GameView
 	public int askShop() 
 	{
 		System.out.println("Need to implement shop GUI");
-		return 0;
+		return myUserInput.nextInt();
 	}
 
 	@Override
@@ -235,6 +312,22 @@ public class GuiView implements GameView
 	
 	public void showRoom(final Room theRoom)
 	{
-		String stringOfRoom = theRoom.toString();
+		//String stringOfRoom = theRoom.toString();
+		//System.out.println(stringOfRoom);
+		if(myDungeonRoomPanel == null ) 
+		{
+			myDungeonRoomPanel = new DungeonRoomPanel(theRoom,
+								myController.getGameConfig());
+			myMainPanel.add(myDungeonRoomPanel);
+			myMainFrame.pack();
+			myMainFrame.setLocationRelativeTo(null);
+			myMainFrame.setVisible(true);
+		}
+		else
+		{
+			myDungeonRoomPanel.setRoom(theRoom);
+			myMainPanel.revalidate();
+			myMainPanel.repaint();
+		}
 	}
 }

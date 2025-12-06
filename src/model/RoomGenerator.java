@@ -34,6 +34,7 @@ public class RoomGenerator
 			for(int col = 0; col < cols; col++)
 			{
 				Room room = theDungeon.getRoom(row, col);
+				//System.out.println(room.getRoomType());
 				createLayout(room);
 				if (room.getRoomType() != RoomType.NONE) createEvents(room, theRng);
 			}
@@ -43,46 +44,50 @@ public class RoomGenerator
 	private void createLayout(final Room theRoom)
 	{
 		Room room = theRoom;
-		int lastRow = room.getTilesRows();
-		int lastCol = room.getTilesCols();
-		int middle = lastRow/2 + 1;
+		int rows = room.getTilesRows();
+		int cols = room.getTilesCols();
+		
+	    int lastRowIndex = rows - 1;
+	    int lastColIndex = cols - 1;
+		int middle = rows/2;
 		
 		// two things ... generate tile type and set valid tiles.
-		for(int row = 0; row < lastRow; row++)
+		for(int row = 0; row < rows; row++)
 		{
-			for(int col = 0; col < lastCol; col++)
+			for(int col = 0; col < cols; col++)
 			{
-				boolean isBorder = (row == 0 || col == 0 || row == lastRow || col == lastCol);
+				boolean isBorder = (row == 0 || col == 0 ||
+							row == lastRowIndex || col == lastColIndex);
 				Point point = new Point(row, col);
-				
 				if(isBorder) // must be wall or door
 				{
 					boolean isRowMiddle = (row == middle);
-					boolean isColMiddle = (row == middle);
+					boolean isColMiddle = (col == middle);
 					
-					if(isRowMiddle || isColMiddle) // doors
+					boolean isNorth = row == 0 && isColMiddle && room.getDirections().contains(Direction.NORTH);
+	                boolean isSouth = row == lastRowIndex && isColMiddle && room.getDirections().contains(Direction.SOUTH);
+	                boolean isEast  = isRowMiddle && col == lastColIndex && room.getDirections().contains(Direction.EAST);
+	                boolean isWest  = isRowMiddle && col == 0 && room.getDirections().contains(Direction.WEST);
+					
+					if(isNorth)
 					{
-						boolean isNorth = row == 0 && isColMiddle && room.getDirections().contains(Direction.NORTH);
-						boolean isEast = isRowMiddle && col == lastCol && room.getDirections().contains(Direction.EAST);
-						boolean isSouth = row == lastRow && isColMiddle && room.getDirections().contains(Direction.SOUTH);
-						boolean isWest = isRowMiddle && col == 0 && room.getDirections().contains(Direction.WEST);
-						
-						if(isNorth)
-						{
-							room.setTile(point, TileType.DOOR_N);
-						}
-						else if(isSouth)
-						{
-							room.setTile(point, TileType.DOOR_S);
-						}
-						else if(isEast)
-						{
-							room.setTile(point, TileType.DOOR_E);
-						}
-						else if(isWest)
-						{
-							room.setTile(point, TileType.DOOR_W);
-						}
+						room.setTile(point, TileType.DOOR_N);
+					}
+					else if(isSouth)
+					{
+						room.setTile(point, TileType.DOOR_S);
+					}
+					else if(isEast)
+					{
+						room.setTile(point, TileType.DOOR_E);
+					}
+					else if(isWest)
+					{
+						room.setTile(point, TileType.DOOR_W);
+					}
+					else
+					{
+						room.setTile(point, TileType.WALL);
 					}
 				}
 				else
@@ -109,8 +114,10 @@ public class RoomGenerator
 			{
 				case START:
 					theRoom.setMiddleTile(TileType.ENTRANCE);
+					break;
 				case SHOP:
-					//theRoom.setMiddleTile(TileType.SHOP); WHEN WE ADD SHOP...
+					theRoom.setMiddleTile(TileType.SHOP); //WHEN WE ADD SHOP...
+					break;
 				default: // exit
 					theRoom.setMiddleTile(TileType.EXIT);
 			}	
@@ -121,10 +128,13 @@ public class RoomGenerator
 			{
 				case PIT:
 					generatePitRoom(room, rng);
+					break;
 				case PILLAR:
 					generatePillarRoom(room, rng);
+					break;
 				case ENCOUNTER:
 					generateEncounterRoom(room, rng);
+					break;
 				default:
 					generateTreasureRoom(room, rng);
 			}
@@ -134,26 +144,32 @@ public class RoomGenerator
 	
 	private void generateEncounterRoom(final Room theRoom, final Random theRng)
 	{
-		List<Monster> monsters = theRoom.getMonsters();
 		List<Point> notFull = getNotFull(theRoom);
-		
-		// placing monsters
-		for(int i = 0; i < monsters.size(); i++)
+		List<Monster> monsters = theRoom.getMonsters();
+		if(monsters != null)
 		{
-			int index = theRng.nextInt(notFull.size() - 1);
-			Point roomPoint = notFull.get(index);
-			notFull.remove(index);
-			Monster monster = monsters.get(index);
-			switch(monster.getClass().getSimpleName().toLowerCase())
+			// placing monsters
+			for(int i = 0; i < monsters.size(); i++)
 			{
-				case "gremlin":
-					theRoom.setTile(roomPoint, TileType.GREMLIN);
-				case "skeleton":
-					theRoom.setTile(roomPoint, TileType.SKELETON);
-				case "ogre":
-					theRoom.setTile(roomPoint, TileType.OGRE);
-			}
-			theRoom.getTile(roomPoint).setCharacter(monsters.get(index));;
+				//System.out.println(notFull);
+				int index = theRng.nextInt(notFull.size());
+				Point roomPoint = notFull.get(index);
+				notFull.remove(index);
+				Monster monster = monsters.get(i);
+				switch(monster.getClass().getSimpleName().toLowerCase())
+				{
+					case "gremlin":
+						theRoom.setTile(roomPoint, TileType.GREMLIN);
+						break;
+					case "skeleton":
+						theRoom.setTile(roomPoint, TileType.SKELETON);
+						break;
+					case "ogre":
+						theRoom.setTile(roomPoint, TileType.OGRE);
+						break;
+				}
+				theRoom.getTile(roomPoint).setCharacter(monsters.get(i));;
+			} 
 		}
 		generateTreasureRoom(theRoom, theRng);
 	}
@@ -162,13 +178,24 @@ public class RoomGenerator
 	
 	private void generatePillarRoom(final Room theRoom, final Random theRng)
 	{
-		char[] pillars = {'A', 'C', 'I', 'P'};
-		List<Point> notFull = getNotFull(theRoom);
-		Point pillarPoint = notFull.get(theRng.nextInt(notFull.size()));
-		
-		theRoom.setTile(pillarPoint, TileType.fromChar(pillars[myPillarCount]));
-		theRoom.getTile(pillarPoint).setItem(new Pillar(pillars[myPillarCount]));
-		myPillarCount++;
+		if(myPillarCount < 4)
+		{
+			char[] pillars = {'A', 'C', 'I', 'P'};
+			List<Point> notFull = getNotFull(theRoom);
+			Point pillarPoint = notFull.get(theRng.nextInt(notFull.size()));
+			
+			theRoom.setTile(pillarPoint, TileType.fromChar(pillars[myPillarCount]));
+			if(pillars[myPillarCount] == 'C')
+			{
+				theRoom.getTile(pillarPoint).setItem(new Pillar('E'));
+			}
+			else
+			{
+				theRoom.getTile(pillarPoint).setItem(new Pillar(pillars[myPillarCount]));
+			}
+			System.out.println(myPillarCount);
+			myPillarCount++;
+		}
 	}
 	
 	private void generatePitRoom(final Room theRoom,
@@ -185,23 +212,6 @@ public class RoomGenerator
 			
 			theRoom.setTile(roomPoint, TileType.PIT);
 		}
-	}
-	
-	private List<Point> getNotFull(final Room theRoom)
-	{
-		List<Point> notFull = new ArrayList<>();
-		for(int r = 0 ; r < theRoom.getFullTiles().length; r++)
-		{
-			for(int c = 0; c < theRoom.getFullTiles()[0].length; c++)
-			{
-				boolean isEmpty = theRoom.getFullTiles()[r][c] == false;			
-				if(isEmpty)
-				{
-					notFull.add(new Point(r, c));
-				}
-			}
-		}
-		return notFull;
 	}
 	
 	private void generateTreasureRoom(final Room theRoom, final Random theRng)
@@ -228,27 +238,60 @@ public class RoomGenerator
 					{
 						case 1:
 							newWeapon = Weapon.createSpear(rarity);
+							theRoom.getTile(roomPoint).setTile(TileType.SPEAR);
+							break;
 						case 2:
 							newWeapon = Weapon.createFlail(rarity);
+							theRoom.getTile(roomPoint).setTile(TileType.FLAIL);
+							break;
 						case 3:
 							newWeapon = Weapon.createFalchion(rarity);
+							theRoom.getTile(roomPoint).setTile(TileType.FALCHION);
+							break;
 						case 4:
 							newWeapon = Weapon.createMorningStar(rarity);
+							theRoom.getTile(roomPoint).setTile(TileType.MORNING_STAR);
+							break;
 						default:
 							newWeapon = Weapon.createStick(rarity);
+							theRoom.getTile(roomPoint).setTile(TileType.STICK);
 					}
 					theRoom.getTile(roomPoint).setItem(newWeapon);
+					
+					break;
 				case VISION_POTION:
 					theRoom.getTile(roomPoint).setItem(new VisionPotion(
 												VISION_POT, rarity));
+					theRoom.getTile(roomPoint).setTile(TileType.VISION_POTION);
+					break;
 				case HEALING_POTION:
 					theRoom.getTile(roomPoint).setItem(new HealingPotion(
 												HEAL_POT, rarity));
+					theRoom.getTile(roomPoint).setTile(TileType.HEALING_POTION);
+					break;
 				default: // gold
 					int goldRng = (int) (theRoom.getDepth() * (8 + (roll * 0.1)));
 					theRoom.getTile(roomPoint).setItem(new Gold(goldRng));
+					theRoom.getTile(roomPoint).setTile(TileType.GOLD);
 			}
 		}
+	}
+	
+	private List<Point> getNotFull(final Room theRoom)
+	{
+		List<Point> notFull = new ArrayList<>();
+		for(int r = 0 ; r < theRoom.getFullTiles().length; r++)
+		{
+			for(int c = 0; c < theRoom.getFullTiles()[0].length; c++)
+			{
+				boolean isEmpty = theRoom.getFullTiles()[r][c] == false;			
+				if(isEmpty)
+				{
+					notFull.add(new Point(r, c));
+				}
+			}
+		}
+		return notFull;
 	}
 	
 	private Rarity getRarity(final int theRoll)

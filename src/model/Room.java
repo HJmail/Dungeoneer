@@ -12,6 +12,8 @@ public class Room
 {	
 	private static final int ROOM_DIMENSION = 13;
 	
+	private static final int PIT_DMG = 5;
+	
 	/**
 	 * This EnumSet represents the directions that exist
 	 */
@@ -49,7 +51,7 @@ public class Room
 	
 	private boolean myIsLooted;
 	
-	private Point myHeroRoomLocation;
+	private Point myHeroTileLocation;
 	
 	public Room()
 	{
@@ -58,7 +60,57 @@ public class Room
 		myItems = EnumSet.noneOf(ItemType.class);
 		myTiles = new Tile[ROOM_DIMENSION][ROOM_DIMENSION];
 		myFullTiles = new boolean[ROOM_DIMENSION][ROOM_DIMENSION];
-		myHeroRoomLocation = new Point(0,0);
+		createBaseTiles();
+		myHeroTileLocation = new Point(0,0);
+		myMonstersInRoom = new ArrayList<Monster>();
+	}
+	
+	public void activateTile(final Point thePoint, final Hero theHero)
+	{
+		Tile tile = getTile(thePoint);
+		TileType type = tile.getTileType();
+		boolean isDoor = (type == TileType.DOOR_N ||
+							type == TileType.DOOR_E ||
+							type == TileType.DOOR_S ||
+							type == TileType.DOOR_W);
+		
+		if(tile.hasItem())
+		{
+			theHero.getInventory().addItem(tile.getItem());
+		}
+		else if(type == TileType.PIT)
+		{
+			theHero.setHitPoints(theHero.getHitPoints() - PIT_DMG);
+		}
+		else if(isDoor)
+		{
+			
+		}
+		// else is normal tile.
+	}
+	
+	public boolean canMoveTo(final Point thePoint)
+	{
+		int row = thePoint.y;
+		int col = thePoint.x;
+		
+	    if (row < 0 || row >= getTilesRows() || col < 0 || col >= getTilesCols()) 
+	    {
+	    	return false;
+	    }
+	    Tile target = getTile(new Point(row, col));
+	    return target.isWalkable();
+	}
+	
+	private void createBaseTiles()
+	{
+		for(int row = 0; row < myTiles.length; row++)
+		{
+			for(int col = 0; col < myTiles[0].length; col++)
+			{
+				myTiles[row][col] = new Tile(TileType.FLOOR); // base
+			}
+		}
 	}
 	
 	public Tile getTile(final Point thePoint)
@@ -83,7 +135,7 @@ public class Room
 	
 	public void setMiddleTile(final TileType theType)
 	{
-		setTile(new Point(ROOM_DIMENSION/2 + 1, ROOM_DIMENSION/2 + 1), theType);
+		setTile(new Point(ROOM_DIMENSION/2, ROOM_DIMENSION/2), theType);
 	}
 	
 	public void setTile(final Point theTile, final TileType theType)
@@ -91,10 +143,13 @@ public class Room
 		int row = (int) theTile.getX();
 		int col = (int) theTile.getY();
 		
-		if(myFullTiles[row][col]) // checks if open... 
+		if(!myFullTiles[row][col]) // checks if open... 
 		{
-			myFullTiles[row][col] = false; // closes the tile
-			myTiles[row][col] = new Tile(theType);
+			if(theType != TileType.FLOOR)
+			{
+				myFullTiles[row][col] = true; // closes the tile
+			}
+			myTiles[row][col].setTile(theType);
 		}
 	}
 	
@@ -230,6 +285,16 @@ public class Room
 		myIsLooted = theLooted;
 	}
 	
+	public void setMyHeroLocation(final Point theNewPoint)
+	{
+		myHeroTileLocation = theNewPoint;
+	}
+	
+	public Point getMyHeroRoomLocation()
+	{
+		return new Point(myHeroTileLocation);
+	}
+	
 	public String toString()
 	{
 		String returnString = "";
@@ -240,11 +305,9 @@ public class Room
 			{
 				returnString += myTiles[row][col].getTileType().getChar();
 			}
+			returnString += "\n";
 		}
-		
 		return returnString;
-		
 	}
-
 }
 
