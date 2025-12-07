@@ -2,12 +2,20 @@ package model;
 
 import java.awt.Point;
 import java.util.EnumSet;
+import java.io.Serializable;
 
 /**
  * This class represents the dungeon the player must traverse.
+ * @author Skyler Z. Broussard
+ * @version 12/6/2025
  */
-public class Dungeon 
+public class Dungeon implements Serializable
 {
+	/**
+	 * This is the serial version.
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * This is a 2d array that holds a grid of rooms that represents a Maze
 	 */
@@ -65,12 +73,19 @@ public class Dungeon
 	
 	/**
 	 * Checks if a given path is able to go into.
+	 * @return Gets a EnumSet representing the avaliable directions.
 	 */
 	public EnumSet<Direction> getTraversable()
 	{
 		return myMaze[(int)myHeroRoomLocation.getX()][(int)myHeroRoomLocation.getY()].getDirections();
 	}
 	
+	/**
+	 * This processes the direction a hero will move.
+	 * @param theDir the Direction the hero wants to move.
+	 * @param theHero This is the Hero
+	 * @return The new Room's RoomType for logic.
+	 */
 	public RoomType stepHero(Direction theDir, Hero theHero)
 	{
 	    Room room = getCurrentRoom();
@@ -96,6 +111,11 @@ public class Dungeon
 	    return room.getRoomType();
 	}
 	
+	/**
+	 * This method does logic for Door traversal for room transfers.
+	 * @param theDir The Direction that we just traveled
+	 * @return the RoomType of the new Room for logic.
+	 */
 	private RoomType goThroughDoor(final Direction theDir)
 	{
 	    int roomRow = myHeroRoomLocation.x;
@@ -115,6 +135,12 @@ public class Dungeon
 	    return nrt;
 	 }
 	
+	/**
+	 * Finds Doors within the the room.
+	 * @param theRoom the given room.
+	 * @param theDir the given Direction
+	 * @return Point that represents where hero will be.
+	 */
 	private Point findDoor(final Room theRoom, final Direction theDir)
 	{
 		int rows = theRoom.getTilesRows();
@@ -141,11 +167,19 @@ public class Dungeon
 		myHeroRoomLocation.setLocation(theRows, theCols);
 	}
 	
+	/**
+	 * This sets the Hero's Tile Location
+	 * @param thePoint Point representing the tile.
+	 */
 	public void setHeroTileLocation(final Point thePoint)
 	{
 		getCurrentRoom().setHeroTileLocation(thePoint);
 	}
 	
+	/**
+	 * This gets the Hero tile location.
+	 * @return A Point representing the Hero Tile Location.
+	 */
 	public Point getHeroTileLocation()
 	{
 		return getCurrentRoom().getHeroTileLocation();
@@ -207,17 +241,32 @@ public class Dungeon
 		setHeroLocation(theRow, theCol);
 	}
 	
+	/**
+	 * This sets the room depth for a given room.
+	 * @param theRow the Row of the Room.
+	 * @param theCol the Col of the Room.
+	 * @param theDepth the Given depth for the room.
+	 */
 	public void setRoomDepth(final int theRow, final int theCol, final int theDepth)
 	{
 		myMaze[theRow][theCol].setDepth(theDepth);
 	}
 	
+	/**
+	 * This method sets the starting room location.
+	 * @param theRow the Row.
+	 * @param theCol the Col.
+	 */
 	public void setStartLocation(final int theRow, final int theCol)
 	{
 		myStartLocation.setLocation(theRow, theCol);
 		setHeroLocation(theRow, theCol);
 	}
 	
+	/**
+	 * This gets the start Point.
+	 * @return A point that represents the start
+	 */
 	public Point getStartPoint()
 	{
 		return new Point(myStartLocation);
@@ -225,7 +274,7 @@ public class Dungeon
 	
 	/**
 	 * This gets the number of rows.
-	 * @return The number of rows
+	 * @return The number of rows.
 	 */
 	public int getRows()
 	{
@@ -241,6 +290,10 @@ public class Dungeon
 		return myCols;
 	}
 	
+	/**
+	 * Gets the current room that the hero is in.
+	 * @return returns the hero's room.
+	 */
 	public Room getCurrentRoom()
 	{
 		int x = (int) myHeroRoomLocation.getX();
@@ -257,6 +310,10 @@ public class Dungeon
 		return myMaze[theRow][theCol];
 	}
 	
+	/**
+	 * This turns the Dungeon into the a string
+	 * @returns	String representing the Dungeon.
+	 */
 	public String toString()
 	{
 		String dungeon = "";

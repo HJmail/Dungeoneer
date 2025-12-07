@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * This is a Dungeon Tile Enum for Room Generation.
+ * @author Skyler, Cristian
+ * @version 12/6/2025
+ */
 public enum DungeonTile 
 {
     FLOOR('.', "Dungeoneer Terrain/wall.png", null, true),
@@ -32,16 +37,38 @@ public enum DungeonTile
 	SKELETON('S', "Dungeoneer Characters/skeleton_down.png", FLOOR, true),
 	OGRE('Z', "Dungeoneer Characters/ogre_down.png", FLOOR, true);
     
+	/**
+	 * This is the char of the enum.
+	 */
     private final char myChar;
     
+    /**
+     * This is the file name.
+     */
     private final String myFileName;
     
+    /**
+     * This is the DungeonTile.
+     */
     private final DungeonTile myBaseType;
     
+    /**
+     * This checks if a room is walkable.
+     */
     private boolean myIsWalkable;
     
+    /**
+     * This is the Door Direction.
+     */
     private Direction myDoorDirection;
     
+    /**
+     * This is a constructor with 4 args.
+     * @param theChar Char representation.
+     * @param theFileName File Path.
+     * @param theBaseType Base Type if its an overlay.
+     * @param theIsWalkable can be walked through.
+     */
     DungeonTile(final char theChar,
     		final String theFileName,
     		final DungeonTile theBaseType,
@@ -53,6 +80,14 @@ public enum DungeonTile
     	myIsWalkable = theIsWalkable;
     }
     
+    /**
+     * Another constructor for Doors.
+     * @param theChar Char representation.
+     * @param theFileName File Path.
+     * @param theBaseType Base Type if its an overlay.
+     * @param theIsWalkable can be walked through.
+     * @param theDoorDirection the direction of the door.
+     */
     DungeonTile(final char theChar,
     		final String theFileName,
     		final DungeonTile theBaseType,
@@ -66,36 +101,65 @@ public enum DungeonTile
     	myDoorDirection = theDoorDirection;
     }
     
+    /**
+     * This gets the file path.
+     * @return String of file path.
+     */
     public String getFilePath()
     {
     	return myFileName;
     }
     
+    /**
+     * This gets the char.
+     * @return the char of the room.
+     */
     public char getChar()
     {
     	return myChar;
     }
     
+    /**
+     * This gets the DungeonTile of the Room.
+     * @return the DungeonTile of the room.
+     */
     public DungeonTile getBaseType()
     {
     	return myBaseType;
     }
     
+    /**
+     * This gets if a room is walkable.
+     * @return
+     */
     public boolean isWalkable()
     {
     	return myIsWalkable;
     }
     
+    /**
+     * This check if a given Tile type is a door.
+     * @return boolean that checks if it is a door.
+     */
     public boolean isDoor()
     {
     	return myDoorDirection != null;
     }
     
+    /** 
+     * This gets the door's direction.
+     * @return
+     */
     public Direction getDoorDirection()
     {
     	return myDoorDirection;
     }
     
+    /**
+     * This turns a char to a enum type.
+     * @param c the given char.
+     * @return the dungeon tile type.
+     */
     public static DungeonTile fromChar(final char c) 
     {
         for (DungeonTile type : values()) 

@@ -39,6 +39,8 @@ public class ConsoleView implements GameView
 		int myRows = theDungeon.getRows();
 		int myCols = theDungeon.getCols();
 		
+		dungeon = addDivider(dungeon, myRows);
+		
 		for(int i = 0; i < myRows; i++)
 		{
 			for(int j = 0; j < myCols; j++)
@@ -59,7 +61,18 @@ public class ConsoleView implements GameView
 			}
 			dungeon += "\n";
 		}
+		
 		System.out.println("\n" + dungeon);
+	}
+	
+	private String addDivider(final String theString, final int theLength)
+	{
+		String newString = theString;
+		for(int i = 0; i < theLength; i++)
+		{
+			newString += "==";
+		}
+		return newString + "\n";
 	}
 	
 	public void showShopItems(final ArrayList<Item> theItem)
@@ -288,7 +301,20 @@ public class ConsoleView implements GameView
 	}
 
 	@Override
-	public void showRoom(Room theRoom) {
+	public void showRoom(Room theRoom) 
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void initRoomPanel(Room currentRoom, GameConfig myGameConfig) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateUI(Hero theHero, Dungeon theDungeon) {
 		// TODO Auto-generated method stub
 		
 	}

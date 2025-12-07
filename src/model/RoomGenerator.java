@@ -7,20 +7,38 @@ import java.util.List;
 import java.util.Random;
 
 
+/**
+ * This is the room generation logic.
+ * @author Skyler Z. Broussard
+ * @version 12/6/2025
+ */
 public class RoomGenerator 
 {
+	/**
+	 * This is the Healing for the pot.
+	 */
 	private static int HEAL_POT = 50;
 	
+	/**
+	 * This is the Vision pot duration.
+	 */
 	private static int VISION_POT = 1;
 	
-	Dungeon myDungeon;
+	/**
+	 * This is the Pillar Count.
+	 */
+	private int myPillarCount;
 	
-	int myPillarCount;
+	/**
+	 * This is the seeded random.
+	 */
+	private Random myRandom;
 	
-	Random myRandom;
-	
-	RoomType myRoomType;
-	
+	/**
+	 * This method generates the passed dungeon's room.
+	 * @param theDungeon the given dungeon.
+	 * @param theRng the seeded random.
+	 */
 	public void generate(final Dungeon theDungeon, final Random theRng)
 	{
 		myPillarCount = 0;
@@ -40,6 +58,10 @@ public class RoomGenerator
 		}
 	}
 	
+	/**
+	 * This creates the layout of the room. 
+	 * @param theRoom The given room.
+	 */
 	private void createLayout(final Room theRoom)
 	{
 		Room room = theRoom;
@@ -70,33 +92,38 @@ public class RoomGenerator
 					
 					if(isNorth)
 					{
-						room.setTile(point, TileType.DOOR_N);
+						room.setTile(point, DungeonTile .DOOR_N);
 					}
 					else if(isSouth)
 					{
-						room.setTile(point, TileType.DOOR_S);
+						room.setTile(point, DungeonTile .DOOR_S);
 					}
 					else if(isEast)
 					{
-						room.setTile(point, TileType.DOOR_E);
+						room.setTile(point, DungeonTile .DOOR_E);
 					}
 					else if(isWest)
 					{
-						room.setTile(point, TileType.DOOR_W);
+						room.setTile(point, DungeonTile .DOOR_W);
 					}
 					else
 					{
-						room.setTile(point, TileType.WALL);
+						room.setTile(point, DungeonTile .WALL);
 					}
 				}
 				else
 				{
-					room.setTile(point, TileType.FLOOR);
+					room.setTile(point, DungeonTile .FLOOR);
 				}
 			}
 		}
 	}
 	
+	/**
+	 * This is the events generator for a room.
+	 * @param theRoom the given room.
+	 * @param theRng the random seed.
+	 */
 	private void createEvents(final Room theRoom, final Random theRng)
 	{
 		Room room = theRoom;
@@ -112,13 +139,13 @@ public class RoomGenerator
 			switch(rt)
 			{
 				case START:
-					theRoom.setMiddleTile(TileType.ENTRANCE);
+					theRoom.setMiddleTile(DungeonTile .ENTRANCE);
 					break;
 				case SHOP:
-					theRoom.setMiddleTile(TileType.SHOP); //WHEN WE ADD SHOP...
+					theRoom.setMiddleTile(DungeonTile .SHOP); //WHEN WE ADD SHOP...
 					break;
 				default: // exit
-					theRoom.setMiddleTile(TileType.EXIT);
+					theRoom.setMiddleTile(DungeonTile .EXIT);
 			}	
 		}
 		else // Pillar, Treasure, Pit, Encounter will be random.
@@ -141,6 +168,11 @@ public class RoomGenerator
 		}
 	}
 	
+	/**
+	 * This generates the encounters within the room.
+	 * @param theRoom This is the Room that is getting generated.
+	 * @param theRng Random seed.
+	 */
 	private void generateEncounterRoom(final Room theRoom, final Random theRng)
 	{
 		List<Point> notFull = getNotFull(theRoom);
@@ -157,13 +189,13 @@ public class RoomGenerator
 				switch(monster.getClass().getSimpleName().toLowerCase())
 				{
 					case "gremlin":
-						theRoom.setTile(roomPoint, TileType.GREMLIN);
+						theRoom.setTile(roomPoint, DungeonTile .GREMLIN);
 						break;
 					case "skeleton":
-						theRoom.setTile(roomPoint, TileType.SKELETON);
+						theRoom.setTile(roomPoint, DungeonTile .SKELETON);
 						break;
 					case "ogre":
-						theRoom.setTile(roomPoint, TileType.OGRE);
+						theRoom.setTile(roomPoint, DungeonTile .OGRE);
 						break;
 				}
 				theRoom.getTile(roomPoint).setCharacter(monsters.get(i));;
@@ -174,6 +206,11 @@ public class RoomGenerator
 	
 	
 	
+	/**
+	 * This generates the pillar rooms.
+	 * @param theRoom the given room.
+	 * @param theRng the seeded Random.
+	 */
 	private void generatePillarRoom(final Room theRoom, final Random theRng)
 	{
 		if(myPillarCount < 4)
@@ -182,7 +219,7 @@ public class RoomGenerator
 			List<Point> notFull = getNotFull(theRoom);
 			Point pillarPoint = notFull.get(theRng.nextInt(notFull.size()));
 			
-			theRoom.setTile(pillarPoint, TileType.fromChar(pillars[myPillarCount]));
+			theRoom.setTile(pillarPoint, DungeonTile .fromChar(pillars[myPillarCount]));
 			if(pillars[myPillarCount] == 'C')
 			{
 				theRoom.getTile(pillarPoint).setItem(new Pillar('E'));
@@ -195,6 +232,11 @@ public class RoomGenerator
 		}
 	}
 	
+	/**
+	 * This is the generation for a pit room.
+	 * @param theRoom The given room.
+	 * @param theRng Seed Random.
+	 */
 	private void generatePitRoom(final Room theRoom,
 								final Random theRng)
 	{
@@ -207,10 +249,15 @@ public class RoomGenerator
 				Point roomPoint = notFull.get(index);
 				notFull.remove(index);
 				
-				theRoom.setTile(roomPoint, TileType.PIT);
+				theRoom.setTile(roomPoint, DungeonTile.PIT);
 		}
 	}
 	
+	/**
+	 * This is the generation of a Treasure Room. 
+	 * @param theRoom The given room.
+	 * @param theRng the seeded Random.
+	 */
 	private void generateTreasureRoom(final Room theRoom, final Random theRng)
 	{
 		List<Point> notFull = getNotFull(theRoom);
@@ -235,23 +282,23 @@ public class RoomGenerator
 					{
 						case 1:
 							newWeapon = Weapon.createSpear(rarity);
-							theRoom.getTile(roomPoint).setTile(TileType.SPEAR);
+							theRoom.getTile(roomPoint).setTile(DungeonTile .SPEAR);
 							break;
 						case 2:
 							newWeapon = Weapon.createFlail(rarity);
-							theRoom.getTile(roomPoint).setTile(TileType.FLAIL);
+							theRoom.getTile(roomPoint).setTile(DungeonTile .FLAIL);
 							break;
 						case 3:
 							newWeapon = Weapon.createFalchion(rarity);
-							theRoom.getTile(roomPoint).setTile(TileType.FALCHION);
+							theRoom.getTile(roomPoint).setTile(DungeonTile .FALCHION);
 							break;
 						case 4:
 							newWeapon = Weapon.createMorningStar(rarity);
-							theRoom.getTile(roomPoint).setTile(TileType.MORNING_STAR);
+							theRoom.getTile(roomPoint).setTile(DungeonTile .MORNING_STAR);
 							break;
 						default:
 							newWeapon = Weapon.createStick(rarity);
-							theRoom.getTile(roomPoint).setTile(TileType.STICK);
+							theRoom.getTile(roomPoint).setTile(DungeonTile .STICK);
 					}
 					theRoom.getTile(roomPoint).setItem(newWeapon);
 					
@@ -259,21 +306,26 @@ public class RoomGenerator
 				case VISION_POTION:
 					theRoom.getTile(roomPoint).setItem(new VisionPotion(
 												VISION_POT, rarity));
-					theRoom.getTile(roomPoint).setTile(TileType.VISION_POTION);
+					theRoom.getTile(roomPoint).setTile(DungeonTile .VISION_POTION);
 					break;
 				case HEALING_POTION:
 					theRoom.getTile(roomPoint).setItem(new HealingPotion(
 												HEAL_POT, rarity));
-					theRoom.getTile(roomPoint).setTile(TileType.HEALING_POTION);
+					theRoom.getTile(roomPoint).setTile(DungeonTile .HEALING_POTION);
 					break;
 				default: // gold
 					int goldRng = (int) (theRoom.getDepth() * (8 + (roll * 0.1)));
 					theRoom.getTile(roomPoint).setItem(new Gold(goldRng));
-					theRoom.getTile(roomPoint).setTile(TileType.GOLD);
+					theRoom.getTile(roomPoint).setTile(DungeonTile .GOLD);
 			}
 		}
 	}
 	
+	/**
+	 * This gets the available Points that are tiles within a room.
+	 * @param theRoom the given room.
+	 * @return List of Points in room that are available.
+	 */
 	private List<Point> getNotFull(final Room theRoom)
 	{
 		List<Point> notFull = new ArrayList<>();
@@ -291,6 +343,11 @@ public class RoomGenerator
 		return notFull;
 	}
 	
+	/**
+	 * This gets a rarity enum form a roll.
+	 * @param theRoll the Seeded Random
+	 * @return A rarity Enum based on the roll.
+	 */
 	private Rarity getRarity(final int theRoll)
 	{ 	// Roll is 1-100
 		Rarity rarity = Rarity.COMMON;

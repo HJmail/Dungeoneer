@@ -8,7 +8,6 @@ import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -26,6 +25,11 @@ import model.Item;
 import model.Potion;
 import model.Room;
 
+/**
+ * This is the GUI version of game.
+ * @author Skyler, Cristian
+ * @version 12/6/2025
+ */
 public class GuiView implements GameView
 {	
     Scanner myUserInput; // temp for testing

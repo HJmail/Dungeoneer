@@ -64,12 +64,29 @@ public interface GameView
      */
     void gameOver();
 
-	void showHeroStats(Hero myOwner);
+    /**
+     * Some Hero stats
+     * @param myOwner
+     */
+	void showHeroStats(final Hero theOwner);
 	
+	/**
+	 * Shows room.
+	 * @param the given room.
+	 */
 	void showRoom(final Room theRoom);
 
-	void initRoomPanel(Room currentRoom, GameConfig myGameConfig);
+	/**
+	 * Mainly for GUI but generates panels.
+	 * @param currentRoom the current room
+	 * @param myGameConfig the game config.
+	 */
+	void initRoomPanel(final Room theCurrentRoom, final GameConfig theGameConfig);
 
-	void updateUI(final Hero theHero,
-			final Dungeon theDungeon);
+	/**
+	 * This is for UI meant to update things.
+	 * @param theHero the Hero 
+	 * @param theDungeon the dungeon.
+	 */
+	void updateUI(final Hero theHero, final Dungeon theDungeon);
 }

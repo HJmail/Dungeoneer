@@ -10,6 +10,7 @@ import model.GameConfig;
 import model.Room;
 import model.RoomGenerator;
 import model.RoomType;
+import view.ConsoleView;
 import view.GameView;
 import view.GuiView;
 
@@ -31,22 +32,32 @@ public class DungeonAdventure
 	private static Dungeon myDungeon;
 	
 	/**
-	 * This is the Console view.
+	 * This is the Console/Gui view.
 	 */
 	private static GameView myView;
 	
+	/**
+	 * This is a gameConfig File that stores main game data.
+	 */
 	private static GameConfig myGameConfig;
 	
+	/**
+	 * This is the Room Controller room logic
+	 */
 	private static RoomController myRoomController;
 	
+	/**
+	 * This is the seeded random.
+	 */
 	private static Random myRandom;
 	
+	/**
+	 * This is the room generator.
+	 */
 	private static RoomGenerator myRoomGenerator;
 	
-	
 	/**
-	 * This is the method with the main workflow.
-	 * @param theArgs 
+	 * This is the main logic for the dungeon.
 	 */
 	public DungeonAdventure()
 	{
@@ -62,8 +73,9 @@ public class DungeonAdventure
 		myGameStatus = true;
 		
 		// Setting up View ... can be Console based or GUI based.
-		//myView = new ConsoleView();
-		myView = new GuiView(this);
+		myView = new ConsoleView();
+		//myView = new GuiView(this);
+		
 		myRoomGenerator =  new RoomGenerator();
 		
 		// User inputs
@@ -97,12 +109,17 @@ public class DungeonAdventure
 	{
 		while(myGameStatus)
 		{
-			myView.updateUI(myGameConfig.getHero(), myDungeon);
+			promptMove();
+			promptInvetory();
 			checkHitPoints();
 		}
 		myView.showMessage("Game Halted.");
 	}
 	
+	/**
+	 * This is the hero movement within a room.
+	 * @param theDirection the given Direction.
+	 */
 	public void moveHero(final Direction theDirection)
 	{
 		activateRoom(myDungeon.stepHero(theDirection, myGameConfig.getHero()));
@@ -130,14 +147,13 @@ public class DungeonAdventure
 		while(!goodResponse) // keep prompting until good input.
 		{
 			myView.showDungeon(myDungeon);
-			
 			myView.showMessage(myDungeon.getTraversable().toString()); // THIS IS FOR TESTING ONLY
 			
 			Direction chosenDirection = myView.askDirection();
 			goodResponse = myDungeon.move(chosenDirection);
 		}
 		// Room is updated need to activate it.
-		activateRoom();
+		//activateRoom();
 	}
 	
 	private void checkHitPoints()

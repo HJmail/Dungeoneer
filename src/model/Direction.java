@@ -135,8 +135,12 @@ public enum Direction {
             default    -> 0;
     };
   }
-
-	public Point translate(final Point theOld) 
+    /**
+     * This  gets the change of a point with a given direction.
+     * @param theOld
+     * @return new point with direction change.
+     */
+    public Point translate(final Point theOld) 
 	{
 		return new Point(theOld.x + dy(), theOld.y + dx());
 	}

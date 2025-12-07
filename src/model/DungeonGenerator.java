@@ -9,8 +9,19 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * This is used to generate the a dungeon with a given seed.
+ * @author Skyler Z. Broussard
+ */
 public class DungeonGenerator 
 {
+	/**
+	 * This starts the generation of a dungeon.
+	 * @param theRng Seeded Random.
+	 * @param theDifficulty User inputed Difficulty
+	 * @param theHero The user's hero.
+	 * @return The generated Dungeon.
+	 */
 	public static Dungeon generate(final Random theRng, final int theDifficulty, final Hero theHero)
 	{
 		Dungeon dungeon = new Dungeon(theDifficulty);
@@ -20,6 +31,12 @@ public class DungeonGenerator
 		return dungeon;
 	}
 	
+	/**
+	 * This creates the layout of the dungeon which rooms has doors.
+	 * @param theDungeon The dungeon.
+	 * @param theRng The seeded random.
+	 * @return returns a int representing the depth of the Dungeon.
+	 */
 	private static int createLayout(final Dungeon theDungeon, final Random theRng)
 	{
 		// getting dimensions
@@ -105,12 +122,17 @@ public class DungeonGenerator
 		return maxDepth;
 	}
 	
+	/**
+	 * This creates the events within the dungeon.
+	 * @param theDungeon The dungeon.
+	 * @param theRng Seeded Random.
+	 * @param maxDepth Max depth.
+	 */
 	private static void createEvents(final Dungeon theDungeon, final Random theRng, int maxDepth)
 	{
 		int rows = theDungeon.getRows();
 		int cols = theDungeon.getCols();
 		
-		//List<Point> allRooms = new ArrayList<>();
 		List<Point> possiablePillars = new ArrayList<>();
 		
 		for(int r = 0; r < rows; r++)
@@ -236,6 +258,11 @@ public class DungeonGenerator
 		}
 	}
 	
+	/**
+	 * This gets a random item based on a roll.
+	 * @param theRandom the seeded Random.
+	 * @return The ItemType generated.
+	 */
 	private static ItemType getRandomItem(final Random theRandom)
 	{
 		int roll = theRandom.nextInt(3);
@@ -249,10 +276,15 @@ public class DungeonGenerator
 		{
 			item = ItemType.VISION_POTION;
 		}
-		
 		return item;
 	}
 	
+	/**
+	 * This gets the Direction of the form the current room to next room.
+	 * @param theCurrent current room
+	 * @param theNext next room.
+	 * @return the Direction.
+	 */
 	private static Direction getDirection(final int[] theCurrent, final int[] theNext)
 	{
 		Direction theDirection = Direction.NORTH; 
@@ -267,6 +299,15 @@ public class DungeonGenerator
 	    return theDirection;
 	}
 
+	/**
+	 * This gets the unvisited neighbors of the given room.
+	 * @param theRow The current row.
+	 * @param theCol the curren col.
+	 * @param theRows total rows.
+	 * @param theCols total cols.
+	 * @param theVisited 2d array of booleans represented visited.
+	 * @return A List of Points that tell us unvisited.
+	 */
 	private static List<Point> getUnvistedNeighbors(final int theRow, final int theCol,
 													final int theRows, final int theCols,
 													final boolean[][] theVisited)
@@ -290,14 +331,21 @@ public class DungeonGenerator
 		}
 		return result;
 	}
-	private static Monster getMonsterForDepth(int depth, Random rng) {
-	    if (depth <= 2) {
+	
+	/**
+	 * Monster creation.
+	 * @param theDepth the depth of the current room.
+	 * @param theRng the seeded random.
+	 * @return Monster that got generated.
+	 */
+	private static Monster getMonsterForDepth(final int theDepth, final Random theRng) {
+	    if (theDepth <= 2) {
 	        return MonsterFactory.createMonster("Gremlin");
 	    }
-	    if (depth <= 4) {
+	    if (theDepth <= 4) {
 	        return MonsterFactory.createMonster("Skeleton");
 	    }
-	    if (rng.nextDouble() < 0.7) {
+	    if (theRng.nextDouble() < 0.7) {
 	        return MonsterFactory.createMonster("Skeleton");
 	    }
 	    return MonsterFactory.createMonster("Ogre");
