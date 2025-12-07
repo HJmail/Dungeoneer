@@ -86,6 +86,8 @@ public class DungeonAdventure
 											  myDungeon,
 											  myView,
 											  myRandom);	
+		
+		myView.initRoomPanel(myDungeon.getCurrentRoom(), myGameConfig);
 	}
 	
 	/**
@@ -95,20 +97,25 @@ public class DungeonAdventure
 	{
 		while(myGameStatus)
 		{
-			myView.showRoom(myDungeon.getCurrentRoom());
-			//promptInvetory();
-			//promptMove(); // user input for move
-			//checkHitPoints();
-			
-			//myGameStatus = false;
+			myView.updateUI(myGameConfig.getHero(), myDungeon);
+			checkHitPoints();
 		}
 		myView.showMessage("Game Halted.");
 	}
 	
 	public void moveHero(final Direction theDirection)
 	{
-		myDungeon.stepHero(theDirection, myGameConfig.getHero());
+		activateRoom(myDungeon.stepHero(theDirection, myGameConfig.getHero()));
 		myView.showRoom(myDungeon.getCurrentRoom());
+	}
+	
+	private void activateRoom(final RoomType theRoomType)
+	{
+		if(theRoomType == RoomType.ENCOUNTER)
+		{
+			CombatController.battleMultiple(myGameConfig.getHero(), myDungeon.getCurrentRoom().getMonsters());
+		}
+		
 	}
 	
 	private void promptInvetory()

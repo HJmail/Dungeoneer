@@ -67,4 +67,9 @@ public interface GameView
 	void showHeroStats(Hero myOwner);
 	
 	void showRoom(final Room theRoom);
+
+	void initRoomPanel(Room currentRoom, GameConfig myGameConfig);
+
+	void updateUI(final Hero theHero,
+			final Dungeon theDungeon);
 }

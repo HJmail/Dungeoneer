@@ -12,10 +12,10 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import model.DungeonTile;
 import model.GameConfig;
 import model.Room;
 import model.Tile;
-import model.TileType;
 
 public class DungeonRoomPanel extends JPanel
 {
@@ -33,8 +33,8 @@ public class DungeonRoomPanel extends JPanel
     private final Map<Facing, Image> myHeroImages =
             new EnumMap<>(Facing.class);
     
-    private final Map<TileType, Image> myTileImages =
-            new EnumMap<>(TileType.class);
+    private final Map<DungeonTile, Image> myTileImages =
+            new EnumMap<>(DungeonTile.class);
 	
 	private enum Facing {UP, DOWN, LEFT, RIGHT}
 	
@@ -70,21 +70,9 @@ public class DungeonRoomPanel extends JPanel
 		drawHero(theGraphics);
 	}
 	
-	private void loadHeroImages2()
-	{
-	    Image hero = new ImageIcon("/Dungeoneer Characters/hero_down.png").getImage();
-	    System.out.println("hero size = " + hero.getWidth(null) + " x " + hero.getHeight(null));
-	    System.out.println("Working dir = " + System.getProperty("user.dir"));
-	    
-	    myHeroImages.put(Facing.DOWN, hero);
-	    myHeroImages.put(Facing.UP, hero);
-	    myHeroImages.put(Facing.LEFT, hero);
-	    myHeroImages.put(Facing.RIGHT, hero);
-	}
-	
 	private void loadTileImages()
 	{
-		for(TileType type: TileType.values())
+		for(DungeonTile type: DungeonTile.values())
 		{
 			String path = "/" + type.getFilePath();
             URL url = getClass().getResource(path);
@@ -152,9 +140,9 @@ public class DungeonRoomPanel extends JPanel
 			for(int col = 0; col < cols; col++)
 			{
 				Tile tile = myRoom.getTile(new Point(row, col));
-				TileType type = tile.getTileType();
+				DungeonTile type = tile.getTileType();
 				
-	            TileType base = type.getBaseType();
+				DungeonTile base = type.getBaseType();
 	            Image baseImg = myTileImages.get(base);
 	            
 	            //if(type.isDoor()) System.out.println("Door Placed: " + row + ", " + col);	
@@ -192,7 +180,6 @@ public class DungeonRoomPanel extends JPanel
 	{
 		Point heroPos = myRoom.getHeroTileLocation();
 		
-
         int col = heroPos.y;
         int row = heroPos.x;
 

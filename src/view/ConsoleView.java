@@ -12,6 +12,7 @@ import model.Inventory;
 import model.Item;
 import model.Potion;
 import model.Priestess;
+import model.Room;
 import model.Thief;
 import model.Warrior;
 
@@ -282,6 +283,12 @@ public class ConsoleView implements GameView
 
 	@Override
 	public void showHeroStats(Hero myOwner) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void showRoom(Room theRoom) {
 		// TODO Auto-generated method stub
 		
 	}

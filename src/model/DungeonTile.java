@@ -1,6 +1,6 @@
 package model;
 
-public enum TileType 
+public enum DungeonTile 
 {
     FLOOR('.', "Dungeoneer Terrain/wall.png", null, true),
     WALL('M', "Dungeoneer Terrain/floor.png", null, false),
@@ -36,15 +36,15 @@ public enum TileType
     
     private final String myFileName;
     
-    private final TileType myBaseType;
+    private final DungeonTile myBaseType;
     
     private boolean myIsWalkable;
     
     private Direction myDoorDirection;
     
-    TileType(final char theChar,
+    DungeonTile(final char theChar,
     		final String theFileName,
-    		final TileType theBaseType,
+    		final DungeonTile theBaseType,
     		final boolean theIsWalkable)
     {
     	myChar = theChar;
@@ -53,9 +53,9 @@ public enum TileType
     	myIsWalkable = theIsWalkable;
     }
     
-    TileType(final char theChar,
+    DungeonTile(final char theChar,
     		final String theFileName,
-    		final TileType theBaseType,
+    		final DungeonTile theBaseType,
     		final boolean theIsWalkable,
     		final Direction theDoorDirection)
     {
@@ -76,7 +76,7 @@ public enum TileType
     	return myChar;
     }
     
-    public TileType getBaseType()
+    public DungeonTile getBaseType()
     {
     	return myBaseType;
     }
@@ -96,9 +96,9 @@ public enum TileType
     	return myDoorDirection;
     }
     
-    public static TileType fromChar(final char c) 
+    public static DungeonTile fromChar(final char c) 
     {
-        for (TileType type : values()) 
+        for (DungeonTile type : values()) 
         {
             if (type.myChar == c) return type;
         }

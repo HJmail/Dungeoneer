@@ -65,20 +65,28 @@ public class Room
 		myMonstersInRoom = new ArrayList<Monster>();
 	}
 	
-	public void activateTile(final Point thePoint, final Hero theHero)
+	public boolean activateTile(final Point thePoint, final Hero theHero)
 	{
 		Tile tile = getTile(thePoint);
-		TileType type = tile.getTileType();
+		DungeonTile type = tile.getTileType();
+		boolean returnbool = false;
 		
 		
 		if(tile.hasItem())
 		{
 			theHero.getInventory().addItem(tile.getItem());
 		}
-		else if(type == TileType.PIT)
+		else if(type == DungeonTile.PIT)
 		{
 			theHero.setHitPoints(theHero.getHitPoints() - PIT_DMG);
 		}
+		else if(type == DungeonTile.EXIT)
+		{
+			returnbool = theHero.getInventory().getCollectedPillarsCount() == 4;
+		}
+		
+		return returnbool;
+		
 	}
 	
 	public boolean canMoveTo(final Point thePoint)
@@ -92,10 +100,6 @@ public class Room
 	    }
 	    Tile target = getTile(thePoint);
 	    
-	    System.out.println("canMoveTo " + thePoint +
-                " TYPE=" + target.getTileType() +
-                " walkable=" + target.isWalkable());
-	    
 	    return target.isWalkable();
 	}
 	
@@ -105,7 +109,7 @@ public class Room
 		{
 			for(int col = 0; col < myTiles[0].length; col++)
 			{
-				myTiles[row][col] = new Tile(TileType.FLOOR); // base
+				myTiles[row][col] = new Tile(DungeonTile.FLOOR); // base
 			}
 		}
 	}
@@ -130,19 +134,19 @@ public class Room
 		return myFullTiles.clone();
 	}
 	
-	public void setMiddleTile(final TileType theType)
+	public void setMiddleTile(final DungeonTile theType)
 	{
 		setTile(new Point(ROOM_DIMENSION/2, ROOM_DIMENSION/2), theType);
 	}
 	
-	public void setTile(final Point theTile, final TileType theType)
+	public void setTile(final Point theTile, final DungeonTile theType)
 	{
 		int row = (int) theTile.getX();
 		int col = (int) theTile.getY();
 		
 		if(!myFullTiles[row][col]) // checks if open... 
 		{
-			if(theType != TileType.FLOOR)
+			if(theType != DungeonTile.FLOOR)
 			{
 				myFullTiles[row][col] = true; // closes the tile
 			}
@@ -270,8 +274,8 @@ public class Room
 	public boolean isVisable()
 	{
 		return myIsVisable;
-	}
-	
+		}
+		
 	public boolean isLooted()
 	{
 		return myIsLooted;

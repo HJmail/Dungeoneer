@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -54,6 +55,27 @@ public class GuiView implements GameView
 		myMainFrame.setVisible(true);
 		
         setupKeyBindings();
+	}
+	
+	public void initRoomPanel(final Room startRoom, final GameConfig config) {
+	    if (myDungeonRoomPanel == null) 
+	    {
+	        myDungeonRoomPanel = new DungeonRoomPanel(startRoom, config);
+	        myMainPanel.add(myDungeonRoomPanel, BorderLayout.CENTER);
+	       
+	        Hero hero = myController.getGameConfig().getHero();
+	        new InventoryDialog(myMainFrame, hero, hero.getInventory());
+	        
+	        myMainPanel.revalidate();
+	        myMainFrame.pack();
+	        myMainFrame.setLocationRelativeTo(null); // <- this is what jumps it
+	    }
+	}
+	
+	public void updateUI(final Hero theHero,
+						final Dungeon theDungeon)
+	{
+		showRoom(theDungeon.getCurrentRoom());
 	}
 	
 	private void setupKeyBindings() 
@@ -312,22 +334,8 @@ public class GuiView implements GameView
 	
 	public void showRoom(final Room theRoom)
 	{
-		//String stringOfRoom = theRoom.toString();
-		//System.out.println(stringOfRoom);
-		if(myDungeonRoomPanel == null ) 
-		{
-			myDungeonRoomPanel = new DungeonRoomPanel(theRoom,
-								myController.getGameConfig());
-			myMainPanel.add(myDungeonRoomPanel);
-			myMainFrame.pack();
-			myMainFrame.setLocationRelativeTo(null);
-			myMainFrame.setVisible(true);
-		}
-		else
-		{
-			myDungeonRoomPanel.setRoom(theRoom);
-			myMainPanel.revalidate();
-			myMainPanel.repaint();
-		}
+		myDungeonRoomPanel.setRoom(theRoom);
+		myMainPanel.revalidate();
+		myMainPanel.repaint();
 	}
 }

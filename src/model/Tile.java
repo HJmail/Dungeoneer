@@ -2,20 +2,20 @@ package model;
 
 public class Tile 
 {	
-	TileType myTileType;
+	DungeonTile myTileType;
 	
 	DungeonCharacter myCharacter;
 	
 	Item myItem;
 	
-	public Tile(final TileType theTileType)
+	public Tile(final DungeonTile theTileType)
 	{
 		myTileType = theTileType;
 		myCharacter = null;
 		myItem = null;
 	}
 	
-	public void setTile(final TileType theTileType)
+	public void setTile(final DungeonTile theTileType)
 	{
 		myTileType = theTileType;
 	}
@@ -49,10 +49,11 @@ public class Tile
 	{
 		Item i = myItem;
 		myItem = null;
+		myTileType = DungeonTile.FLOOR;
 		return i;
 	}
 	
-	public TileType getTileType()
+	public DungeonTile getTileType()
 	{
 		return  myTileType;
 	}

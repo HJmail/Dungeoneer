@@ -71,7 +71,7 @@ public class Dungeon
 		return myMaze[(int)myHeroRoomLocation.getX()][(int)myHeroRoomLocation.getY()].getDirections();
 	}
 	
-	public void stepHero(Direction theDir, Hero theHero)
+	public RoomType stepHero(Direction theDir, Hero theHero)
 	{
 	    Room room = getCurrentRoom();
 
@@ -80,26 +80,23 @@ public class Dungeon
 	    
 	    if(!room.canMoveTo(nextPos))
 	    {
-	    	return;
+	    	return room.getRoomType();
 	    }
 	    
 	    Tile tile = room.getTile(nextPos);
-	    TileType type = tile.getTileType();
+	    DungeonTile type = tile.getTileType();
 	    
 	    if(type.isDoor())
 	    {
-	    	System.out.println("Reached Door");
 	    	Direction doorDir = type.getDoorDirection();
-	    	goThroughDoor(doorDir);
-	    	return;
+	    	return goThroughDoor(doorDir);
 	    }
-	    
-	    System.out.println("Moved to:" + nextPos + " TYPE=" + type + " isDoor=" + type.isDoor());
 	    setHeroTileLocation(nextPos);
 	    room.activateTile(nextPos, theHero);
+	    return room.getRoomType();
 	}
 	
-	private void goThroughDoor(final Direction theDir)
+	private RoomType goThroughDoor(final Direction theDir)
 	{
 	    int roomRow = myHeroRoomLocation.x;
 	    int roomCol = myHeroRoomLocation.y;
@@ -113,7 +110,10 @@ public class Dungeon
 	    Point entryPos = findDoor(nRoom, entry);
 	    
 	    nRoom.setHeroTileLocation(entryPos);
-	}
+	    RoomType nrt = nRoom.getRoomType();
+	    
+	    return nrt;
+	 }
 	
 	private Point findDoor(final Room theRoom, final Direction theDir)
 	{
@@ -270,8 +270,6 @@ public class Dungeon
 			}
 			dungeon += "\n";
 		}
-		
-		System.out.println("\n" + dungeon);
 		return dungeon;
 	}
 }
