@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.util.Random;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -27,62 +28,152 @@ import model.Hero;
 import model.Priestess;
 import model.Thief;
 import model.Warrior;
-import view.ConsoleView;
-import view.DungeonBoardPanel;
 import view.DungeoneerFrame;
 
 /**
- * Main controller / entry point for the Dungeoneer game.
+ * Entry point and top–level controller for the Dungeoneer game.
+ * <p>
+ * Responsibilities:
+ * <ul>
+ *   <li>Show the welcome screen and help dialog.</li>
+ *   <li>Prompt the player for hero, difficulty, and seed.</li>
+ *   <li>Generate all dungeons (lobby + branch dungeons).</li>
+ *   <li>Own the active {@link Hero}, current {@link Dungeon}, and GUI frame.</li>
+ *   <li>Handle high-level events such as entering doors.</li>
+ * </ul>
+ * </p>
+ *
+ * This class is intentionally static because there is a single global game
+ * controller in the current design.
+ *
+ * @author(s): Cristian, Skyler, Hiba
+ * @version 23.0.1
  */
 public class DungeonAdventure {
-	
-    /** Main Dungeoneer logo used on the welcome screen. */
+
+    /* ------------------------------------------------------------------
+     * Constants
+     * ------------------------------------------------------------------ */
+
+    /**
+     * Main Dungeoneer logo used on the welcome and help screens.
+     */
     private static final ImageIcon DUNGEONEER_LOGO =
             loadScaledIcon("Dungeoneer_Icon.png", 64);
 
-    /** The active hero. */
+    /**
+     * Text shown in the Help window on the welcome screen.
+     */
+    private static final String HELP_TEXT =
+            "Controls:\n"
+          + "W / ↑  -> Move Up\n"
+          + "S / ↓  -> Move Down\n"
+          + "A / ←  -> Move Left\n"
+          + "D / →  -> Move Right\n"
+          + "\n"
+          + "I         -> Inventory / Selections\n"
+          + "ENTER     -> Use Item\n"
+          + "DELETE    -> Drop / Remove Item\n";
+
+    /* ------------------------------------------------------------------
+     * Global game state
+     * ------------------------------------------------------------------ */
+
+    /**
+     * The active hero chosen by the player.
+     */
     private static Hero myHero;
 
-    /** Console view used for debugging / logging. */
-    private static ConsoleView myConsoleView;
-
-    /** Main GUI window. */
+    /**
+     * Main GUI window for the game.
+     */
     private static DungeoneerFrame myGui;
 
-    /** Global difficulty (1–9). */
+    /**
+     * Selected difficulty level (1–9).
+     */
     private static int myDifficulty;
 
-    /** Base seed typed by the user (or random). */
+    /**
+     * Base random seed typed by the user (or generated randomly).
+     * Used to seed all dungeon generators.
+     */
     private static long mySeed;
 
-    /* ---------- Multiple dungeons ---------- */
-
+    /**
+     * Lobby dungeon (central area with doors to all branch dungeons).
+     */
     private static Dungeon lobbyDungeon;
+
+    /**
+     * Branch dungeon to the North of the lobby.
+     */
     private static Dungeon northDungeon;
+
+    /**
+     * Branch dungeon to the South of the lobby.
+     */
     private static Dungeon southDungeon;
+
+    /**
+     * Branch dungeon to the East of the lobby.
+     */
     private static Dungeon eastDungeon;
+
+    /**
+     * Branch dungeon to the West of the lobby.
+     */
     private static Dungeon westDungeon;
 
-    /** Currently active dungeon (shown in GUI & used for logic). */
+    /**
+     * Currently active dungeon (shown in the GUI and used for movement logic).
+     */
     private static Dungeon currentDungeon;
 
-    /** 'L' = Lobby, 'N','S','E','W' = branch dungeons. */
+    /**
+     * Current area identifier:
+     * <ul>
+     *   <li>'L' – Lobby</li>
+     *   <li>'N' – North branch dungeon</li>
+     *   <li>'S' – South branch dungeon</li>
+     *   <li>'E' – East branch dungeon</li>
+     *   <li>'W' – West branch dungeon</li>
+     * </ul>
+     */
     private static char currentArea;
 
-    /** Which branch dungeon contains the true OUT exit. */
+    /**
+     * Which branch dungeon contains the true OUT exit.
+     * Must be one of 'N', 'S', 'E', or 'W'.
+     */
     private static char exitDungeonKey;
 
-    /* ---------- Main ---------- */
+    /* ------------------------------------------------------------------
+     * Main
+     * ------------------------------------------------------------------ */
 
-    public static void main(final String[] theArgs) {
-        SwingUtilities.invokeLater(() -> showWelcomeScreen());
-    }
-    
     /**
-     * Shows the initial welcome window with New Game / Load Game / Help.
+     * Program entry point. Schedules the welcome screen to be shown
+     * on the Swing event dispatch thread.
+     *
+     * @param theArgs command-line arguments (unused)
      */
+    public static void main(final String[] theArgs) {
+        SwingUtilities.invokeLater(DungeonAdventure::showWelcomeScreen);
+    }
+
+    /* ------------------------------------------------------------------
+     * Welcome screen & help
+     * ------------------------------------------------------------------ */
+
     /**
-     * Shows the initial welcome window with New Game / Load Game / Help.
+     * Shows the initial welcome window with:
+     * <ul>
+     *   <li>New Game</li>
+     *   <li>Load Game (currently disabled)</li>
+     *   <li>Help</li>
+     * </ul>
+     * Selecting New Game will close this window and start the setup flow.
      */
     private static void showWelcomeScreen() {
         JFrame frame = new JFrame("Dungeoneer");
@@ -118,7 +209,7 @@ public class DungeonAdventure {
 
         newGameButton.addActionListener(_ -> {
             frame.dispose();   // close the welcome window
-            setupGame();       // existing method
+            setupGame();       // start main game setup
         });
 
         helpButton.addActionListener(_ -> showHelpDialog(frame));
@@ -146,7 +237,10 @@ public class DungeonAdventure {
     }
 
     /**
-     * Pops up the help text window (used from the welcome screen).
+     * Displays a modal help dialog with basic controls and optionally
+     * the Dungeoneer logo.
+     *
+     * @param parent the parent frame to center the dialog on
      */
     private static void showHelpDialog(final JFrame parent) {
         JTextArea area = new JTextArea(HELP_TEXT, 8, 30);
@@ -169,12 +263,20 @@ public class DungeonAdventure {
         );
     }
 
-    /* ---------- Setup ---------- */
+    /* ------------------------------------------------------------------
+     * Game setup
+     * ------------------------------------------------------------------ */
 
+    /**
+     * Performs the game setup sequence:
+     * <ol>
+     *   <li>Prompts the player to choose hero, difficulty, and seed.</li>
+     *   <li>Generates lobby + branch dungeons using deterministic seeds.</li>
+     *   <li>Randomly chooses which branch contains the true OUT exit.</li>
+     *   <li>Creates and shows the main game GUI.</li>
+     * </ol>
+     */
     private static void setupGame() {
-
-        myConsoleView = new ConsoleView();
-        myConsoleView.showMessage("Starting Dungeoneer...");
 
         // Single setup dialog – also sets mySeed & myDifficulty
         myHero = promptHero();
@@ -185,6 +287,10 @@ public class DungeonAdventure {
         southDungeon = DungeonGenerator.generate(new Random(mySeed + 2), myDifficulty, myHero);
         eastDungeon  = DungeonGenerator.generate(new Random(mySeed + 3), myDifficulty, myHero);
 
+        // NOTE: westDungeon could be generated here as well when implemented.
+        // Example (uncomment when ready):
+        // westDungeon = DungeonGenerator.generate(new Random(mySeed + 4), myDifficulty, myHero);
+
         // Randomly choose which branch is the "true exit" dungeon
         char[] dirs = {'N', 'S', 'E', 'W'};
         exitDungeonKey = dirs[new Random(mySeed).nextInt(dirs.length)];
@@ -193,23 +299,25 @@ public class DungeonAdventure {
         currentDungeon = lobbyDungeon;
 
         // Create and show the GUI window
-        myGui = new DungeoneerFrame(currentDungeon, myHero);
+        myGui = new DungeoneerFrame(currentDungeon, myHero, myDifficulty);
         myGui.setVisible(true);
 
         myGui.showMessage("Welcome to Dungeoneer!");
         myGui.showDungeon(currentDungeon);
     }
 
-    /* ---------- Hero setup dialog ---------- */
-
     /**
      * Shows a single setup dialog where the player:
-     *  - chooses a hero class (with sprite)
-     *  - chooses difficulty (1–9)
-     *  - enters hero name
-     *  - optionally provides a dungeon seed
+     * <ul>
+     *   <li>chooses a hero class (with sprite),</li>
+     *   <li>chooses difficulty (1–9),</li>
+     *   <li>enters hero name,</li>
+     *   <li>optionally provides a dungeon seed.</li>
+     * </ul>
+     * This method sets {@link #myDifficulty} and {@link #mySeed} and
+     * returns the newly created {@link Hero}.
      *
-     * Sets myDifficulty and mySeed, and returns the created Hero.
+     * @return the {@link Hero} selected and configured by the player
      */
     private static Hero promptHero() {
 
@@ -240,6 +348,7 @@ public class DungeonAdventure {
         heroGroup.add(thiefButton);
         heroGroup.add(priestessButton);
 
+        // Warrior is the default selection
         warriorButton.setSelected(true);
 
         JPanel warriorPanel = new JPanel(new BorderLayout());
@@ -317,6 +426,7 @@ public class DungeonAdventure {
         );
 
         if (result != JOptionPane.OK_OPTION) {
+            // Player canceled setup → exit the application
             System.exit(0);
         }
 
@@ -337,11 +447,12 @@ public class DungeonAdventure {
             try {
                 mySeed = Long.parseLong(seedInput);
             } catch (NumberFormatException ex) {
+                // Fallback to random if parsing fails
                 mySeed = new Random().nextLong();
             }
         }
 
-        // Create hero
+        // Create hero based on selected class
         Hero hero;
         if (priestessButton.isSelected()) {
             hero = new Priestess(heroName);
@@ -351,17 +462,24 @@ public class DungeonAdventure {
             hero = new Warrior(heroName);
         }
 
-        myConsoleView.showMessage(heroName + " has been created!");
         return hero;
     }
 
-    /* ---------- Door handling from the board ---------- */
+    /* ------------------------------------------------------------------
+     * Door / dungeon transitions
+     * ------------------------------------------------------------------ */
 
     /**
-     * Called by DungeoneerFrame / DungeonBoardPanel when the hero steps onto a
-     * door tile and presses OK in the confirmation dialog.
+     * Called by {@link view.DungeoneerFrame} / {@link view.DungeonBoardPanel}
+     * when the hero steps onto a door tile and confirms entering it.
+     * <p>
+     * This method delegates to {@link #enterBranchDungeon(char)} based
+     * on the door tile direction.
+     * </p>
+     *
+     * @param door the door tile type the hero stepped on
      */
-    public static void handleDoorEvent(DungeonTile door) {
+    public static void handleDoorEvent(final DungeonTile door) {
         switch (door) {
             case DOOR_N -> enterBranchDungeon('N');
             case DOOR_S -> enterBranchDungeon('S');
@@ -370,20 +488,17 @@ public class DungeonAdventure {
             default     -> myGui.showMessage("Unknown door entered.");
         }
     }
-    
-    /** Text shown in the Help window on the welcome screen. */
-    private static final String HELP_TEXT =
-            "Controls:\n"
-          + "W / ↑  -> Move Up\n"
-          + "S / ↓  -> Move Down\n"
-          + "A / ←  -> Move Left\n"
-          + "D / →  -> Move Right\n"
-          + "\n"
-          + "I         -> Inventory / Selections\n"
-          + "ENTER     -> Use Item\n"
-          + "DELETE    -> Drop / Remove Item\n";
 
-    /** Switches currentDungeon to the correct branch and updates the GUI. */
+    /**
+     * Switches {@link #currentDungeon} to the appropriate branch dungeon
+     * based on the given side and updates the GUI.
+     * <p>
+     * Also updates {@link #currentArea} and displays flavor messages,
+     * including a hint if this dungeon contains the true OUT exit.
+     * </p>
+     *
+     * @param side the side/direction: 'N', 'S', 'E', or 'W'
+     */
     private static void enterBranchDungeon(final char side) {
         switch (side) {
             case 'N' -> currentDungeon = northDungeon;
@@ -405,8 +520,16 @@ public class DungeonAdventure {
         myGui.showDungeon(currentDungeon);
     }
 
-    /* ---------- Helpers ---------- */
+    /* ------------------------------------------------------------------
+     * Utility helpers
+     * ------------------------------------------------------------------ */
 
+    /**
+     * Converts a direction character into a user-friendly name.
+     *
+     * @param side direction character ('N', 'S', 'E', 'W')
+     * @return the human-readable direction name, or "?" if unknown
+     */
     private static String directionName(final char side) {
         return switch (side) {
             case 'N' -> "North";
@@ -417,14 +540,26 @@ public class DungeonAdventure {
         };
     }
 
-    /** Loads an image and scales it to the given size (square). */
+    /**
+     * Loads an image from the given path and scales it to a square icon
+     * of the given size using smooth scaling.
+     *
+     * @param path the classpath or file-system path to the image
+     * @param size the width and height in pixels of the scaled icon
+     * @return a scaled {@link ImageIcon}. If loading fails, the icon may be empty.
+     */
     private static ImageIcon loadScaledIcon(final String path, final int size) {
         ImageIcon icon = new ImageIcon(path);
         Image scaled = icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
         return new ImageIcon(scaled);
     }
 
-    /** Returns a text description for a given difficulty value. */
+    /**
+     * Returns a descriptive text label for a given difficulty setting.
+     *
+     * @param diff difficulty value (1–9)
+     * @return a user-friendly description of that difficulty
+     */
     private static String difficultyDescription(final int diff) {
         if (diff <= 2) {
             return diff + " - Beginner. New to Dungeoneer!";
