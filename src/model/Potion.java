@@ -1,77 +1,41 @@
 package model;
 
 /**
- * Represents a general Potion item that can be consumed by the player to produce
- * temporary effects such as healing or enhanced vision. Potions have a base
- * duration and a rarity that modifies the final duration or effect strength.
- * 
- * <p>@author Cristian Acevedo-Villasana
- * 
- * <p>@version 0.0.1
- * 
- * <p>@date 11/16/25
+ * Abstract base class for consumable potion items (healing, vision, etc.).
+ * Potions are stackable in {@link Inventory} and can be consumed via {@link #use()}.
+ *
+ * Potions no longer have rarity – only weapons use {@link Rarity}.
+ *
+ * @author Cristian Acevedo-Villasana
+ * @version 0.0.2
+ * @date 12/04/25
  */
 public abstract class Potion implements Item {
 
-  /** The rarity of this potion (affects duration/strength). */
-  private Rarity myRarity;
+    /**
+     * Applies the actual effect of this potion.
+     * Subclasses implement this (heal, reveal map, etc.).
+     */
+    protected abstract void consume();
 
-  /**
-   * Constructs a Potion with a specified base duration and rarity.
-   * 
-   * <p>@param theDuration the base duration of the potion effect
-   * 
-   * <p>@param theRarity   the rarity of the potion
-   */
-  public Potion(Rarity theRarity) {
-    myRarity = theRarity;
-  }
+    /**
+     * Called when the player uses this item from the inventory.
+     * Default behavior for all potions is to consume them.
+     */
+    @Override
+    public void use() {
+        consume();
+    }
 
-  /**
-   * Returns the rarity bonus for potions (interpreted as extra duration/strength).
-   * COMMON -> 0, UNCOMMON -> 1, RARE -> 2, EPIC -> 3, LEGENDARY -> 4
-   * 
-   * <p>@return the integer duration/strength bonus from rarity
-   */
-  protected int getRarityBonus() {
-    return switch (myRarity) {
-      case COMMON -> 0;
-      case UNCOMMON -> 1;
-      case RARE -> 2;
-      case EPIC -> 3;
-      case LEGENDARY -> 4;
-    };
-  }
+    /**
+     * Each potion subtype must provide a name (e.g. "Healing Potion").
+     */
+    @Override
+    public abstract String getName();
 
-  /**
-   * Returns the rarity of this potion.
-   * 
-   * <p>@return the potion's rarity
-   */
-  public Rarity getRarity() {
-    return myRarity;
-  }
-
-  /**
-   * Subclasses must implement the specific consumption behavior.
-   */
-  public abstract void consume();
-
-  /**
-   * Generic description for a potion. Subclasses may override for more detail.
-   * 
-   * <p>@return a short description of the potion
-   */
-  @Override
-  public String getDescription() {
-    return "Potion (" + myRarity + ")";
-  }
-
-  /**
-   * Default use behavior: call consume() to apply the potion's effect.
-   */
-  @Override
-  public void use() {
-    consume();
-  }
+    /**
+     * Short description shown in inventory / tooltips.
+     */
+    @Override
+    public abstract String getDescription();
 }

@@ -250,11 +250,11 @@ public class DungeonGenerator {
 
         case 1 -> {
             room.setTile(DungeonTile.HEALING_POTION);
-            room.addItem(new HealingPotion(25, Rarity.COMMON));
+            room.addItem(new HealingPotion());
         }
         case 2 -> {
             room.setTile(DungeonTile.VISION_POTION);
-            room.addItem(new VisionPotion(3, Rarity.COMMON));
+            room.addItem(new VisionPotion());
         }
         }
     }

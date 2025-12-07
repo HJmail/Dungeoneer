@@ -10,6 +10,10 @@ public abstract class Hero extends DungeonCharacter {
 
     /** The maximum HP this hero can have. */
     private  int myMaxHitPoints;
+    
+    /** Currently equipped weapon (may be null). */
+    protected Weapon myEquippedWeapon;
+
 
     /**
      * Constructs a Hero with all necessary statistics.
@@ -42,6 +46,7 @@ public abstract class Hero extends DungeonCharacter {
 
         // every hero starts with an inventory, and we tell the inventory who owns it
         myInventory = new Inventory();
+        myEquippedWeapon = null;
         myInventory.setOwner(this);   // <-- IMPORTANT
     }
 
@@ -95,6 +100,37 @@ public abstract class Hero extends DungeonCharacter {
     // This should just assign, not clamp again
     public void setHitPoints(final int theHp) {
         myHitPoints = theHp;
+    }
+    
+    public Weapon getEquippedWeapon() {
+        return myEquippedWeapon;
+    }
+
+    public void equipWeapon(final Weapon theWeapon) {
+        myEquippedWeapon = theWeapon;
+    }
+    
+    /**
+     * Perform a standard attack on a monster.
+     * Uses the equipped weapon’s damage; if none, uses base hero attack.
+     */
+    public String attack(final Monster theMonster) {
+        int baseDamage = (myEquippedWeapon != null)
+            ? myEquippedWeapon.getDamage()
+            : 8; // fallback bare-handed
+
+        // small random ±20% variance
+        double variance = 0.8 + Math.random() * 0.4;
+        int damage = (int) Math.round(baseDamage * variance);
+
+        int newHp = Math.max(0, theMonster.getHitPoints() - damage);
+        theMonster.setHitPoints(newHp);
+
+        return myName + " attacks " + theMonster.getName()
+               + " with " + (myEquippedWeapon != null
+                            ? myEquippedWeapon.getName()
+                            : "bare hands")
+               + " for " + damage + " damage!";
     }
 
     public abstract String specialSkill(DungeonCharacter opponent);

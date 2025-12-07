@@ -1,67 +1,98 @@
 package model;
 
+/**
+ * Enumeration of all possible dungeon tile types used to represent the 2D
+ * dungeon map. Each tile corresponds to a single character symbol used in
+ * ASCII and graphical rendering.
+ *
+ * This enum supports quick lookup from map characters, and serves as a
+ * bridge between textual map representations and game logic.
+ *
+ * Implements Professor’s project requirements:
+ * 
+ *  -Entrance ('i'), Exit ('O')
+ *  -Pits ('X')
+ *  -Healing ('H') and Vision ('V') potions
+ *  -Four Pillars of OO: A, E, I, P
+ *  -Shopkeeper ('S')
+ * 
+ *
+ * @author Cristian Acevedo-Villasana
+ * @version 0.0.3
+ * @date 12/05/25
+ */
 public enum DungeonTile {
 
-    // Basic terrain
+    // ─────────────── Terrain ───────────────
     FLOOR('.'),
     WALL('M'),
 
-    // Doors
+    // ─────────────── Doors ───────────────
     DOOR_N('^'),
     DOOR_S('v'),
     DOOR_E('>'),
     DOOR_W('<'),
 
-    // Entrance & Exit
-    ENTRANCE('E'),
+    // ─────────────── Entry / Exit ───────────────
+    ENTRANCE('i'),
     EXIT('O'),
 
-    // Pit
+    // ─────────────── Hazards ───────────────
     PIT('X'),
 
-    // Items placed on the map
+    // ─────────────── Loot / Items ───────────────
     GOLD('$'),
     HEALING_POTION('H'),
     VISION_POTION('V'),
 
-    // Individual weapon tiles (map file can use '1'–'5')
+    // ─────────────── Weapons ───────────────
     SPEAR('1'),
     FALCHION('2'),
     FLAIL('3'),
     MORNING_STAR('4'),
     STICK('5'),
 
-    // Pillars
+    // ─────────────── Pillars of OO ───────────────
     ABSTRACTION_PILLAR('A'),
-    ENCAPSULATION_PILLAR('C'),   // use 'C' so it doesn't clash with ENTRANCE 'E'
+    ENCAPSULATION_PILLAR('C'),   // ⚠ changed to 'C' (for Encapsulation)
     INHERITANCE_PILLAR('I'),
     POLYMORPHISM_PILLAR('P'),
 
-    // Maze drawing characters
+    // ─────────────── NPC ───────────────
+    SHOPKEEPER('S'),
+
+    // ─────────────── Map Drawing ───────────────
     HORIZONTAL('-'),
     VERTICAL('|'),
     INTERSECTION('+'),
 
-    // Optional: empty/void space
+    // ─────────────── Fallback ───────────────
     VOID(' ');
 
+    /** ASCII symbol representing this tile on the map. */
     private final char symbol;
 
     DungeonTile(final char c) {
-        symbol = c;
+        this.symbol = c;
     }
 
     public char getSymbol() {
         return symbol;
     }
 
-    /** Find a tile by ASCII symbol. */
+    /**
+     * Returns the DungeonTile associated with a given ASCII symbol.
+     * Defaults to FLOOR if no match is found.
+     *
+     * @param c the character symbol to convert
+     * @return corresponding DungeonTile, or FLOOR if none matches
+     */
     public static DungeonTile fromSymbol(final char c) {
         for (DungeonTile t : values()) {
             if (t.symbol == c) {
                 return t;
             }
         }
-        return FLOOR; // default
+        return FLOOR;
     }
 }

@@ -2,7 +2,7 @@ package model;
 
 public class Skeleton extends Monster {
 
-    public Skeleton(String name,
+  public Skeleton(String name,
                     int hitPoints,
                     int minDamage,
                     int maxDamage,
@@ -12,10 +12,10 @@ public class Skeleton extends Monster {
                     int minHeal,
                     int maxHeal) {
 
-        super(name, hitPoints, minDamage, maxDamage,
+    super(name, hitPoints, minDamage, maxDamage,
               attackSpeed, chanceToHit, chanceToHeal,
               minHeal, maxHeal);
 
-        myImagePath = "images/skeleton.png";
-    }
+    myImagePath = "images/skeleton.png";
+  }
 }

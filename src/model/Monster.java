@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Random;
+
 /**
  * Abstract Monster class that extends DungeonCharacter and adds
  * healing behavior specific to all monster types.
@@ -75,4 +77,12 @@ public abstract class Monster extends DungeonCharacter {
 
     public int getMaxHeal() { return myMaxHeal; }
     public void setMaxHeal(int theMaxHeal) { myMaxHeal = theMaxHeal; }
+    
+    public String attack(final Hero theHero) {
+        int damage = new Random().nextInt(myMaxDamage - myMinDamage + 1) + myMinDamage;
+        int newHp = Math.max(0, theHero.getHitPoints() - damage);
+        theHero.setHitPoints(newHp);
+        return myName + " attacks " + theHero.getName() + " for " + damage + " damage!";
+    }
+
 }

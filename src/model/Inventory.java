@@ -38,7 +38,7 @@ public class Inventory {
   private boolean myPillarPolymorphismCollected;
 
   /** The maximum number of each potion type that can be stacked. */
-  private static final int MAX_POTION_STACK = 3;
+  private static final int MAX_POTION_STACK = 6;
 
   /** The maximum total number of items the player can carry. */
   private static final int MAX_ITEMS = 5;
@@ -102,7 +102,7 @@ public class Inventory {
    * pillar it it's false.
    * 
    * <p>Adds an item to the player's inventory.
-   * Potions are stackable (maximum 3 per type). Pillars are tracked individually.
+   * Potions are stackable (maximum 6 per type). Pillars are tracked individually.
    * </p>
    *
    * @param theItem the item to add (must not be null)
@@ -262,6 +262,36 @@ public class Inventory {
   }
   
   /**
+   * Drops (discards) the given item instance.
+   * For potions, this delegates to the type-based drop (stack handling).
+   * For non-stack items (weapons etc.), it removes this exact instance.
+   *
+   * @param theItem the item to drop (must not be null)
+   */
+  public void dropItem(final Item theItem) {
+    if (theItem == null) {
+      throw new IllegalArgumentException("Item cannot be null.");
+    }
+
+    // Don't allow dropping pillars
+    if (theItem instanceof Pillar) {
+      log("You decide not to drop such an important artifact.");
+      return;
+    }
+
+    // Potions are stackable -> let the existing String method handle stacks
+    if (theItem instanceof Potion) {
+      String key = theItem.getClass().getSimpleName(); // "HealingPotion", "VisionPotion", ...
+      dropItem(key);  // calls your existing dropItem(String) logic
+      return;
+    }
+
+    // Non-potion, non-pillar items (weapons, etc.): remove THIS instance
+    myInventory.remove(theItem);
+    log("Dropped " + theItem.getClass().getSimpleName() + ".");
+  }
+  
+  /**
    * Drops (discards) one instance of an item by its simple class name.
    * For potions, only one is removed from the stack. For other items
    * the whole item is removed. Pillars are not dropped.
@@ -367,6 +397,35 @@ public class Inventory {
         && myPillarInheritanceCollected 
         && myPillarPolymorphismCollected; 
   }
+  
+  /**
+   * @return true if the Abstraction pillar has been collected.
+   */
+  public boolean hasAbstractionPillar() {
+    return myPillarAbstractionCollected;
+  }
+
+  /**
+   * @return true if the Encapsulation pillar has been collected.
+   */
+  public boolean hasEncapsulationPillar() {
+    return myPillarEncapsulationCollected;
+  }
+
+  /**
+   * @return true if the Inheritance pillar has been collected.
+   */
+  public boolean hasInheritancePillar() {
+    return myPillarInheritanceCollected;
+  }
+
+  /**
+   * @return true if the Polymorphism pillar has been collected.
+   */
+  public boolean hasPolymorphismPillar() {
+    return myPillarPolymorphismCollected;
+  }
+
 
   /**
    * Returns how many of the four Pillars of OO have been collected.
