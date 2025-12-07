@@ -8,13 +8,18 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
 import model.Dungeon;
 import model.DungeonTile;
 import model.DungeonGenerator;
@@ -30,6 +35,10 @@ import view.DungeoneerFrame;
  * Main controller / entry point for the Dungeoneer game.
  */
 public class DungeonAdventure {
+	
+    /** Main Dungeoneer logo used on the welcome screen. */
+    private static final ImageIcon DUNGEONEER_LOGO =
+            loadScaledIcon("Dungeoneer_Icon.png", 64);
 
     /** The active hero. */
     private static Hero myHero;
@@ -66,7 +75,98 @@ public class DungeonAdventure {
     /* ---------- Main ---------- */
 
     public static void main(final String[] theArgs) {
-        setupGame();
+        SwingUtilities.invokeLater(() -> showWelcomeScreen());
+    }
+    
+    /**
+     * Shows the initial welcome window with New Game / Load Game / Help.
+     */
+    /**
+     * Shows the initial welcome window with New Game / Load Game / Help.
+     */
+    private static void showWelcomeScreen() {
+        JFrame frame = new JFrame("Dungeoneer");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Use logo as the window icon, if it loaded correctly
+        if (DUNGEONEER_LOGO != null) {
+            frame.setIconImage(DUNGEONEER_LOGO.getImage());
+        }
+
+        JPanel root = new JPanel(new BorderLayout(10, 10));
+
+        // Vertical stack: logo, title, buttons
+        JPanel center = new JPanel();
+        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
+
+        // Logo
+        JLabel logoLabel = new JLabel(DUNGEONEER_LOGO);
+        logoLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+
+        // Title
+        JLabel title = new JLabel("Welcome to Dungeoneer!", SwingConstants.CENTER);
+        title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+
+        // Buttons row
+        JPanel buttons = new JPanel();
+        JButton newGameButton = new JButton("New Game");
+        JButton loadGameButton = new JButton("Load Game");
+        JButton helpButton    = new JButton("Help");
+
+        // Load Game is grayed out for now
+        loadGameButton.setEnabled(false);
+
+        newGameButton.addActionListener(_ -> {
+            frame.dispose();   // close the welcome window
+            setupGame();       // existing method
+        });
+
+        helpButton.addActionListener(_ -> showHelpDialog(frame));
+
+        buttons.add(newGameButton);
+        buttons.add(loadGameButton);
+        buttons.add(helpButton);
+        buttons.setAlignmentX(JPanel.CENTER_ALIGNMENT);
+
+        // Build the vertical layout
+        center.add(Box.createVerticalStrut(8));
+        center.add(logoLabel);
+        center.add(Box.createVerticalStrut(4));
+        center.add(title);
+        center.add(Box.createVerticalStrut(8));
+        center.add(buttons);
+        center.add(Box.createVerticalStrut(8));
+
+        root.add(center, BorderLayout.CENTER);
+
+        frame.setContentPane(root);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    /**
+     * Pops up the help text window (used from the welcome screen).
+     */
+    private static void showHelpDialog(final JFrame parent) {
+        JTextArea area = new JTextArea(HELP_TEXT, 8, 30);
+        area.setEditable(false);
+        area.setOpaque(false);
+        area.setFocusable(false);
+
+        // Build a panel with logo on the left and text on the right
+        JPanel panel = new JPanel(new BorderLayout(10, 0));
+        if (DUNGEONEER_LOGO != null) {
+            panel.add(new JLabel(DUNGEONEER_LOGO), BorderLayout.WEST);
+        }
+        panel.add(area, BorderLayout.CENTER);
+
+        JOptionPane.showMessageDialog(
+                parent,
+                panel,
+                "Dungeoneer Help",
+                JOptionPane.PLAIN_MESSAGE   // no default Duke icon
+        );
     }
 
     /* ---------- Setup ---------- */
@@ -169,7 +269,7 @@ public class DungeonAdventure {
         JLabel diffLabel = new JLabel(difficultyDescription(diffSlider.getValue()));
         diffLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        diffSlider.addChangeListener(e ->
+        diffSlider.addChangeListener(_ ->
                 diffLabel.setText(difficultyDescription(diffSlider.getValue())));
 
         JPanel diffPanel = new JPanel(new BorderLayout());
@@ -270,6 +370,18 @@ public class DungeonAdventure {
             default     -> myGui.showMessage("Unknown door entered.");
         }
     }
+    
+    /** Text shown in the Help window on the welcome screen. */
+    private static final String HELP_TEXT =
+            "Controls:\n"
+          + "W / ↑  -> Move Up\n"
+          + "S / ↓  -> Move Down\n"
+          + "A / ←  -> Move Left\n"
+          + "D / →  -> Move Right\n"
+          + "\n"
+          + "I         -> Inventory / Selections\n"
+          + "ENTER     -> Use Item\n"
+          + "DELETE    -> Drop / Remove Item\n";
 
     /** Switches currentDungeon to the correct branch and updates the GUI. */
     private static void enterBranchDungeon(final char side) {

@@ -16,50 +16,55 @@ import model.Gold;
  */
 public class RoomController {
 
-    private final Random myRng = new Random();
+  private final Random myRng = new Random();
 
-    /**
-     * Places loot in the room based on tile type.
-     */
-    public void addLoot(Room theRoom, DungeonTile theTile) {
+  /**
+   * Places loot in the room based on tile type.
+   */
+  public void addLoot(Room theRoom, DungeonTile theTile) {
 
-        switch (theTile) {
+    switch (theTile) {
 
-        case GOLD -> {
-            theRoom.addItem(new Gold(25));  // or any amount you want
-            theRoom.setIsLooted(true);
-        }
+      case GOLD -> {
+        theRoom.addItem(new Gold(25));  // or any amount you want
+        theRoom.setIsLooted(true);
+      }
 
 
-        case HEALING_POTION -> {
-            theRoom.addItem(new HealingPotion(25, Rarity.COMMON));
-            theRoom.setIsLooted(true);
-        }
+      case HEALING_POTION -> {
+        theRoom.addItem(new HealingPotion());
+        theRoom.setIsLooted(true);
+      }
 
-        case VISION_POTION -> {
-            theRoom.addItem(new VisionPotion(3, Rarity.UNCOMMON));
-            theRoom.setIsLooted(true);
-        }
+      case VISION_POTION -> {
+        theRoom.addItem(new VisionPotion());
+        theRoom.setIsLooted(true);
+      }
 
-        // --- Weapon tiles ---
-        case STICK -> {
-            theRoom.addItem(new Weapon("Stick", 8, Rarity.COMMON));
-            theRoom.setIsLooted(true);
-        }
+      // --- Weapon tiles ---
+      case STICK -> {
+        Rarity r = randomRarity();
+          theRoom.addItem(Weapon.createStick(r));
+          theRoom.setIsLooted(true);
+      }
         case SPEAR -> {
-            theRoom.addItem(new Weapon("Spear", 10, Rarity.UNCOMMON));
+            Rarity r = randomRarity();
+            theRoom.addItem(Weapon.createSpear(r));
             theRoom.setIsLooted(true);
         }
         case FALCHION -> {
-            theRoom.addItem(new Weapon("Falchion", 12, Rarity.UNCOMMON));
+            Rarity r = randomRarity();
+            theRoom.addItem(Weapon.createFalchion(r));
             theRoom.setIsLooted(true);
         }
         case FLAIL -> {
-            theRoom.addItem(new Weapon("Flail", 14, Rarity.RARE));
+            Rarity r = randomRarity();
+            theRoom.addItem(Weapon.createFlail(r));
             theRoom.setIsLooted(true);
         }
         case MORNING_STAR -> {
-            theRoom.addItem(new Weapon("Morning Star", 16, Rarity.RARE));
+            Rarity r = randomRarity();
+            theRoom.addItem(Weapon.createMorningStar(r));
             theRoom.setIsLooted(true);
         }
 
