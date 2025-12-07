@@ -274,7 +274,7 @@ public class GuiView implements GameView
 	    JLabel diffLabel = new JLabel(difficultyDescription(diffSlider.getValue()));
 	    diffLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-	    diffSlider.addChangeListener(e ->
+	    diffSlider.addChangeListener(_ ->
 	        diffLabel.setText(difficultyDescription(diffSlider.getValue()))
 	    );
 
@@ -394,4 +394,5 @@ public class GuiView implements GameView
 		
 		return new GameConfig(myHero, difficulty, mySeed);
 	}
+
 }

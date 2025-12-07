@@ -28,7 +28,6 @@ import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 import javax.swing.AbstractAction;
 
-import view.GameView;
 import model.Hero;
 import model.Priestess;
 import model.Thief;
@@ -38,10 +37,9 @@ import model.Item;
 import model.Weapon;
 import model.Pillar;
 import model.Potion;
+import model.Rarity;
 import model.HealingPotion;
 import model.VisionPotion;
-
-import view.CountIcon;
 
 
 /**
@@ -115,6 +113,10 @@ public final class InventoryDialog extends JDialog {
     	
 
         super(owner, "Inventory", true);  // modal dialog
+        
+        setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+        setAlwaysOnTop(true);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         
         if (owner instanceof GameView gv) {
             myGameView = gv;
@@ -403,14 +405,18 @@ public final class InventoryDialog extends JDialog {
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,  0), "invRight");
 
         am.put("invLeft", new AbstractAction() {
-            @Override
+            private static final long serialVersionUID = 1L;
+
+			@Override
             public void actionPerformed(final ActionEvent e) {
                 moveSelection(-1);
             }
         });
 
         am.put("invRight", new AbstractAction() {
-            @Override
+            private static final long serialVersionUID = 1L;
+
+			@Override
             public void actionPerformed(final ActionEvent e) {
                 moveSelection(1);
             }
@@ -419,7 +425,9 @@ public final class InventoryDialog extends JDialog {
         // Enter key to "use" the selected item
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "useSelected");
         am.put("useSelected", new AbstractAction() {
-            @Override
+            private static final long serialVersionUID = 1L;
+
+			@Override
             public void actionPerformed(final ActionEvent e) {
                 useSelectedItem();
             }
@@ -429,7 +437,9 @@ public final class InventoryDialog extends JDialog {
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "dropSelected");
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "dropSelected");
         am.put("dropSelected", new AbstractAction() {
-            @Override
+            private static final long serialVersionUID = 1L;
+
+			@Override
             public void actionPerformed(final ActionEvent e) {
                 dropSelectedItem();
             }
@@ -468,7 +478,6 @@ public final class InventoryDialog extends JDialog {
         } while (idx != start);
     }
     
-    /** Use the currently selected item (for now: potions only). */
     /** Use the currently selected item (for now: potions only). */
     private void useSelectedItem() {
         if (myInventory == null) return;
@@ -525,10 +534,9 @@ public final class InventoryDialog extends JDialog {
             return;
         }
 
-        String key = item.getClass().getSimpleName();  // e.g. "HealingPotion"
-
         try {
-            myInventory.dropItem(key);       // update model (stacks + list)
+            // NEW: drop this specific item
+            myInventory.dropItem(item);
 
             // Refresh HUD in main window (gold / HP / inventory bar)
             if (myGameView != null) {
@@ -538,7 +546,7 @@ public final class InventoryDialog extends JDialog {
             // Refresh the dialog’s own icons and counts
             refreshFromModel();
 
-            myInfoArea.setText("You dropped a " + key + ".");
+            myInfoArea.setText("You dropped " + item.getDescription() + ".");
         } catch (Exception ex) {
             myInfoArea.setText("Could not drop item: " + ex.getMessage());
         }
@@ -567,21 +575,48 @@ public final class InventoryDialog extends JDialog {
         return -1;
     }
 
-    /** Update borders so the selected slot has a blue outline. */
+    /** Update borders so the selected slot has a thicker outline, colored by rarity. */
     private void updateSelectionHighlight() {
         for (int i = 0; i < myItemSlots.length; i++) {
             JLabel slot = myItemSlots[i];
-            if (i == mySelectedIndex && myDisplayedItems[i] != null) {
-                slot.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
+            Item item = myDisplayedItems[i];
+
+            Color baseColor = getRarityColor(item); // rarity color for weapons, gray otherwise
+
+            if (i == mySelectedIndex && item != null) {
+                // Selected item: thicker border in its rarity color
+                slot.setBorder(BorderFactory.createLineBorder(baseColor, 3));
             } else {
-                slot.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+                // Non-selected: thin border in rarity color (or gray)
+                slot.setBorder(BorderFactory.createLineBorder(baseColor, 1));
             }
         }
+    }
+    
+    /**
+     * Returns the color to use for a weapon's rarity.
+     * Common = black, Uncommon = green, Rare = blue, Epic = purple, Legendary = orange.
+     * Non-weapons or null items fall back to a dark gray.
+     */
+    private Color getRarityColor(final Item item) {
+        if (item instanceof Weapon weapon) {
+            Rarity r = weapon.getRarity();
+            return switch (r) {
+                case COMMON    -> Color.BLACK;
+                case UNCOMMON  -> new Color(0, 128, 0);       // green
+                case RARE      -> Color.BLUE;                // blue
+                case EPIC      -> new Color(128, 0, 128);    // purple
+                case LEGENDARY -> new Color(255, 140, 0);    // orange
+            };
+        }
+        // Non-weapons (potions, pillars, empty slots)
+        return Color.DARK_GRAY;
     }
 
     /** Update the bottom info text based on the selected item. */
     private void updateInfoForSelected() {
         if (mySelectedIndex == -1 || myDisplayedItems[mySelectedIndex] == null) {
+            myInfoArea.setForeground(Color.BLACK);
             myInfoArea.setText("Weapon/Potion info will appear here when you select an item.");
             return;
         }
@@ -590,6 +625,13 @@ public final class InventoryDialog extends JDialog {
         String displayName = item.getClass().getSimpleName();
         if (item instanceof Weapon weapon) {
             displayName = weapon.getName();
+        }
+
+        // Color the text by rarity for weapons, default black otherwise
+        if (item instanceof Weapon) {
+            myInfoArea.setForeground(getRarityColor(item));
+        } else {
+            myInfoArea.setForeground(Color.BLACK);
         }
 
         StringBuilder sb = new StringBuilder();
@@ -684,7 +726,9 @@ public final class InventoryDialog extends JDialog {
             .put(KeyStroke.getKeyStroke(KeyEvent.VK_I, 0), "closeInventory");
 
         root.getActionMap().put("closeInventory", new AbstractAction() {
-            @Override
+            private static final long serialVersionUID = 2263944761660594928L;
+
+			@Override
             public void actionPerformed(final ActionEvent e) {
                 dispose();  // closes the dialog
             }

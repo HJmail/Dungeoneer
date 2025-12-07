@@ -4,19 +4,20 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.awt.Image;
-
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,30 +25,28 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import model.Direction;
-
-import javax.swing.ImageIcon;
-
-import model.Inventory;
-import model.Thief;
-import model.Priestess;
-import model.Warrior;
 import model.Dungeon;
-import model.Hero;
-import view.DungeonBoardPanel;
-import model.HealingPotion;
-import model.VisionPotion;
-import model.Weapon;
-import model.Rarity;
 import model.DungeonTile;
+import model.GameConfig;
+import model.Gremlin;
+import model.HealingPotion;
+import model.Hero;
+import model.Inventory;
+import model.Item;
+import model.Monster;
+import model.Ogre;
 import model.Pillar;
 import model.Potion;
-import model.Item;
-import model.GameConfig;
-
-import view.GameView;
-import view.CountIcon;
+import model.Priestess;
+import model.Rarity;
+import model.Skeleton;
+import model.Thief;
+import model.VisionPotion;
+import model.Warrior;
+import model.Weapon;
 
 
 /**
@@ -57,66 +56,74 @@ import view.CountIcon;
  */
 public class DungeoneerFrame extends JFrame implements GameView {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    // Model references
-    private final Dungeon myDungeon;
-    private final Hero myHero;
+  // Model references
+  private final Dungeon myDungeon;
+  private final Hero myHero;
 
-    // HUD components
-    private final JLabel myGoldLabel;
-    private final JProgressBar myHealthBar;
-    private final JLabel myHpLabel;
-    private final JLabel[] myPillarSlots;
-    private final JLabel[] myInventorySlots;
-    private ImageIcon myDeadIcon;
+  // HUD components
+  private final JLabel myGoldLabel;
+  private final JProgressBar myHealthBar;
+  private final JLabel myHpLabel;
+  private final JLabel[] myPillarSlots;
+  private final JLabel[] myInventorySlots;
     
- // --- Cached HUD icons so we don't reload/scale images every time ---
-    private final Icon myHudHealingIcon;
-    private final Icon myHudVisionIcon;
+  /** Random number generator used for item rarities and events. */
+  private final Random myRandom = new Random();
+  private ImageIcon myDeadIcon;
+    
+  // --- Cached HUD icons so we don't reload/scale images every time ---
+  private final Icon myHudHealingIcon;
+  private final Icon myHudVisionIcon;
 
-    // one icon per weapon type
-    private final Icon myHudStickIcon;
-    private final Icon myHudSpearIcon;
-    private final Icon myHudFlailIcon;
-    private final Icon myHudFalchionIcon;
-    private final Icon myHudMorningStarIcon;
+  // one icon per weapon type
+  private final Icon myHudStickIcon;
+  private final Icon myHudSpearIcon;
+  private final Icon myHudFlailIcon;
+  private final Icon myHudFalchionIcon;
+  private final Icon myHudMorningStarIcon;
 
-    private final Icon myHudAbsPillarIcon;
-    private final Icon myHudEncapPillarIcon;
-    private final Icon myHudInherPillarIcon;
-    private final Icon myHudPolyPillarIcon;
+  private final Icon myHudAbsPillarIcon;
+  private final Icon myHudEncapPillarIcon;
+  private final Icon myHudInherPillarIcon;
+  private final Icon myHudPolyPillarIcon;
+    
+  // Portrait icons for dialogs
+  private final Icon myHeroPortraitIcon;
+  private final Icon myShopkeeperIcon;
 
     
- // Track max HP separately so the bar ratio is correct
-    private final int myMaxHitPoints;
-    private boolean myCanMove = true;
+  // Track max HP separately so the bar ratio is correct
+  private final int myMaxHitPoints;
+  private boolean myCanMove = true;
 
+  // Center game area
+  private final DungeonBoardPanel myGamePanel;
 
-    // Center game area
-    private final DungeonBoardPanel myGamePanel;
+  // Text dialog
+  private final JTextArea myLogArea;
+  
+  /** Size (in pixels) of the Dungeoneer logo in the Exit dialog. */
+  private static final int EXIT_DIALOG_ICON_SIZE = 64;
 
-    // Text dialog
-    private final JTextArea myLogArea;
+  public DungeoneerFrame(final Dungeon theDungeon, final Hero theHero) {
+    super("Dungeoneer");
+    myDungeon = theDungeon;
+    myHero = theHero;
+    myMaxHitPoints = myHero.getHitPoints();  // starting HP = max HP
+    myHero.getInventory().setView(this);
 
-    public DungeoneerFrame(final Dungeon theDungeon, final Hero theHero) {
-        super("Dungeoneer");
-        myDungeon = theDungeon;
-        myHero = theHero;
-        myMaxHitPoints = myHero.getHitPoints();  // starting HP = max HP
-        
-        myHero.getInventory().setView(this);
+    // --- HUD top bar ---
+    JPanel hudPanel = new JPanel();
+    hudPanel.setLayout(new BoxLayout(hudPanel, BoxLayout.X_AXIS));
+    hudPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        // --- HUD top bar ---
-        JPanel hudPanel = new JPanel();
-        hudPanel.setLayout(new BoxLayout(hudPanel, BoxLayout.X_AXIS));
-        hudPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        // Gold
-        myGoldLabel = new JLabel("Gold: 0");
-        myGoldLabel.setFont(myGoldLabel.getFont().deriveFont(Font.BOLD, 14f));
-        hudPanel.add(myGoldLabel);
-        hudPanel.add(Box.createHorizontalStrut(20));
+    // Gold
+    myGoldLabel = new JLabel("Gold: 0");
+    myGoldLabel.setFont(myGoldLabel.getFont().deriveFont(Font.BOLD, 14f));
+    hudPanel.add(myGoldLabel);
+    hudPanel.add(Box.createHorizontalStrut(20));
 
         // Health bar + HP label
         JLabel healthTitle = new JLabel("Health: ");
@@ -171,6 +178,17 @@ public class DungeoneerFrame extends JFrame implements GameView {
             heroSpritePath = "Dungeoneer_Characters/warrior_down.png";
             deadSpritePath = "Dungeoneer_Characters/warrior_dead.png";
         }
+        
+        // Hero portrait for dialogs
+        Image heroImg = new ImageIcon(heroSpritePath).getImage()
+                .getScaledInstance(96, 96, Image.SCALE_SMOOTH);
+        myHeroPortraitIcon = new ImageIcon(heroImg);
+
+        // Shopkeeper face icon for dialogs
+        Image shopImg = new ImageIcon("Dungeoneer_NPCs/shopkeeper_down.png")
+                .getImage()
+                .getScaledInstance(96, 96, Image.SCALE_SMOOTH);
+        myShopkeeperIcon = new ImageIcon(shopImg);
 
         // store the icon for the dialog
         myDeadIcon = new ImageIcon(deadSpritePath);
@@ -224,12 +242,81 @@ public class DungeoneerFrame extends JFrame implements GameView {
         pack();
         setResizable(false);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // We want to handle the close ourselves:
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+        // Hook into the close (red X) event
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                confirmExitGame();
+            }
+        });
 
         // Initialize HUD with current hero/dungeon state
         refreshHeroStats();
         refreshDungeonView();
     }
+  
+  /** Ask the player if they want to save before exiting the game window. */
+  private void confirmExitGame() {
+      // Load & scale the Dungeoneer icon
+      ImageIcon icon = null;
+      try {
+          Image img = new ImageIcon("Dungeoneer_Icon.png")
+                  .getImage()
+                  .getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+          icon = new ImageIcon(img);
+      } catch (Exception ignored) {
+          // If the icon fails, we'll just show text only
+      }
+
+      String message = "Do you want to save your progress?";
+      String title   = "Exit Dungeoneer";
+
+      String[] options = {
+          "Cancel",
+          "Exit without saving",
+          "Save and Exit"
+      };
+
+      int choice = JOptionPane.showOptionDialog(
+              this,
+              message,
+              title,
+              JOptionPane.DEFAULT_OPTION,
+              JOptionPane.PLAIN_MESSAGE,
+              icon,
+              options,
+              options[0]       // default = Cancel
+      );
+
+      if (choice == JOptionPane.CLOSED_OPTION || choice == 0) {
+          // Cancel or closed dialog: do nothing, stay in game
+          return;
+      }
+
+      if (choice == 2) { // "Save and Exit"
+          saveGame();    // TODO: real save implementation
+      }
+
+      // Either "Exit without saving" or "Save and Exit"
+      dispose();
+      System.exit(0);
+  }
+  
+  /**
+   * Placeholder for saving the game.
+   * TODO: hook this into your real save system.
+   */
+  private void saveGame() {
+      // For now, just log to console or show a small message.
+      System.out.println("Saving game... (not implemented yet)");
+      // You could also show a quick dialog:
+      // JOptionPane.showMessageDialog(this, "Game saved (stub).");
+  }
+
     
     private void setupControls() {
         myGamePanel.setFocusable(true);
@@ -248,6 +335,11 @@ public class DungeoneerFrame extends JFrame implements GameView {
                 int dy = 0;
 
                 switch (e.getKeyCode()) {
+                
+                case KeyEvent.VK_C -> {
+                    testCombatDialog();
+                    return;
+                }
                     case KeyEvent.VK_I -> {
                         // Show inventory popup
                         showInventoryDialog();
@@ -271,6 +363,12 @@ public class DungeoneerFrame extends JFrame implements GameView {
                 if (dx != 0 || dy != 0) {
                     int oldX = myGamePanel.getHeroX();
                     int oldY = myGamePanel.getHeroY();
+                    
+                    // First: if we're trying to walk INTO the shopkeeper, open the dialog instead
+                    if (myGamePanel.isShopkeeperAt(oldX + dx, oldY + dy)) {
+                        checkShopkeeperInteraction(dx, dy);
+                        return; // don't move onto the NPC tile
+                    }
 
                     myGamePanel.moveHero(dx, dy);
 
@@ -304,8 +402,7 @@ public class DungeoneerFrame extends JFrame implements GameView {
                                         + damage + " damage! HP now: " + myHero.getHitPoints());
                         }
                     }
-
-                    // --- Item / pillar pickups (only if we’re still alive) ---
+                    
                  // --- Item / pillar pickups (only if we’re still alive) ---
                     DungeonTile tile = myGamePanel.getTileUnderHero();
 
@@ -319,7 +416,7 @@ public class DungeoneerFrame extends JFrame implements GameView {
 
                     case HEALING_POTION -> {
                         boolean added = myHero.getInventory().addItem(
-                                new HealingPotion(25, Rarity.COMMON));
+                                new HealingPotion());
 
                         if (added) {
                             myGamePanel.clearTileUnderHero();
@@ -332,7 +429,7 @@ public class DungeoneerFrame extends JFrame implements GameView {
 
                     case VISION_POTION -> {
                         boolean added = myHero.getInventory().addItem(
-                                new VisionPotion(3, Rarity.COMMON));
+                                new VisionPotion());
 
                         if (added) {
                             myGamePanel.clearTileUnderHero();
@@ -345,20 +442,25 @@ public class DungeoneerFrame extends JFrame implements GameView {
 
                     // any weapon tile (1–5 in the map)
                     case SPEAR, FALCHION, FLAIL, MORNING_STAR, STICK -> {
+                        Rarity rarity = randomRarity();  // new helper in this class
+
                         Weapon weapon = switch (tile) {
-                            case SPEAR        -> new Weapon("Spear",        10, Rarity.COMMON);
-                            case FALCHION     -> new Weapon("Falchion",     12, Rarity.COMMON);
-                            case FLAIL        -> new Weapon("Flail",        14, Rarity.COMMON);
-                            case MORNING_STAR -> new Weapon("Morning Star", 16, Rarity.COMMON);
-                            case STICK        -> new Weapon("Stick",         8, Rarity.COMMON);
-                            default           -> new Weapon("Rusty Sword", 10, Rarity.COMMON);
+                            case SPEAR        -> Weapon.createSpear(rarity);
+                            case FALCHION     -> Weapon.createFalchion(rarity);
+                            case FLAIL        -> Weapon.createFlail(rarity);
+                            case MORNING_STAR -> Weapon.createMorningStar(rarity);
+                            case STICK        -> Weapon.createStick(rarity);
+                            default           -> new Weapon("Rusty Sword", 10, rarity);
                         };
 
                         boolean added = myHero.getInventory().addItem(weapon);
 
                         if (added) {
+                            myHero.equipWeapon(weapon);
                             myGamePanel.clearTileUnderHero();
-                            showMessage("You picked up a " + weapon.getName() + "!");
+                            showMessage("You picked up a " 
+                                        + weapon.getRarity() + " " + weapon.getName()
+                                        + " (Damage " + weapon.getDamage() + ")!");
                             refreshHudFromInventory();
                         } else {
                             showMessage("Your inventory is full. You leave the "
@@ -409,6 +511,10 @@ public class DungeoneerFrame extends JFrame implements GameView {
                             showMessage("You already carry all the pillars you need.");
                         }
                     }
+                    
+                    case EXIT -> {
+                        handleExitTile();
+                    }
 
                     default -> {
                         // nothing special on this tile
@@ -418,6 +524,130 @@ public class DungeoneerFrame extends JFrame implements GameView {
               } // end if dx/dy != 0
             }     // end keyPressed
         });        // end addKeyListener
+    }
+
+
+    /**
+     * Called whenever the hero steps onto the Exit tile.
+     * Shows a win dialog if all four Pillars are collected,
+     * otherwise lists which pillars remain – with 4 pillar slots.
+     */
+    private void handleExitTile() {
+        Inventory inv = myHero.getInventory();
+        if (inv == null) {
+            return;
+        }
+
+        // ---------------- Shared UI pieces ----------------
+        // Dungeoneer icon on the left
+        JLabel iconLabel = null;
+        try {
+            Image img = new ImageIcon("Dungeoneer_Icon.png")
+                    .getImage()
+                    .getScaledInstance(EXIT_DIALOG_ICON_SIZE,
+                                       EXIT_DIALOG_ICON_SIZE,
+                                       Image.SCALE_SMOOTH);
+            iconLabel = new JLabel(new ImageIcon(img));
+        } catch (Exception ignored) {
+            // If it fails, we'll just skip the icon
+        }
+
+        // Build the row of 4 pillar slots (same look as HUD)
+        JPanel pillarsRow = new JPanel();
+        pillarsRow.setLayout(new BoxLayout(pillarsRow, BoxLayout.X_AXIS));
+        pillarsRow.add(new JLabel("Pillars: "));
+        pillarsRow.add(Box.createHorizontalStrut(5));
+
+        addPillarSlot(pillarsRow, inv.hasAbstractionPillar(),   myHudAbsPillarIcon);
+        addPillarSlot(pillarsRow, inv.hasEncapsulationPillar(), myHudEncapPillarIcon);
+        addPillarSlot(pillarsRow, inv.hasInheritancePillar(),   myHudInherPillarIcon);
+        addPillarSlot(pillarsRow, inv.hasPolymorphismPillar(),  myHudPolyPillarIcon);
+
+        // ---------------- Winning vs locked text ----------------
+        boolean hasAll = inv.canExit();
+
+        String text;
+        String title;
+        if (hasAll) {
+            text =
+                "You step onto the Exit carrying all four Pillars of OO!\n"
+              + "The magical barrier fades and the way out opens.\n\n"
+              + "Congratulations, " + myHero.getName() + " you escaped the dungeon!";
+            title = "You Win!";
+        } else {
+            int collected = inv.getCollectedPillarsCount();
+            text =
+                "A shimmering barrier blocks your path...\n"
+              + "You must collect all four Pillars of OO to leave!\n\n"
+              + "Pillars collected: " + collected + "/4";
+            title = "Exit Locked";
+        }
+
+     // Use fixed rows/columns so the dialog packs at a nice size
+        JTextArea textArea = new JTextArea(5, 28);
+        textArea.setText(text);
+        textArea.setEditable(false);
+        textArea.setOpaque(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+
+        // Main panel: icon on the left, text in center, pillar slots below
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.add(textArea);
+        centerPanel.add(Box.createVerticalStrut(10));
+        centerPanel.add(pillarsRow);
+
+        JPanel root = new JPanel(new BorderLayout(10, 10));
+        if (iconLabel != null) {
+            root.add(iconLabel, BorderLayout.WEST);
+        }
+        root.add(centerPanel, BorderLayout.CENTER);
+
+        JOptionPane optionPane = new JOptionPane(
+                root,
+                JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.DEFAULT_OPTION
+        );
+
+        // Build a pinned dialog from the option pane
+        JDialog dialog = optionPane.createDialog(this, title);
+        dialog.setModal(true);
+        dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+        dialog.setAlwaysOnTop(true);
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+
+        dialog.setVisible(true);  // blocks until the player clicks OK/close
+
+        // If all pillars collected, end the game after showing dialog
+        if (hasAll) {
+            gameOver();
+        } else {
+            //  Still playing: restore focus so movement works immediately
+            refocusGamePanel();
+        }
+    }
+    
+    /**
+     * Adds a single pillar slot to the given panel.
+     * If the pillar is found, shows the pillar icon.
+     * If missing, shows an empty bordered slot.
+     */
+    private void addPillarSlot(final JPanel parent,
+                               final boolean found,
+                               final Icon pillarIcon) {
+
+        JLabel slot = createSquareSlot();   // same size / border as HUD slots
+
+        if (found && pillarIcon != null) {
+            slot.setIcon(pillarIcon);
+        } else {
+            // keep it empty; the border + empty slot visually means "missing"
+            slot.setIcon(null);
+        }
+
+        parent.add(slot);
+        parent.add(Box.createHorizontalStrut(3));
     }
     
  // default HUD size 24x24
@@ -435,6 +665,69 @@ public class DungeoneerFrame extends JFrame implements GameView {
         label.setVerticalAlignment(JLabel.CENTER);
         label.setOpaque(false); // key: no filled background
         return label;
+    }
+    
+    private void checkShopkeeperInteraction(final int dx, final int dy) {
+        int heroX = myGamePanel.getHeroX();
+        int heroY = myGamePanel.getHeroY();
+        int targetX = heroX + dx;
+        int targetY = heroY + dy;
+
+        // Only trigger if the tile we're trying to walk into IS the shopkeeper
+        if (!myGamePanel.isShopkeeperAt(targetX, targetY)) {
+            return;
+        }
+
+        // Face hero toward that direction (without moving)
+        myGamePanel.faceHeroTowards(dx, dy);
+        myGamePanel.updateShopkeeperFacing();
+
+        // --- pinned confirm dialog using JOptionPane ---
+        JOptionPane pane = new JOptionPane(
+                "Do you want to interact with the shopkeeper?",
+                JOptionPane.QUESTION_MESSAGE,
+                JOptionPane.YES_NO_OPTION,
+                myShopkeeperIcon
+        );
+
+        JDialog dialog = pane.createDialog(this, "Shopkeeper");
+        dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+        dialog.setAlwaysOnTop(true);
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setResizable(false);
+        dialog.setVisible(true);   // blocks here until Yes/No is clicked
+
+        Object value = pane.getValue();
+        int choice = (value instanceof Integer)
+                ? (Integer) value
+                : JOptionPane.CLOSED_OPTION;
+
+        if (choice == JOptionPane.YES_OPTION) {
+            // Open the full shop GUI
+            ShopDialog shopDialog = new ShopDialog(
+                    this,
+                    myHero,
+                    myHeroPortraitIcon,
+                    myShopkeeperIcon
+            );
+            shopDialog.setLocationRelativeTo(this);
+            shopDialog.setVisible(true);     // blocks until closed
+
+            // After shop closes, refresh HUD
+            refreshHeroStats();
+            myGamePanel.repaint();
+            refocusGamePanel();
+        }
+    }
+  
+    /** Random rarity helper for weapons picked up on the map. */
+    private Rarity randomRarity() {
+        int roll = myRandom.nextInt(100); // or new Random() if you prefer
+        if (roll < 50) return Rarity.COMMON;
+        if (roll < 80) return Rarity.UNCOMMON;
+        if (roll < 95) return Rarity.RARE;
+        if (roll < 98) return Rarity.EPIC; 
+        return Rarity.LEGENDARY;
     }
 
     // --- GameView interface methods ---
@@ -461,7 +754,7 @@ public class DungeoneerFrame extends JFrame implements GameView {
         refreshInventoryHUD();
     }
 
-    private void refreshHeroStats() {
+    public void refreshHeroStats() {
         int currentHp = myHero.getHitPoints();
         int maxHp = myMaxHitPoints;
 
@@ -507,8 +800,7 @@ public class DungeoneerFrame extends JFrame implements GameView {
             }
         }
     }
-    
-    /** Updates the top HUD inventory slots (right side) with non-pillar items. */
+
     /** Updates the top HUD inventory slots (right side) with non-pillar items. */
     private void refreshInventoryHUD() {
         Inventory inv = myHero.getInventory();
@@ -562,16 +854,29 @@ public class DungeoneerFrame extends JFrame implements GameView {
         }
     }
     
+    /** 
+     * Ensures the dungeon board has keyboard focus after a dialog closes.
+     */
+    private void refocusGamePanel() {
+        SwingUtilities.invokeLater(() -> {
+            if (myGamePanel != null) {
+                myGamePanel.requestFocusInWindow();
+                myGamePanel.grabFocus();
+            }
+        });
+    }
+    
     /**
      * Shows a simple inventory popup.
      * For now it just displays the hero's gold; later we can
      * list real items from the Inventory model.
      */
-
     private void showInventoryDialog() {
         InventoryDialog dialog =
             new InventoryDialog(this, myHero, myHero.getInventory());
         dialog.setVisible(true);  // blocks until closed
+        
+        refocusGamePanel();
     }
 
     private void refreshDungeonView() {
@@ -579,26 +884,50 @@ public class DungeoneerFrame extends JFrame implements GameView {
         // For now we do nothing here.
     }
     
-    private void handlePlayerDeath() {
+    /** Shows a pinned Respawn/Exit dialog and returns 0=Respawn, 1=Exit. */
+    private int showPinnedDeathDialog(final String message) {
+        String[] options = {"Respawn", "Exit"};
+
+        JOptionPane pane = new JOptionPane(
+                message,
+                JOptionPane.INFORMATION_MESSAGE,
+                JOptionPane.DEFAULT_OPTION,
+                myDeadIcon,
+                options,
+                options[0]
+        );
+
+        JDialog dialog = pane.createDialog(this, "You Died");
+        dialog.setModalityType(JDialog.ModalityType.APPLICATION_MODAL);
+        dialog.setAlwaysOnTop(true);
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setResizable(false);
+        dialog.setVisible(true);  // blocks until a button is clicked
+
+        Object value = pane.getValue();
+        int choice = 1; // default to "Exit" just in case
+
+        if (value != null) {
+            for (int i = 0; i < options.length; i++) {
+                if (options[i].equals(value)) {
+                    choice = i;
+                    break;
+                }
+            }
+        }
+        return choice; // 0 = Respawn, 1 = Exit
+    }
+
+    
+    public void handlePlayerDeath() {
         myCanMove = false;  // stop further movement
         myGamePanel.setHeroDead(true);  // show dead sprite on the board
 
         String message = myHero.getName()
                 + " has fallen into a pit and died.\n"
                 + "You will respawn at the entrance or you can exit the dungeon.";
-
-        String[] options = {"Respawn", "Exit"};
-
-        int choice = JOptionPane.showOptionDialog(
-                this,
-                message,
-                "You Died",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.INFORMATION_MESSAGE,
-                myDeadIcon,     // <-- class-specific dead icon
-                options,
-                options[0]
-        );
+        
+        int choice = showPinnedDeathDialog(message);  // <-- use helper
 
         if (choice == 0) { // Respawn
             myHero.setHitPoints(myMaxHitPoints);
@@ -614,6 +943,34 @@ public class DungeoneerFrame extends JFrame implements GameView {
             System.exit(0);
         }
     }
+    
+ // Called ONLY when hero dies in combat
+    public void handleHeroDeathFromCombat(final String killerName) {
+        myCanMove = false;
+        myGamePanel.setHeroDead(true);
+
+        String message = myHero.getName()
+                + " was slain by " + killerName + ".\n"
+                + "You will respawn at the entrance or you can exit the dungeon.";
+        
+        int choice = showPinnedDeathDialog(message);  // <-- use helper
+
+        if (choice == 0) { // Respawn
+            myHero.setHitPoints(myMaxHitPoints);
+            refreshHeroStats();
+
+            myGamePanel.resetHeroToEntrance();
+            myGamePanel.setHeroDead(false);
+
+            showMessage("You respawn at the dungeon entrance.");
+            myCanMove = true;
+        } else {
+            dispose();
+            System.exit(0);
+        }
+    }
+    
+
     
  // === HUD helper methods ============================================
 
@@ -755,16 +1112,100 @@ public class DungeoneerFrame extends JFrame implements GameView {
      };
  }
 
- @Override
  public void gameOver() {
-     JOptionPane.showMessageDialog(
-             this,
-             "Game Over! You have either died or exited the dungeon.",
-             "Game Over",
-             JOptionPane.INFORMATION_MESSAGE
-     );
-     dispose();
-     System.exit(0);
- }
-   
+	    // Load and scale the Dungeoneer icon for the dialog
+	    ImageIcon icon = null;
+	    try {
+	        Image img = new ImageIcon("Dungeoneer_Icon.png")
+	                .getImage()
+	                .getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+	        icon = new ImageIcon(img);
+	    } catch (Exception ignored) {
+	        // If loading fails, we'll just show the text without a custom icon
+	    }
+
+	    String message = "Game Over! Thanks for playing!";
+
+	    if (icon != null) {
+	        JOptionPane.showMessageDialog(
+	                this,
+	                message,
+	                "Game Over",
+	                JOptionPane.PLAIN_MESSAGE,  // no Duke icon
+	                icon
+	        );
+	    } else {
+	        JOptionPane.showMessageDialog(
+	                this,
+	                message,
+	                "Game Over",
+	                JOptionPane.PLAIN_MESSAGE
+	        );
+	    }
+
+	    dispose();
+	    System.exit(0);
+	}
+ 
+   private List<Monster> createRandomMonsters() {
+	    Random rand = new Random();
+	    int count = 1 + rand.nextInt(3); // 1–3 monsters
+
+	    List<Monster> list = new java.util.ArrayList<>();
+
+	    for (int i = 0; i < count; i++) {
+	        int which = rand.nextInt(3); // 0=Gremlin, 1=Ogre, 2=Skeleton
+	        Monster m;
+	        switch (which) {
+	            case 0 -> m = new Gremlin(
+	                    "Gremlin",
+	                    70,   // hp
+	                    15,   // min dmg
+	                    30,   // max dmg
+	                    4,    // attack speed
+	                    0.8,  // chance to hit
+	                    0.4,  // chance to heal
+	                    20,   // min heal
+	                    40    // max heal
+	            );
+	            case 1 -> m = new Ogre(
+	                    "Ogre",
+	                    120,
+	                    25,
+	                    45,
+	                    3,
+	                    0.7,
+	                    0.3,
+	                    30,
+	                    50
+	            );
+	            default -> m = new Skeleton(
+	                    "Skeleton",
+	                    60,
+	                    10,
+	                    20,
+	                    5,
+	                    0.75,
+	                    0.25,
+	                    15,
+	                    30
+	            );
+	        }
+	        list.add(m);
+	    }
+	    return list;
+	}
+
+   private void testCombatDialog() {
+	    List<Monster> monsters = createRandomMonsters();
+
+	    CombatDialog dialog = new CombatDialog(this, myHero, monsters);
+	    dialog.setVisible(true);   // <-- blocks until player closes the battle window
+
+	    // ===== After combat: sync HUD with current hero + inventory state =====
+	    refreshHeroStats();        // updates HP bar, gold, pillars, inventory icons
+	    refreshDungeonView();      // optional: redraw board if needed
+	    myGamePanel.repaint();     // extra-safe repaint of the tile panel
+	    refocusGamePanel();
+	}
 }

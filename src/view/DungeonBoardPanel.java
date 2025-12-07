@@ -45,9 +45,15 @@ import model.DungeonTile;
         // Where to draw the hero
         private int myHeroX;
         private int myHeroY;
-        
+
         private int myEntranceX;
         private int myEntranceY;
+
+        private int myShopX = -1;
+        private int myShopY = -1;
+        private Facing myShopFacing = Facing.DOWN;
+        private final Map<Facing, Image> myShopImages =
+                new EnumMap<>(Facing.class);
 
         // Tile images
         private final Map<DungeonTile, Image> myTileImages = new HashMap<>();
@@ -57,6 +63,7 @@ import model.DungeonTile;
 
         	loadHeroImages(heroSpritePath);
         	myDeadHeroImage = new ImageIcon(deadSpritePath).getImage();
+        	loadShopkeeperImages();
         	
             // read the ASCII map
             try (Scanner in = new Scanner(new File(MAP_FILE))) {
@@ -117,6 +124,23 @@ import model.DungeonTile;
             }
             myHeroImages.put(facing, img);
         }
+        
+        /** Load shopkeeper sprites for each direction. */
+        private void loadShopkeeperImages() {
+            String base = "Dungeoneer_NPCs/";  // <-- make sure this folder name matches your project
+
+            Image down  = new ImageIcon(base + "shopkeeper_down.png").getImage();
+            Image up    = new ImageIcon(base + "shopkeeper_up.png").getImage();
+            Image left  = new ImageIcon(base + "shopkeeper_left.png").getImage();
+            Image right = new ImageIcon(base + "shopkeeper_right.png").getImage();
+
+            System.out.println("shop_down width = " + down.getWidth(null)); // debug
+
+            myShopImages.put(Facing.DOWN,  down);
+            myShopImages.put(Facing.UP,    up);
+            myShopImages.put(Facing.LEFT,  left);
+            myShopImages.put(Facing.RIGHT, right);
+        }
 
         /** Reads the grid layout (same format as the demo's city_map1.txt). */
         private void readGrid(final Scanner in) {
@@ -134,19 +158,22 @@ import model.DungeonTile;
                     myGrid[r][c] = tile;
 
                     if (tile == DungeonTile.ENTRANCE) {
-                        // Entrance tile: put hero there
                         myHeroY = r;
                         myHeroX = c;
-                        
-                     // Remember entrance for respawn
+
                         myEntranceY = r;
                         myEntranceX = c;
+                        
+                    } else if (tile == DungeonTile.SHOPKEEPER) {
+                            myShopY = r;
+                            myShopX = c;
+                            System.out.println("Shopkeeper at (" + myShopX + ", " + myShopY + ")"); // debug
+
                     }
                 }
             }
         }
 
-        /** Map ASCII chars (from city_map1.txt) to tile types. */
         /** Map ASCII chars (from city_map1.txt) to tile types. */
         private DungeonTile convertASCII(final char ch) {
             return switch (ch) {
@@ -156,7 +183,7 @@ import model.DungeonTile;
                 case '|' -> DungeonTile.VERTICAL;
                 case '+' -> DungeonTile.INTERSECTION;
                 case 'X' -> DungeonTile.PIT;
-                case 'E' -> DungeonTile.ENTRANCE;
+                case 'i' -> DungeonTile.ENTRANCE;
                 case 'O' -> DungeonTile.EXIT;
                 case '^' -> DungeonTile.DOOR_N;
                 case 'v' -> DungeonTile.DOOR_S;
@@ -178,9 +205,11 @@ import model.DungeonTile;
 
                 // pillars  (match your city_map1.txt: A, N, I, P)
                 case 'A' -> DungeonTile.ABSTRACTION_PILLAR;
-                case 'N' -> DungeonTile.ENCAPSULATION_PILLAR;  // N for eNcapsulation
+                case 'E' -> DungeonTile.ENCAPSULATION_PILLAR;  // N for eNcapsulation
                 case 'I' -> DungeonTile.INHERITANCE_PILLAR;
                 case 'P' -> DungeonTile.POLYMORPHISM_PILLAR;
+                
+                case 'S' -> DungeonTile.SHOPKEEPER;
 
                 default -> DungeonTile.FLOOR;
             };
@@ -261,7 +290,8 @@ import model.DungeonTile;
                     if (isItemTile(tile)
                             || tile == DungeonTile.HORIZONTAL
                             || tile == DungeonTile.VERTICAL
-                            || tile == DungeonTile.INTERSECTION) {
+                            || tile == DungeonTile.INTERSECTION
+                    	    || tile == DungeonTile.SHOPKEEPER) {
                         baseImg = myTileImages.get(DungeonTile.FLOOR);
                     } else {
                         baseImg = myTileImages.get(tile);
@@ -287,16 +317,27 @@ import model.DungeonTile;
                                          TILE_SIZE,
                                          TILE_SIZE,
                                          this);
-                            // If you want a smaller inset, use:
-                            // int off = 6, size = TILE_SIZE - 2 * off;
-                            // g2.drawImage(itemImg,
-                            //              c * TILE_SIZE + off,
-                            //              r * TILE_SIZE + off,
-                            //              size, size, this);
                         }
                     }
                 }
             }
+            
+            // --- 2) Shopkeeper sprite (on top of tiles/items) ---
+            if (myShopX >= 0 && myShopY >= 0) {
+                Image shopImg = myShopImages.get(myShopFacing);
+                if (shopImg == null) {
+                    shopImg = myShopImages.get(Facing.DOWN);
+                }
+                if (shopImg != null) {
+                    g2.drawImage(shopImg,
+                                 myShopX * TILE_SIZE,
+                                 myShopY * TILE_SIZE,
+                                 TILE_SIZE,
+                                 TILE_SIZE,
+                                 this);
+                }
+            }
+            
 
             // --- 2) Hero sprite on top ---
             Image heroImg;
@@ -329,7 +370,7 @@ import model.DungeonTile;
             }
 
             DungeonTile target = myGrid[newY][newX];
-            if (target == DungeonTile.WALL) {
+            if (target == DungeonTile.WALL || target == DungeonTile.SHOPKEEPER) {
                 return;
             }
 
@@ -346,7 +387,37 @@ import model.DungeonTile;
 
             myHeroX = newX;
             myHeroY = newY;
+
+            updateShopkeeperFacing();
             repaint();
+        }
+
+        
+        /** Make the shopkeeper face the hero when the hero is next to (or on) the shop tile. */
+        public void updateShopkeeperFacing() {
+            if (myShopX < 0 || myShopY < 0) {
+                return; // no shopkeeper on this map
+            }
+
+            int dx = myHeroX - myShopX;
+            int dy = myHeroY - myShopY;
+            int manhattan = Math.abs(dx) + Math.abs(dy);
+
+            if (manhattan == 1 || (dx == 0 && dy == 0)) {
+                // Hero is adjacent or on the same tile: face toward the hero
+                if (dx > 0) {
+                    myShopFacing = Facing.RIGHT; // hero is to the right
+                } else if (dx < 0) {
+                    myShopFacing = Facing.LEFT;  // hero is to the left
+                } else if (dy > 0) {
+                    myShopFacing = Facing.DOWN;  // hero is below
+                } else if (dy < 0) {
+                    myShopFacing = Facing.UP;    // hero is above
+                }
+            } else {
+                // Hero far away: default idle direction
+                myShopFacing = Facing.DOWN;
+            }
         }
         
      // In DungeonBoardPanel
@@ -374,7 +445,8 @@ import model.DungeonTile;
         public void resetHeroToEntrance() {
             myHeroX = myEntranceX;
             myHeroY = myEntranceY;
-            myFacing = Facing.DOWN; // or whatever default you like
+            myFacing = Facing.DOWN;
+            updateShopkeeperFacing();
             repaint();
         }
 
@@ -403,6 +475,31 @@ import model.DungeonTile;
 
         // === NEW: helper methods your DungeoneerFrame is calling ===
 
+        public boolean isHeroNextToShopkeeper() {
+            if (myShopX < 0 || myShopY < 0) return false;
+            int dx = Math.abs(myHeroX - myShopX);
+            int dy = Math.abs(myHeroY - myShopY);
+            return dx + dy == 1; // exactly one tile away
+        }
+        
+        public boolean isShopkeeperAt(final int x, final int y) {
+            return myShopX == x && myShopY == y;
+        }
+
+        /** Let outside code turn the hero without moving. */
+        public void faceHeroTowards(final int dx, final int dy) {
+            if (dx > 0) {
+                myFacing = Facing.RIGHT;
+            } else if (dx < 0) {
+                myFacing = Facing.LEFT;
+            } else if (dy > 0) {
+                myFacing = Facing.DOWN;
+            } else if (dy < 0) {
+                myFacing = Facing.UP;
+            }
+            repaint();
+        }
+        
         public boolean isHeroOnGold() {
             return myGrid[myHeroY][myHeroX] == DungeonTile.GOLD;
         }
