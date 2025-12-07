@@ -1,8 +1,11 @@
 package model;
 
-public class MonsterData {
+import java.io.Serializable;
 
-    public String myName;
+public class MonsterData implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+	public String myName;
     public int myHitPoints;
     public int myMinDamage;
     public int myMaxDamage;

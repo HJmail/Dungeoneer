@@ -43,9 +43,11 @@ public class VisionPotion extends Potion {
    */
   @Override
   public void consume() {
-    System.out.println("You used a Vision Potion. You can now see hidden parts of the"
-        + " dungeon for " + getDuration() + " turns!");
+      System.out.println("You used a Vision Potion.");
+      // Vision revealing logic happens in Inventory.useItem()
   }
+
+
 
   /**
    * Provides a short description of this Vision Potion item.

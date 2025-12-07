@@ -182,6 +182,24 @@ public class Dungeon
 		return new Point(myStartLocation);
 	}
 	
+	public void revealSurroundingRooms() {
+	    int row = myHeroRoomLocation.x;
+	    int col = myHeroRoomLocation.y;
+
+	    // Check all surrounding room positions
+	    for (int r = row - 1; r <= row + 1; r++) {
+	        for (int c = col - 1; c <= col + 1; c++) {
+
+	            // Skip out-of-bounds
+	            if (r < 0 || r >= myRows || c < 0 || c >= myCols) continue;
+
+	            Room room = myMaze[r][c];
+	            room.setVisability(true);  // Skyler already uses this flag
+	        }
+	    }
+	}
+
+	
 	/**
 	 * This gets the number of rows.
 	 * @return The number of rows
